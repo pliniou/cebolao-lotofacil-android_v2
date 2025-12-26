@@ -64,6 +64,7 @@ import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Shapes
 import com.cebolao.lotofacil.viewmodels.CheckerUiState
 import com.cebolao.lotofacil.viewmodels.CheckerViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -330,7 +331,7 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
     ) {
         when (state) {
             is CheckerUiState.Success -> {
-                // Termômetro de Qualidade (Agora dentro da seção de resultados)
+                // Termômetro de Qualidade
                 gameScore?.let { score ->
                     GameQualityCard(
                         score = score,
@@ -359,9 +360,30 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
                     projection = state.report.financialMetrics
                 )
                 
-                // CheckResult Card (convertido de CheckReport)
+                // CheckResult Card
                 CheckResultCard(state.report.toCheckResult())
-                SimpleStatsCard(state.simpleStats)
+                
+                // Stats Card with explicit mapping
+                val metrics = state.gameMetrics
+                val statsList = remember(metrics) {
+                    kotlinx.collections.immutable.persistentListOf(
+                        R.string.stat_sum to metrics.sum,
+                        R.string.stat_evens to metrics.evens,
+                        R.string.stat_primes to metrics.primes,
+                        R.string.stat_frame to metrics.frame,
+                        R.string.stat_fibonacci to metrics.fibonacci,
+                        R.string.stat_repeated to metrics.repeated,
+                        R.string.stat_sequences to metrics.sequences,
+                        R.string.stat_quadrants to metrics.quadrants
+                    )
+                }
+                
+                // Converting ResId keys to String for the generic card
+                val resolvedStats = statsList.map { (key, value) ->
+                    stringResource(key) to value.toString()
+                }.toImmutableList()
+
+                SimpleStatsCard(resolvedStats)
             }
 
             is CheckerUiState.Loading -> {
@@ -387,7 +409,7 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
 
             is CheckerUiState.Error -> {
                 MessageState(
-                    icon = AppIcons.Success,
+                    icon = AppIcons.Success, // Placeholder icon
                     title = stringResource(R.string.general_error_title),
                     message = stringResource(state.messageResId),
                     iconTint = MaterialTheme.colorScheme.error

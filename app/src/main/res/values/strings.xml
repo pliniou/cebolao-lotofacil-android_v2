@@ -204,12 +204,19 @@
     <string name="widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
     <!-- Presets -->
     <string name="preset_standard">Padrão</string>
+    <string name="preset_standard_desc">Estratégia mais comum, seguindo a média histórica da maioria dos sorteios.</string>
     <string name="preset_balanced">Equilibrado</string>
+    <string name="preset_balanced_desc">Foco balanceado simples, ideal para jogos sem riscos extremos.</string>
     <string name="preset_math">Matemático</string>
+    <string name="preset_math_desc">Prioriza padrões matemáticos como Primos e Fibonacci.</string>
     <string name="preset_surprise">Surpresa</string>
+    <string name="preset_surprise_desc">Gera combinações com um toque de aleatoriedade controlada.</string>
     <string name="preset_aggressive">Agressivo</string>
+    <string name="preset_aggressive_desc">Busca padrões muito específicos e raros (Sequências curtas, todos os quadrantes).</string>
     <string name="preset_conservative">Conservador</string>
+    <string name="preset_conservative_desc">Mantém tudo dentro das faixas mais seguras e frequentes.</string>
     <string name="preset_hot_numbers">Quentes</string>
+    <string name="preset_hot_numbers_desc">Usa estatísticas recentes para selecionar dezenas com alta frequência.</string>
 
     <!-- Checker -->
     <string name="checker_recent_hits_chart_title">Acertos Recentes</string>
@@ -228,6 +235,7 @@
     <string name="filters_unavailable_data">Dados indisponíveis</string>
     <string name="filters_min_label">Mín</string>
     <string name="filters_max_label">Máx</string>
+    <string name="filter_recommended_range">Recomendado: %1$d a %2$d</string>
     <string name="filters_button_generate">Gerar Jogos</string>
     <string name="filters_button_generating_progress">Gerando…</string>
     <string name="filter_preset_applied">Estratégia aplicada: %1$s</string>
@@ -273,7 +281,7 @@
     <string name="game_card_pinned">Fixado</string>
 
     <!-- Share -->
-    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:\n%1$s\n\n📊 Soma: %2$d | Pares: %3$d\n\nGerado com Cebolão Lotofácil</string>
+    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:\n%1$s\n\n📊 Estatísticas:\nSoma: %2$d | Pares: %3$d | Primos: %4$d\nMoldura: %5$d | Repet.: %6$s | Fib.: %7$d\nSeq.: %8$d\n\nGerado com Cebolão Lotofácil</string>
     <string name="share_error_message">Erro ao compartilhar jogo</string>
 
     <!-- General -->
@@ -290,6 +298,11 @@
     <string name="stat_primes">Primos</string>
     <string name="stat_sequences">Seq.</string>
     <string name="stat_fibonacci">Fib.</string>
+    <string name="stat_lines">Linhas</string>
+    <string name="stat_cols">Colunas</string>
+    <string name="stat_frame">Moldura</string>
+    <string name="stat_repeated">Repet.</string>
+    <string name="stat_quadrants">Quad.</string>
     <string name="prize_table_title">Premiação</string>
     <string name="prize_table_header_prize">Faixa</string>
     <string name="prize_table_header_winners">Ganhadores</string>

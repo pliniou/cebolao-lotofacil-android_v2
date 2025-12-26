@@ -13,47 +13,50 @@ import com.cebolao.lotofacil.domain.model.FilterType
 data class FilterPreset(
     val id: String,
     @param:StringRes val labelRes: Int,
+    @param:StringRes val descriptionRes: Int,
     val rules: Map<FilterType, ClosedFloatingPointRange<Float>>
 )
 
-@Suppress("unused") // Pode ser usado por UI/UseCases; evita warning/inspeção quando ainda não referenciado
+@Suppress("unused")
 object FilterPresets {
 
-    /**
-     * Lista canônica de presets.
-     */
     val all: List<FilterPreset> = listOf(
         FilterPreset(
             id = "standard",
             labelRes = R.string.preset_standard,
+            descriptionRes = R.string.preset_standard_desc,
             rules = mapOf(
-                FilterType.SOMA_DEZENAS to 180f..210f,
-                FilterType.PARES to 7f..8f,
+                FilterType.SOMA_DEZENAS to 166f..220f,
+                FilterType.PARES to 6f..9f,
                 FilterType.REPETIDAS_CONCURSO_ANTERIOR to 8f..10f,
-                FilterType.MOLDURA to 9f..10f,
-                FilterType.PRIMOS to 4f..6f
+                FilterType.MOLDURA to 8f..11f,
+                FilterType.PRIMOS to 4f..7f
             )
         ),
         FilterPreset(
             id = "balanced",
             labelRes = R.string.preset_balanced,
+            descriptionRes = R.string.preset_balanced_desc,
             rules = mapOf(
-                FilterType.SOMA_DEZENAS to 170f..220f,
-                FilterType.PARES to 6f..9f,
+                FilterType.SOMA_DEZENAS to 170f..210f,
+                FilterType.PARES to 7f..8f,
                 FilterType.REPETIDAS_CONCURSO_ANTERIOR to 8f..10f
             )
         ),
         FilterPreset(
             id = "math",
             labelRes = R.string.preset_math,
+            descriptionRes = R.string.preset_math_desc,
             rules = mapOf(
                 FilterType.PRIMOS to 5f..6f,
-                FilterType.FIBONACCI to 4f..5f
+                FilterType.FIBONACCI to 4f..5f,
+                FilterType.SOMA_DEZENAS to 180f..210f
             )
         ),
         FilterPreset(
             id = "surprise",
             labelRes = R.string.preset_surprise,
+            descriptionRes = R.string.preset_surprise_desc,
             rules = mapOf(
                 FilterType.REPETIDAS_CONCURSO_ANTERIOR to 9f..9f,
                 FilterType.PARES to 5f..7f
@@ -62,38 +65,39 @@ object FilterPresets {
         FilterPreset(
             id = "aggressive",
             labelRes = R.string.preset_aggressive,
+            descriptionRes = R.string.preset_aggressive_desc,
+            // Focused on highly specific patterns
             rules = mapOf(
-                FilterType.SOMA_DEZENAS to 185f..205f,
+                FilterType.SOMA_DEZENAS to 190f..205f,
                 FilterType.PARES to 7f..8f,
                 FilterType.PRIMOS to 5f..6f,
-                FilterType.SEQUENCIAS to 0f..1f,
-                FilterType.QUADRANTES to 7f..8f
+                FilterType.SEQUENCIAS to 1f..3f,
+                FilterType.QUADRANTES to 4f..4f // All 4 quadrants must be present
             )
         ),
         FilterPreset(
             id = "conservative",
             labelRes = R.string.preset_conservative,
+            descriptionRes = R.string.preset_conservative_desc,
             rules = mapOf(
-                FilterType.SOMA_DEZENAS to 180f..210f,
-                FilterType.PARES to 7f..8f,
-                FilterType.REPETIDAS_CONCURSO_ANTERIOR to 8f..10f,
-                FilterType.MOLDURA to 9f..10f
+                FilterType.SOMA_DEZENAS to 160f..230f,
+                FilterType.PARES to 5f..10f,
+                FilterType.REPETIDAS_CONCURSO_ANTERIOR to 7f..11f,
+                FilterType.MOLDURA to 7f..12f
             )
         ),
         FilterPreset(
             id = "hot_numbers",
             labelRes = R.string.preset_hot_numbers,
+            descriptionRes = R.string.preset_hot_numbers_desc,
             rules = mapOf(
                 FilterType.REPETIDAS_CONCURSO_ANTERIOR to 9f..11f,
-                FilterType.PARES to 6f..9f,
-                FilterType.SEQUENCIAS to 0f..2f
+                FilterType.PARES to 6f..8f,
+                FilterType.SEQUENCIAS to 2f..4f
             )
         )
     )
 
-    /**
-     * Lookup por id (útil para UI/UseCases).
-     */
     val byId: Map<String, FilterPreset> = all.associateBy { it.id }
 
     fun find(id: String): FilterPreset? = byId[id]

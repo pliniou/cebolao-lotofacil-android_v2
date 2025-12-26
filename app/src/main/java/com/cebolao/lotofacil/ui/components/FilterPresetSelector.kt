@@ -129,7 +129,7 @@ fun FilterPresetSelector(
                                 color = if (isSelected) scheme.primary else scheme.onSurface
                             )
                             Text(
-                                text = "${preset.rules.size} filtros ativos",
+                                text = stringResource(preset.descriptionRes),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = scheme.onSurfaceVariant
                             )

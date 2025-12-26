@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.ui.components
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -33,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.model.FilterType
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
 
@@ -223,36 +223,15 @@ private fun EduBullet(
     }
 }
 
-private data class FilterInfo(
-    @param:StringRes @field:StringRes val titleRes: Int,
-    @param:StringRes @field:StringRes val descRes: Int
-)
-
 @Composable
 private fun FilterExplainerList() {
     val scheme = MaterialTheme.colorScheme
-
-    val filters = remember {
-        listOf(
-            FilterInfo(R.string.filter_soma_title, R.string.filter_soma_desc),
-            FilterInfo(R.string.filter_pares_title, R.string.filter_pares_desc),
-            FilterInfo(R.string.filter_primos_title, R.string.filter_primos_desc),
-            FilterInfo(R.string.filter_moldura_title, R.string.filter_moldura_desc),
-            FilterInfo(R.string.filter_retrato_title, R.string.filter_retrato_desc),
-            FilterInfo(R.string.filter_fibonacci_title, R.string.filter_fibonacci_desc),
-            FilterInfo(R.string.filter_multiplos3_title, R.string.filter_multiplos3_desc),
-            FilterInfo(R.string.filter_repetidas_title, R.string.filter_repetidas_desc),
-            FilterInfo(R.string.filter_sequencias_title, R.string.filter_sequencias_desc),
-            FilterInfo(R.string.filter_linhas_title, R.string.filter_linhas_desc),
-            FilterInfo(R.string.filter_colunas_title, R.string.filter_colunas_desc),
-            FilterInfo(R.string.filter_quadrantes_title, R.string.filter_quadrantes_desc)
-        )
-    }
+    val filters = FilterType.entries
 
     Column(
         verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
     ) {
-        filters.forEach { item ->
+        filters.forEach { filter ->
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = scheme.surface,
@@ -266,13 +245,13 @@ private fun FilterExplainerList() {
                     verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
                 ) {
                     Text(
-                        text = stringResource(item.titleRes),
+                        text = stringResource(filter.titleRes),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = scheme.onSurface
                     )
                     Text(
-                        text = stringResource(item.descRes),
+                        text = stringResource(filter.descriptionRes),
                         style = MaterialTheme.typography.bodySmall,
                         color = scheme.onSurfaceVariant
                     )

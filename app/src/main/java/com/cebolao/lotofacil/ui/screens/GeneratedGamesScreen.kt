@@ -116,11 +116,17 @@ fun GeneratedGamesScreen(
                 is com.cebolao.lotofacil.viewmodels.GameScreenEvent.ShareGame -> {
                     try {
                         val numbersFormatted = event.numbers.joinToString(" - ") { it.toString().padStart(2, '0') }
+                        val m = event.metrics
                         val text = context.getString(
                             R.string.share_game_text_format,
                             numbersFormatted,
-                            event.sum,
-                            event.evens
+                            m.sum,
+                            m.evens,
+                            m.primes,
+                            m.frame,
+                            m.repeated.toString(),
+                            m.fibonacci,
+                            m.sequences
                         )
                         val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                             type = "text/plain"

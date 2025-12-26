@@ -32,7 +32,7 @@ import java.math.BigDecimal
 import javax.inject.Inject
 
 sealed interface GameScreenEvent {
-    data class ShareGame(val numbers: List<Int>, val sum: Int, val evens: Int) : GameScreenEvent
+    data class ShareGame(val numbers: List<Int>, val metrics: com.cebolao.lotofacil.domain.model.GameComputedMetrics) : GameScreenEvent
     data class ShowSnackbar(@param:StringRes val messageRes: Int) : GameScreenEvent
 }
 
@@ -68,8 +68,11 @@ class GameViewModel @Inject constructor(
     private val togglePinStateUseCase: TogglePinStateUseCase,
     private val deleteGameUseCase: DeleteGameUseCase,
     private val clearUnpinnedGamesUseCase: ClearUnpinnedGamesUseCase,
-    private val analyzeGameUseCase: AnalyzeGameUseCase
+    private val analyzeGameUseCase: AnalyzeGameUseCase,
+    private val historyRepository: com.cebolao.lotofacil.domain.repository.HistoryRepository
 ) : ViewModel() {
+
+    private val metricsCalculator = com.cebolao.lotofacil.domain.service.GameMetricsCalculator()
 
     val unpinnedGames: StateFlow<ImmutableList<LotofacilGame>> = observeUnpinnedGamesUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), persistentListOf())
@@ -178,9 +181,10 @@ class GameViewModel @Inject constructor(
     fun shareGame(game: LotofacilGame) {
         viewModelScope.launch {
             val sortedNumbers = game.numbers.sorted()
-            val sum = sortedNumbers.sum()
-            val evens = sortedNumbers.count { it % 2 == 0 }
-            _events.send(GameScreenEvent.ShareGame(numbers = sortedNumbers, sum = sum, evens = evens))
+            val lastDraw = historyRepository.getLastDraw()
+            val metrics = metricsCalculator.calculate(game, lastDraw?.numbers)
+            
+            _events.send(GameScreenEvent.ShareGame(numbers = sortedNumbers, metrics = metrics))
         }
     }
 

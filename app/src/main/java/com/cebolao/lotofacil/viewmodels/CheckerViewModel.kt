@@ -8,18 +8,19 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.GameAnalyzer
+import com.cebolao.lotofacil.domain.model.GameComputedMetrics
 import com.cebolao.lotofacil.domain.model.GameScore
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.repository.CheckRunRepository
+import com.cebolao.lotofacil.domain.repository.HistoryRepository
+import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
 import com.cebolao.lotofacil.domain.usecase.CheckGameUseCase
-import com.cebolao.lotofacil.domain.usecase.GetGameSimpleStatsUseCase
+import com.cebolao.lotofacil.domain.usecase.GetAnalyzedStatsUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
-import com.cebolao.lotofacil.mapper.toSimpleStats
 import com.cebolao.lotofacil.navigation.Screen
 import com.cebolao.lotofacil.util.CHECKER_ARG_SEPARATOR
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,7 +38,7 @@ sealed interface CheckerUiState {
     data object Loading : CheckerUiState
     data class Success(
         val report: CheckReport,
-        val simpleStats: ImmutableList<Pair<String, String>>
+        val gameMetrics: GameComputedMetrics
     ) : CheckerUiState
 
     data class Error(@param:StringRes val messageResId: Int) : CheckerUiState
@@ -47,11 +48,13 @@ sealed interface CheckerUiState {
 class CheckerViewModel @Inject constructor(
     private val checkGameUseCase: CheckGameUseCase,
     private val saveGameUseCase: SaveGameUseCase,
-    private val getGameSimpleStatsUseCase: GetGameSimpleStatsUseCase,
-    private val getAnalyzedStatsUseCase: com.cebolao.lotofacil.domain.usecase.GetAnalyzedStatsUseCase,
+    private val getAnalyzedStatsUseCase: GetAnalyzedStatsUseCase,
     private val checkRunRepository: CheckRunRepository,
+    private val historyRepository: HistoryRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val metricsCalculator = GameMetricsCalculator()
 
     private val _uiState = MutableStateFlow<CheckerUiState>(CheckerUiState.Idle)
     val uiState: StateFlow<CheckerUiState> = _uiState.asStateFlow()
@@ -89,7 +92,6 @@ class CheckerViewModel @Inject constructor(
 
             if (numbers.isNotEmpty()) {
                 _selectedNumbers.value = numbers
-                // NOTE: Do NOT checkGame() automatically. User wants explicit action.
             }
         }
         
@@ -109,7 +111,6 @@ class CheckerViewModel @Inject constructor(
             }
         }
         
-        // Reset state on change
         if (_gameScore.value != null) _gameScore.value = null
         if (_uiState.value !is CheckerUiState.Idle) _uiState.value = CheckerUiState.Idle
     }
@@ -126,7 +127,7 @@ class CheckerViewModel @Inject constructor(
     
     private fun loadHeatmapData() {
         viewModelScope.launch {
-            getAnalyzedStatsUseCase(25) // Use a reasonable window like 25
+            getAnalyzedStatsUseCase(25)
                 .onSuccess { report ->
                     val freqs = report.mostFrequentNumbers
                     if (freqs.isNotEmpty()) {
@@ -135,7 +136,7 @@ class CheckerViewModel @Inject constructor(
                         val range = (max - min).coerceAtLeast(1f)
                         
                         val map = freqs.associate { 
-                            it.number to ((it.frequency - min) / range) // 0..1
+                            it.number to ((it.frequency - min) / range)
                         }
                         _heatmapIntensities.value = map
                     }
@@ -155,26 +156,27 @@ class CheckerViewModel @Inject constructor(
         val numbers = _selectedNumbers.value
         viewModelScope.launch {
             _uiState.value = CheckerUiState.Loading
-            analyzeScore(numbers) // Calculate score when checking
+            analyzeScore(numbers)
+            
             checkGameUseCase(numbers)
                 .collect { result ->
                     result.onSuccess { report ->
-                        // Obter estatísticas simples do jogo
                         val game = report.ticket
-                        val metrics = getGameSimpleStatsUseCase(game)
-                        val simpleStats = metrics.toSimpleStats()
                         
-                        // Persistir CheckRun
+                        // Fetch last draw for 'Repeated' calculation
+                        val lastDraw = historyRepository.getLastDraw()
+                        
+                        val metrics = metricsCalculator.calculate(game, lastDraw?.numbers)
+                        
                         try {
                             checkRunRepository.saveCheckRun(report)
                         } catch (e: Exception) {
-                            // Log mas não falha a operação
                             android.util.Log.e("CheckerViewModel", "Failed to save check run", e)
                         }
                         
                         _uiState.value = CheckerUiState.Success(
                             report = report,
-                            simpleStats = simpleStats
+                            gameMetrics = metrics
                         )
                     }.onFailure {
                         _uiState.value = CheckerUiState.Error(R.string.error_analysis_failed)

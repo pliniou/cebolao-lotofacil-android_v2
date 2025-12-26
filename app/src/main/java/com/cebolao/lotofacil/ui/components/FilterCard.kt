@@ -9,9 +9,11 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -174,6 +176,37 @@ private fun Content(
             steps = steps,
             modifier = Modifier.padding(top = Dimen.Spacing8)
         )
+
+        // Visual guidance for recommended range
+        val defaultStart = state.type.defaultRange.start.toInt()
+        val defaultEnd = state.type.defaultRange.endInclusive.toInt()
+        val isDefault = state.selectedRange == state.type.defaultRange
+        
+        AnimatedVisibility(
+             visible = !isDefault,
+             enter = fadeIn() + expandVertically()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = Dimen.Spacing4),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = AppIcons.Info,
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(R.string.filter_recommended_range, defaultStart, defaultEnd),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+        }
     }
 }
 

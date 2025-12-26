@@ -77,7 +77,7 @@ fun DistributionChartsCard(
                     CustomChip(
                         selected = selectedPattern == pattern,
                         onClick = { onPatternSelected(pattern) },
-                        label = pattern.title
+                        label = stringResource(pattern.filterType.titleRes)
                     )
                 }
             }
