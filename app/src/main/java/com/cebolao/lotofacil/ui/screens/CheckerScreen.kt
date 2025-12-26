@@ -160,9 +160,9 @@ fun CheckerScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = Dimen.Spacing8),
+                        .padding(vertical = Dimen.Spacing16), // More vertical breathing room
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
                 ) {
                     val scheme = MaterialTheme.colorScheme
                     val isComplete = selectedNumbers.size == GameConstants.GAME_SIZE
@@ -177,10 +177,10 @@ fun CheckerScreen(
                         Text(
                             text = "${selectedNumbers.size}/${GameConstants.GAME_SIZE}",
                             modifier = Modifier.padding(
-                                horizontal = Dimen.Spacing16,
+                                horizontal = Dimen.Spacing24, // Wider pill
                                 vertical = Dimen.Spacing8
                             ),
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.headlineSmall, // Larger text
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -196,50 +196,60 @@ fun CheckerScreen(
                 }
             }
 
-            // Grid centralizado
+            // Grid centralizado com restrição de largura
             item(key = "grid") {
-                NumberGrid(
-                    selectedNumbers = selectedNumbers,
-                    onNumberClick = viewModel::toggleNumber,
-                    maxSelection = GameConstants.GAME_SIZE,
-                    sizeVariant = NumberBallSize.Medium,
-                    horizontalArrangement = Arrangement.spacedBy(
-                        Dimen.Spacing4,
-                        Alignment.CenterHorizontally
-                    ),
-                    heatmapColors = heatmapColors,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = Dimen.Spacing16)
-                )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    NumberGrid(
+                        selectedNumbers = selectedNumbers,
+                        onNumberClick = viewModel::toggleNumber,
+                        maxSelection = GameConstants.GAME_SIZE,
+                        sizeVariant = NumberBallSize.Medium,
+                        horizontalArrangement = Arrangement.spacedBy(
+                            Dimen.Spacing4,
+                            Alignment.CenterHorizontally
+                        ),
+                        heatmapColors = heatmapColors,
+                        modifier = Modifier
+                            .widthIn(max = 400.dp) // Constrain width for better UX on tablets
+                            .padding(top = Dimen.Spacing8)
+                    )
+                }
             }
             
-
 
             // Card de instruções (Idle)
             // Show only if no game score and no results (pure idle)
             if (uiState is CheckerUiState.Idle && gameScore == null) {
                 item(key = "instructions") {
-                    AppCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = Dimen.Spacing8),
-                        outlined = false,
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        contentPadding = Dimen.CardContentPadding
-                    ) {
-                        MessageState(
-                            icon = AppIcons.Success,
-                            title = stringResource(R.string.checker_how_it_works_title),
-                            message = stringResource(R.string.checker_how_it_works_desc)
-                        )
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                         AppCard(
+                            modifier = Modifier
+                                .widthIn(max = 600.dp)
+                                .padding(top = Dimen.Spacing24),
+                            outlined = false,
+                            color = MaterialTheme.colorScheme.surfaceContainer,
+                            contentPadding = Dimen.CardContentPadding
+                        ) {
+                            MessageState(
+                                icon = AppIcons.Success, // Should verify if this icon is appropriate, assuming 'Success' is used as generic positive or instructions
+                                title = stringResource(R.string.checker_how_it_works_title),
+                                message = stringResource(R.string.checker_how_it_works_desc)
+                            )
+                        }
                     }
                 }
             }
 
             // Resultados
             item(key = "results") {
-                CheckerResultSection(uiState, gameScore)
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Column(modifier = Modifier.widthIn(max = 600.dp)) {
+                         CheckerResultSection(uiState, gameScore)
+                    }
+                }
             }
         }
     }

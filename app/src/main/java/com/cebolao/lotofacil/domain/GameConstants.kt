@@ -10,7 +10,7 @@ object GameConstants {
     const val HISTORY_CHECK_SIZE = 10
     const val SUM_MIN_RANGE = 120
     const val SUM_MAX_RANGE = 270
-    const val SUM_STEP = 10
+    const val SUM_STEP = 5
     const val GRID_COLUMNS = 5
 
     val TIME_WINDOWS: List<Int> = listOf(0, 20, 50, 75, 100, 200, 500)

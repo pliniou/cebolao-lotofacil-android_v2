@@ -289,7 +289,7 @@ private fun StatItem(
             )
 
             Text(
-                text = if (isOverdue) "atraso" else "frequência",
+                text = if (isOverdue) "dias" else "vezes",
                 style = MaterialTheme.typography.labelSmall,
                 color = scheme.onSurfaceVariant.copy(alpha = 0.7f),
                 fontSize = 10.sp

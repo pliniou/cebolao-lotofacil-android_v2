@@ -256,19 +256,20 @@ private fun EmptyState(
     isNewGamesTab: Boolean,
     onGenerateRequest: () -> Unit
 ) {
-    androidx.compose.foundation.layout.Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
                 horizontal = Dimen.ScreenPadding,
                 vertical = Dimen.SectionSpacing
             ),
-        contentAlignment = androidx.compose.ui.Alignment.Center
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
         com.cebolao.lotofacil.ui.components.AppCard(
-            modifier = Modifier.fillMaxWidth(),
-            outlined = false,
-            color = MaterialTheme.colorScheme.surfaceContainer
+            modifier = Modifier.fillMaxWidth().widthIn(max = 600.dp),
+            outlined = true, // Better visualization for empty state
+            color = MaterialTheme.colorScheme.surface,
+            contentPadding = 0.dp // MessageState handles its own padding
         ) {
             MessageState(
                 icon = AppIcons.List,
@@ -278,8 +279,7 @@ private fun EmptyState(
                     else R.string.widget_no_pinned_games
                 ),
                 actionLabel = if (isNewGamesTab) stringResource(R.string.filters_button_generate) else null,
-                onActionClick = if (isNewGamesTab) onGenerateRequest else null,
-                modifier = Modifier
+                onActionClick = if (isNewGamesTab) onGenerateRequest else null
             )
         }
     }

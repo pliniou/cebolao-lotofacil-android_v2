@@ -109,58 +109,61 @@ fun FilterPresetSelector(
             }
         }
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .widthIn(max = 520.dp)
+        MaterialTheme(
+            shapes = MaterialTheme.shapes.copy(extraSmall = MaterialTheme.shapes.medium)
         ) {
-            FilterPresets.all.forEach { preset ->
-                val isSelected = selectedPresetLabelRes == preset.labelRes
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 520.dp),
+                containerColor = scheme.surfaceContainerHigh,
+                tonalElevation = Dimen.Elevation.Level2,
+                shadowElevation = Dimen.Elevation.Level2
+            ) {
+                FilterPresets.all.forEach { preset ->
+                    val isSelected = selectedPresetLabelRes == preset.labelRes
 
-                DropdownMenuItem(
-                    text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)) {
-                            Text(
-                                text = stringResource(preset.labelRes),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                                color = if (isSelected) scheme.primary else scheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(preset.descriptionRes),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = scheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    leadingIcon = {
-                        if (isSelected) {
-                            Surface(
-                                color = scheme.primaryContainer,
-                                contentColor = scheme.onPrimaryContainer,
-                                shape = MaterialTheme.shapes.small
-                            ) {
-                                Spacer(
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = Dimen.Spacing8,
-                                            vertical = Dimen.Spacing8
-                                        )
-                                        .size(6.dp)
+                    DropdownMenuItem(
+                        text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(
+                                    text = stringResource(preset.labelRes),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                                    color = if (isSelected) scheme.primary else scheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(preset.descriptionRes),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = scheme.onSurfaceVariant
                                 )
                             }
-                        } else {
-                            Spacer(modifier = Modifier.width(Dimen.Spacing16))
-                        }
-                    },
-                    onClick = {
-                        selectedPresetLabelRes = preset.labelRes
-                        onPresetSelected(preset)
-                        expanded = false
-                    }
-                )
+                        },
+                        leadingIcon = {
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = AppIcons.Check,
+                                    contentDescription = null,
+                                    tint = scheme.primary,
+                                    modifier = Modifier.size(Dimen.IconSmall)
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.size(Dimen.IconSmall))
+                            }
+                        },
+                        onClick = {
+                            selectedPresetLabelRes = preset.labelRes
+                            onPresetSelected(preset)
+                            expanded = false
+                        },
+                        contentPadding = PaddingValues(
+                            horizontal = Dimen.Spacing16,
+                            vertical = Dimen.Spacing8
+                        )
+                    )
+                }
             }
         }
     }

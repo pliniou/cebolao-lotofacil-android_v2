@@ -245,69 +245,76 @@ private fun ThemeModeSection(
     currentTheme: String,
     onThemeChange: (String) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
         SettingsSectionHeader(
             icon = AppIcons.Tune,
             title = stringResource(R.string.settings_theme_mode_title)
         )
 
-        Column(
-            modifier = Modifier.selectableGroup(),
-            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
         ) {
-            ThemeModeOption(
-                icon = AppIcons.StarFilled,
+            ThemeOptionButton(
+                icon = AppIcons.StarFilled, // Represents Light usually or Sun
                 label = stringResource(R.string.settings_theme_light),
                 isSelected = currentTheme == THEME_MODE_LIGHT,
-                onClick = { onThemeChange(THEME_MODE_LIGHT) }
+                onClick = { onThemeChange(THEME_MODE_LIGHT) },
+                modifier = Modifier.weight(1f)
             )
-            ThemeModeOption(
-                icon = AppIcons.StarOutlined,
+            ThemeOptionButton(
+                icon = AppIcons.StarOutlined, // Represents Dark usually or Moon
                 label = stringResource(R.string.settings_theme_dark),
                 isSelected = currentTheme == THEME_MODE_DARK,
-                onClick = { onThemeChange(THEME_MODE_DARK) }
+                onClick = { onThemeChange(THEME_MODE_DARK) },
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
 
 @Composable
-private fun ThemeModeOption(
+private fun ThemeOptionButton(
     icon: ImageVector,
     label: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 0.98f else 1f,
+        animationSpec = Motion.Spring.gentle(),
+        label = "scale"
+    )
 
-    AppCard(
+    Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        outlined = !isSelected,
-        color = if (isSelected) scheme.primaryContainer.copy(alpha = 0.55f) else scheme.surface,
-        contentPadding = Dimen.SmallPadding
+        modifier = modifier.scale(scale),
+        shape = MaterialTheme.shapes.medium,
+        color = if (isSelected) scheme.primaryContainer else scheme.surface,
+        border = BorderStroke(
+            width = if (isSelected) 1.dp else Dimen.Border.Hairline,
+            color = if (isSelected) scheme.primary else scheme.outlineVariant.copy(alpha = 0.5f)
+        ),
+        tonalElevation = if (isSelected) 2.dp else 0.dp
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+        Column(
+            modifier = Modifier
+                .padding(vertical = Dimen.Spacing12, horizontal = Dimen.Spacing8),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
         ) {
-            RadioButton(
-                selected = isSelected,
-                onClick = null
-            )
-
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(Dimen.IconMedium),
                 tint = if (isSelected) scheme.primary else scheme.onSurfaceVariant
             )
-
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (isSelected) scheme.onPrimaryContainer else scheme.onSurface,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) scheme.onPrimaryContainer else scheme.onSurface
             )
         }
     }

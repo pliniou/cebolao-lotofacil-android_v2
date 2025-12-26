@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.cebolao.lotofacil.ui.theme.Alpha
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -99,6 +97,7 @@ fun AppCard(
     )
 
     // Background determination
+    // Background determination
     val defaultBg = when (effectiveVariant) {
         CardVariant.Glass -> GlassSurfaceDark
         CardVariant.Outlined -> scheme.surface
@@ -108,23 +107,24 @@ fun AppCard(
     
     val effectiveBackground = if (color != Color.Unspecified) color else defaultBg
 
-    // Border determination
-    val border = if (hasBorder || effectiveVariant == CardVariant.Outlined) {
+    // Border determination - Single source of truth
+    val borderAlpha = when (effectiveVariant) {
+        CardVariant.Glass -> Alpha.DIVIDER
+        CardVariant.Outlined -> Alpha.MEDIUM
+        CardVariant.Solid -> 0.12f // Softer border for solid cards
+        CardVariant.Elevated -> 0f // No border for elevated cards usually, or very subtle
+    }
+    
+    val borderWidth = when {
+        hasBorder || effectiveVariant == CardVariant.Outlined -> Dimen.Border.Thin
+        effectiveVariant == CardVariant.Solid -> Dimen.Border.Hairline
+        else -> 0.dp
+    }
+
+    val border = if (borderWidth > 0.dp) {
         BorderStroke(
-            width = when (effectiveVariant) {
-                CardVariant.Glass -> Dimen.Glass.BorderWidth
-                CardVariant.Outlined -> Dimen.Border.Thin
-                CardVariant.Solid -> Dimen.Border.Hairline
-                CardVariant.Elevated -> Dimen.Border.Hairline
-            },
-            color = scheme.outlineVariant.copy(
-                alpha = when (effectiveVariant) {
-                    CardVariant.Glass -> Alpha.DIVIDER
-                    CardVariant.Outlined -> Alpha.MEDIUM
-                    CardVariant.Solid -> 0.35f
-                    CardVariant.Elevated -> 0.30f
-                }
-            )
+            width = borderWidth,
+            color = scheme.outlineVariant.copy(alpha = borderAlpha)
         )
     } else null
 
@@ -144,6 +144,10 @@ fun AppCard(
     val cardModifier = if (onClick != null) modifier.scale(scale) else modifier
 
     CompositionLocalProvider(LocalCardNesting provides nestingLevel + 1) {
+        val cardContent: @Composable ColumnScope.() -> Unit = {
+            CardContent(contentPadding, nestingLevel + 1, title, headerActions, header, footer, content)
+        }
+
         if (onClick != null) {
             Card(
                 onClick = onClick,
@@ -152,20 +156,18 @@ fun AppCard(
                 colors = colors,
                 elevation = cardElevation,
                 border = border,
-                interactionSource = interactionSource
-            ) {
-                CardContent(contentPadding, nestingLevel + 1, title, headerActions, header, footer, content)
-            }
+                interactionSource = interactionSource,
+                content = cardContent
+            )
         } else {
             Card(
                 modifier = cardModifier,
                 shape = shape,
                 colors = colors,
                 elevation = cardElevation,
-                border = border
-            ) {
-                CardContent(contentPadding, nestingLevel + 1, title, headerActions, header, footer, content)
-            }
+                border = border,
+                content = cardContent
+            )
         }
     }
 }
@@ -180,6 +182,9 @@ private fun CardContent(
     footer: (@Composable CardScope.() -> Unit)?,
     content: @Composable CardScope.() -> Unit
 ) {
+    // Only apply padding if it is explicitly requested, to avoid double padding when caller handles it.
+    // However, AppCard is a container, so it SHOULD handle padding. 
+    // We stick to the design system: Container has padding.
     Column(
         modifier = Modifier.padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
@@ -192,16 +197,16 @@ private fun CardContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = Dimen.SmallPadding),
+                    .padding(bottom = if (contentPadding > 0.dp) Dimen.Spacing4 else 0.dp), // Adjust spacing based on padding presence
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (title != null) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface 
                     )
                 }
                 if (headerActions != null) {

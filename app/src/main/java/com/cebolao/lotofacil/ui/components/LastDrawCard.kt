@@ -55,17 +55,19 @@ fun LastDrawCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Dimen.Spacing16),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing24), // Increased spacing for better separation
+            horizontalAlignment = Alignment.CenterHorizontally // Centralize everything by default
         ) {
             // Header
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(R.string.app_result_title, draw.contestNumber),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold, // Bold for better hierarchy
                     color = scheme.onSurface
                 )
                 DrawDateSubtitle(draw)
@@ -77,20 +79,22 @@ fun LastDrawCard(
             // Stats (tonal surface, flat)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = scheme.surfaceVariant,
+                color = scheme.surfaceVariant.copy(alpha = 0.5f), // Softer background
                 contentColor = scheme.onSurfaceVariant,
-                shape = MaterialTheme.shapes.large
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.2f))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(Dimen.Spacing16),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
                 ) {
                     Text(
                         text = stringResource(R.string.statistics),
                         style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     DrawStatisticsSection(draw)
                 }
@@ -99,7 +103,9 @@ fun LastDrawCard(
             // Primary action (flat, modern)
             FilledTonalButton(
                 onClick = { onCheckGame(draw.numbers) },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .height(Dimen.ActionButtonHeight)
+                    .fillMaxWidth(0.8f), // Limit width on large screens
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = scheme.secondaryContainer,
@@ -121,17 +127,20 @@ fun LastDrawCard(
             }
 
             // Details
-            HorizontalDivider(color = scheme.outlineVariant)
+            if (details != null || details == null) { // Show divider for both loading and success states
+                HorizontalDivider(color = scheme.outlineVariant.copy(alpha = 0.5f))
+            }
 
             if (details != null) {
-                PrizeTableSection(details)
-
-                Spacer(Modifier.height(Dimen.Spacing4))
-                LocationInfoSection(details)
-
-                if (details.winnersByState.isNotEmpty()) {
-                    Spacer(Modifier.height(Dimen.Spacing8))
-                    WinnersByStateSection(details.winnersByState)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+                ) {
+                    PrizeTableSection(details)
+                    LocationInfoSection(details)
+                    if (details.winnersByState.isNotEmpty()) {
+                        WinnersByStateSection(details.winnersByState)
+                    }
                 }
             } else {
                 Row(
@@ -143,7 +152,8 @@ fun LastDrawCard(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp
+                        strokeWidth = 2.dp,
+                        color = scheme.primary
                     )
                     Text(
                         text = stringResource(R.string.loading_details_fallback),
