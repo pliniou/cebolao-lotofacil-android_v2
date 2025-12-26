@@ -58,7 +58,8 @@ fun BarChart(
     showNormalLine: Boolean = false,
     mean: Float? = null,
     stdDev: Float? = null,
-    highlightValue: String? = null
+    highlightValue: String? = null,
+    highlightPredicate: ((Int) -> Boolean)? = null
 ) {
     val density = LocalDensity.current
     val context = LocalContext.current
@@ -111,6 +112,7 @@ fun BarChart(
                 prog = animProgress.value,
                 selIdx = selectedIndex,
                 highlightVal = highlightValue,
+                highlightPred = highlightPredicate,
                 c = colors,
                 p = paints
             )
@@ -262,6 +264,7 @@ private fun DrawScope.drawBars(
     prog: Float,
     selIdx: Int?,
     highlightVal: String?,
+    highlightPred: ((Int) -> Boolean)?,
     c: ChartColors,
     p: ChartPaints
 ) {
@@ -270,11 +273,13 @@ private fun DrawScope.drawBars(
         val x = m.getX(index)
         val y = TOP_PADDING_PX + m.drawHeight - height
         val isHighlighted = label == highlightVal
+        val meetsPredicate = highlightPred?.invoke(value) ?: false
 
         if (height > 0f) {
             val barColor = when {
                 selIdx == index -> c.secondary
                 isHighlighted -> c.highlight
+                meetsPredicate -> c.highlight
                 else -> c.primary
             } // Prioridade: Seleção > Destaque > Normal
             

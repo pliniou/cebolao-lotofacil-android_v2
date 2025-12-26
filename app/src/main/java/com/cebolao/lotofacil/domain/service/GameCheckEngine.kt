@@ -81,8 +81,7 @@ class GameCheckEngine @Inject constructor() {
         )
     }
 
-    companion object {
-        private const val RECENT_HITS_WINDOW = 15
+        private const val RECENT_HITS_WINDOW = 100
     }
 }
 

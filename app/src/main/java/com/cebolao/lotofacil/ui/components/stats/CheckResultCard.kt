@@ -107,7 +107,8 @@ fun CheckResultCard(
                         data = chartData,
                         maxValue = GameConstants.GAME_SIZE,
                         modifier = Modifier.fillMaxWidth(),
-                        chartHeight = Dimen.CheckResultChartHeight
+                        chartHeight = Dimen.CheckResultChartHeight,
+                        highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
                     )
                 }
 
@@ -118,12 +119,11 @@ fun CheckResultCard(
             }
 
             if (totalWins > 0) {
-                result.scoreCounts.entries
-                    .sortedByDescending { it.key }
-                    .filter { it.key >= GameConstants.MIN_PRIZE_SCORE }
-                    .forEach { (score, count) ->
-                        ScoreRow(score, count)
-                    }
+                // Show all prize tiers (15 down to 11), even if count is 0
+                (15 downTo 11).forEach { score ->
+                    val count = result.scoreCounts[score] ?: 0
+                    ScoreRow(score, count)
+                }
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = Dimen.Spacing8),
@@ -223,11 +223,19 @@ private fun LastHit(res: CheckResult) {
             modifier = Modifier.size(Dimen.IconSmall)
         )
         Text(
-            text = stringResource(
-                R.string.checker_last_hit_info,
-                res.lastHitContest?.toString() ?: DEFAULT_PLACEHOLDER,
-                res.lastHitScore?.toString() ?: DEFAULT_PLACEHOLDER
-            ),
+            text = if (res.lastHitContest != null && res.lastHitScore != null) {
+                stringResource(
+                    R.string.checker_last_hit_details_format,
+                    res.lastHitContest,
+                    res.lastHitScore
+                )
+            } else {
+                stringResource(
+                    R.string.checker_last_hit_info,
+                    DEFAULT_PLACEHOLDER,
+                    DEFAULT_PLACEHOLDER
+                )
+            },
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

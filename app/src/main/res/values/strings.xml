@@ -225,6 +225,7 @@
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analisado em %1$d concursos</string>
     <string name="checker_score_breakdown_hits_format" tools:ignore="PluralsCandidate">%1$d pontos</string>
     <string name="checker_last_hit_info">Último acerto</string>
+    <string name="checker_last_hit_details_format">concurso %1$d, fazendo %2$d pontos</string>
     <string name="checker_no_wins_message">Infelizmente, nenhum prêmio encontrado neste período.</string>
     <string name="checker_simple_stats_title">Estatísticas Rápidas</string>
     <string name="checker_incomplete_game_message">Complete os 15 números para conferir.</string>
