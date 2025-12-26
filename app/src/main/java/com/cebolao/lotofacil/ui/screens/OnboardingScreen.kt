@@ -34,8 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.ui.components.PagerIndicator
-import com.cebolao.lotofacil.ui.components.PrimaryActionButton
+import com.cebolao.lotofacil.ui.components.common.PagerIndicator
+import com.cebolao.lotofacil.ui.components.common.PrimaryActionButton
 import com.cebolao.lotofacil.ui.theme.Dimen
 import kotlinx.coroutines.launch
 

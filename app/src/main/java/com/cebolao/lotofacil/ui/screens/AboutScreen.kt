@@ -18,7 +18,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import com.cebolao.lotofacil.ui.components.GameRulesCard
+import com.cebolao.lotofacil.ui.components.game.GameRulesCard
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,12 +41,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.data.repository.THEME_MODE_DARK
 import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
-import com.cebolao.lotofacil.ui.components.AppCard
-import com.cebolao.lotofacil.ui.components.FormattedText
-import com.cebolao.lotofacil.ui.components.SectionHeader
-import com.cebolao.lotofacil.ui.components.StandardPageLayout
-import com.cebolao.lotofacil.ui.components.StatisticsExplanationCard
-import com.cebolao.lotofacil.ui.components.StudioHero
+import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.stats.FormattedText
+import com.cebolao.lotofacil.ui.components.layout.SectionHeader
+import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.stats.StatisticsExplanationCard
+import com.cebolao.lotofacil.ui.components.common.StudioHero
 import com.cebolao.lotofacil.ui.theme.AccentPalette
 import com.cebolao.lotofacil.ui.theme.Alpha
 import com.cebolao.lotofacil.ui.theme.AppIcons

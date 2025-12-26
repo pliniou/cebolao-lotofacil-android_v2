@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.cebolao.lotofacil.data.HistoryParser
 import com.cebolao.lotofacil.data.local.db.DrawDao
+import com.cebolao.lotofacil.data.local.db.DrawDetailsDao
+import com.cebolao.lotofacil.data.local.db.DrawDetailsEntity
 import com.cebolao.lotofacil.data.mapper.toDraw
 import com.cebolao.lotofacil.data.mapper.toEntity
 import com.cebolao.lotofacil.di.IoDispatcher
@@ -27,12 +29,15 @@ interface HistoryLocalDataSource {
     fun observeLocalHistory(): Flow<List<Draw>>
     fun observeLastDraw(): Flow<Draw?>
     suspend fun saveNewContests(newDraws: List<Draw>)
+    suspend fun getDrawDetails(contestNumber: Int): DrawDetailsEntity?
+    suspend fun saveDrawDetails(details: DrawDetailsEntity)
 }
 
 @Singleton
 class HistoryLocalDataSourceImpl @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val drawDao: DrawDao,
+    private val drawDetailsDao: DrawDetailsDao,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : HistoryLocalDataSource {
 
@@ -56,6 +61,14 @@ class HistoryLocalDataSourceImpl @Inject constructor(
             ensureInitialized()
         }
         drawDao.getLastDrawSnapshot()?.toDraw()
+    }
+
+    override suspend fun getDrawDetails(contestNumber: Int): DrawDetailsEntity? = withContext(ioDispatcher) {
+        drawDetailsDao.getDrawDetails(contestNumber)
+    }
+
+    override suspend fun saveDrawDetails(details: DrawDetailsEntity) = withContext(ioDispatcher) {
+        drawDetailsDao.insertDetails(details)
     }
 
     override suspend fun saveNewContests(newDraws: List<Draw>) {

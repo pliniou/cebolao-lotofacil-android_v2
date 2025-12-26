@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cebolao.lotofacil.navigation.AppNavHost
-import com.cebolao.lotofacil.ui.components.AppBottomBar
+import com.cebolao.lotofacil.ui.components.layout.AppBottomBar
 import com.cebolao.lotofacil.viewmodels.MainViewModel
 
 @Composable

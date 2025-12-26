@@ -40,11 +40,11 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.navigation.Screen
 import com.cebolao.lotofacil.navigation.navigateToChecker
-import com.cebolao.lotofacil.ui.components.AnimateOnEntry
-import com.cebolao.lotofacil.ui.components.AppConfirmationDialog
-import com.cebolao.lotofacil.ui.components.GameCard
-import com.cebolao.lotofacil.ui.components.GameCardAction
-import com.cebolao.lotofacil.ui.components.MessageState
+import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
+import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
+import com.cebolao.lotofacil.ui.components.game.GameCard
+import com.cebolao.lotofacil.ui.components.game.GameCardAction
+import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.viewmodels.GameViewModel
@@ -265,7 +265,7 @@ private fun EmptyState(
             ),
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
-        com.cebolao.lotofacil.ui.components.AppCard(
+        com.cebolao.lotofacil.ui.components.layout.AppCard(
             modifier = Modifier.fillMaxWidth().widthIn(max = 600.dp),
             outlined = true, // Better visualization for empty state
             color = MaterialTheme.colorScheme.surface,

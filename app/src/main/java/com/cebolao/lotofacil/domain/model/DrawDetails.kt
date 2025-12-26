@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.domain.model
 
+import kotlinx.serialization.Serializable
 /**
  * Detalhes estendidos de um sorteio, incluindo premiações e dados do próximo concurso.
  */
@@ -15,12 +16,14 @@ data class DrawDetails(
     val prizeRates: List<PrizeRate>
 )
 
+@Serializable
 data class WinnerLocation(
     val state: String,
     val city: String,
     val count: Int
 )
 
+@Serializable
 data class PrizeRate(
     val description: String,
     val winnerCount: Int,

@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.cebolao.lotofacil.data.local.db.AppDatabase
 import com.cebolao.lotofacil.data.local.db.CheckRunDao
 import com.cebolao.lotofacil.data.local.db.DrawDao
+import com.cebolao.lotofacil.data.local.db.DrawDetailsDao
 import com.cebolao.lotofacil.data.local.db.UserGameDao
 import dagger.Module
 import dagger.Provides
@@ -24,7 +25,9 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "lotofacil.db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration()
+        .build()
     }
 
     @Provides
@@ -35,4 +38,7 @@ object DatabaseModule {
 
     @Provides
     fun provideUserGameDao(database: AppDatabase): UserGameDao = database.userGameDao()
+
+    @Provides
+    fun provideDrawDetailsDao(database: AppDatabase): DrawDetailsDao = database.drawDetailsDao()
 }

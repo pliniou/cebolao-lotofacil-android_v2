@@ -7,7 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.cebolao.lotofacil.ui.components.StandardScreenHeader
+import com.cebolao.lotofacil.ui.components.layout.StandardScreenHeader
 
 @Composable
 fun AppScreen(

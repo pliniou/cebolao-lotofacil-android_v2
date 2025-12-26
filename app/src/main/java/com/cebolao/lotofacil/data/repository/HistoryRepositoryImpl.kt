@@ -5,6 +5,7 @@ import com.cebolao.lotofacil.data.datasource.HistoryLocalDataSource
 import com.cebolao.lotofacil.data.datasource.HistoryRemoteDataSource
 import com.cebolao.lotofacil.data.mapper.toDraw
 import com.cebolao.lotofacil.data.mapper.toDrawDetails
+import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.domain.model.Draw
@@ -57,8 +58,25 @@ class HistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastDrawDetails(): DrawDetails? {
-        return latestApiResult?.toDrawDetails() ?: runCatching {
-            remoteDataSource.getLatestDraw()?.also { latestApiResult = it }?.toDrawDetails()
+        val lastDraw = localDataSource.getLastDraw() ?: return null
+        
+        // 1. Try local DB
+        val cachedDetails = localDataSource.getDrawDetails(lastDraw.contestNumber)
+        if (cachedDetails != null) {
+             return cachedDetails.toDrawDetails(lastDraw)
+        }
+
+        // 2. Try API
+        return latestApiResult?.let { 
+             val entity = it.toDrawDetailsEntity()
+             localDataSource.saveDrawDetails(entity)
+             entity.toDrawDetails(lastDraw) 
+        } ?: runCatching {
+            remoteDataSource.getLatestDraw()?.also { apiResult -> 
+                latestApiResult = apiResult
+                val entity = apiResult.toDrawDetailsEntity()
+                localDataSource.saveDrawDetails(entity)
+            }?.toDrawDetails() // Basic conversion without entity if needed, or use entity flow
         }.getOrNull()
     }
 

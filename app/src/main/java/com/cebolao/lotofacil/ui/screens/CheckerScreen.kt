@@ -2,6 +2,8 @@ package com.cebolao.lotofacil.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -45,17 +47,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
-import com.cebolao.lotofacil.ui.components.AppCard
-import com.cebolao.lotofacil.ui.components.AppConfirmationDialog
+import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
 import com.cebolao.lotofacil.domain.model.toCheckResult
-import com.cebolao.lotofacil.ui.components.CheckResultCard
-import com.cebolao.lotofacil.ui.components.FinancialPerformanceCard
-import com.cebolao.lotofacil.ui.components.GameQualityCard
-import com.cebolao.lotofacil.ui.components.MessageState
-import com.cebolao.lotofacil.ui.components.NumberBallSize
-import com.cebolao.lotofacil.ui.components.NumberGrid
-import com.cebolao.lotofacil.ui.components.SimpleStatsCard
-import com.cebolao.lotofacil.ui.components.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
+import com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard
+import com.cebolao.lotofacil.ui.components.stats.GameQualityCard
+import com.cebolao.lotofacil.ui.components.common.MessageState
+import com.cebolao.lotofacil.ui.components.game.NumberBallSize
+import com.cebolao.lotofacil.ui.components.game.NumberGrid
+import com.cebolao.lotofacil.ui.components.stats.SimpleStatsCard
+import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
