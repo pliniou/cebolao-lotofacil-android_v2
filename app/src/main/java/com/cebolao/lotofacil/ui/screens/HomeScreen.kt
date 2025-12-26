@@ -1,0 +1,276 @@
+package com.cebolao.lotofacil.ui.screens
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.model.NextDrawInfo
+import com.cebolao.lotofacil.navigation.navigateToChecker
+import com.cebolao.lotofacil.ui.components.AnimateOnEntry
+import com.cebolao.lotofacil.ui.components.AppCard
+import com.cebolao.lotofacil.ui.components.DistributionChartsCard
+import com.cebolao.lotofacil.ui.components.EntryAnimation
+import com.cebolao.lotofacil.ui.components.LastDrawCard
+import com.cebolao.lotofacil.ui.components.NextContestHeroCard
+import com.cebolao.lotofacil.ui.components.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.StatisticsPanel
+import com.cebolao.lotofacil.ui.components.WelcomeCard
+import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.staggerDelay
+import com.cebolao.lotofacil.util.Formatters
+import com.cebolao.lotofacil.viewmodels.HomeScreenState
+import com.cebolao.lotofacil.viewmodels.HomeViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(
+    navController: NavController? = null,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    uiState.syncMessageRes?.let { msgId ->
+        val msg = stringResource(msgId)
+        LaunchedEffect(msgId) {
+            snackbarHostState.showSnackbar(msg)
+            viewModel.onMessageShown()
+        }
+    }
+
+    AppScreen(
+        title = stringResource(R.string.app_name),
+        subtitle = stringResource(R.string.home_subtitle),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        val isRefreshing = uiState.screenState is HomeScreenState.Loading
+
+        androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.forceSync() },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val successState = uiState.screenState as? HomeScreenState.Success
+            val nextDrawInfoFromDetails = remember(successState?.details) {
+                successState?.details?.let { details ->
+                    NextDrawInfo(
+                        contestNumber = details.nextContestNumber ?: 0,
+                        formattedDate = details.nextContestDate ?: "??/??",
+                        formattedPrize = Formatters.formatCurrency(details.nextEstimatedPrize),
+                        formattedPrizeFinalFive = Formatters.formatCurrency(details.accumulatedValue05)
+                    )
+                }
+            }
+
+            StandardPageLayout(scaffoldPadding = innerPadding) {
+                item(key = "welcome") {
+                    AnimateOnEntry(
+                        delayMillis = staggerDelay(0).toLong(),
+                        animation = EntryAnimation.Fade
+                    ) {
+                        WelcomeCard()
+                    }
+                }
+
+                item(key = "hero") {
+                    AnimateOnEntry(
+                        delayMillis = staggerDelay(1).toLong(),
+                        animation = EntryAnimation.Scale
+                    ) {
+                        when {
+                            successState != null -> {
+                                NextContestHeroCard(nextDrawInfoFromDetails)
+                            }
+                            uiState.screenState is HomeScreenState.Loading -> {
+                                HeroLoadingCard()
+                            }
+                        }
+                    }
+                }
+
+                successState?.lastDraw?.let { draw ->
+                    item(key = "last_draw") {
+                        AnimateOnEntry(
+                            delayMillis = staggerDelay(2).toLong(),
+                            animation = EntryAnimation.SlideUp
+                        ) {
+                            LastDrawCard(
+                                draw = draw,
+                                details = successState.details,
+                                onCheckGame = { numbers ->
+                                    navController?.navigateToChecker(numbers.toSet())
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
+                val stats = uiState.statistics
+                if (stats != null) {
+                    item(key = "stats_panel") {
+                        AnimateOnEntry(
+                            delayMillis = staggerDelay(2).toLong(),
+                            animation = EntryAnimation.SlideUp
+                        ) {
+                            StatisticsPanel(
+                                stats = stats,
+                                modifier = Modifier.fillMaxWidth(),
+                                onTimeWindowSelected = viewModel::onTimeWindowSelected,
+                                selectedWindow = uiState.selectedTimeWindow,
+                                isStatsLoading = uiState.isStatsLoading
+                            )
+                        }
+                    }
+
+                    item(key = "distribution_charts") {
+                        AnimateOnEntry(
+                            delayMillis = staggerDelay(2).toLong(),
+                            animation = EntryAnimation.SlideUp
+                        ) {
+                            DistributionChartsCard(
+                                stats = stats,
+                                selectedPattern = uiState.selectedPattern,
+                                onPatternSelected = viewModel::onPatternSelected,
+                                lastDraw = successState?.lastDraw,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
+                item(key = "disclaimer") {
+                    AnimateOnEntry(
+                        delayMillis = staggerDelay(2).toLong(),
+                        animation = EntryAnimation.Fade
+                    ) {
+                        // Card de atenção centralizado (cores invertidas)
+                        AttentionCardCentered()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroLoadingCard(
+    modifier: Modifier = Modifier
+) {
+    AppCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(120.dp),
+        outlined = true,
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(Dimen.IconMedium),
+                strokeWidth = 2.dp
+            )
+            Spacer(Modifier.width(Dimen.SpacingMedium))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = stringResource(R.string.home_updating_data),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.home_pull_to_refresh_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AttentionCardCentered(
+    modifier: Modifier = Modifier
+) {
+    val scheme = MaterialTheme.colorScheme
+
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        AppCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = 520.dp),
+            outlined = false,
+            color = scheme.inverseSurface,
+            contentPadding = Dimen.CardContentPadding
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = null,
+                        tint = scheme.inversePrimary,
+                        modifier = Modifier.size(Dimen.IconMedium)
+                    )
+                    Text(
+                        text = stringResource(R.string.attention_title).uppercase(),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = scheme.inverseOnSurface
+                    )
+                }
+
+                Text(
+                    text = stringResource(R.string.attention_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = scheme.inverseOnSurface,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}

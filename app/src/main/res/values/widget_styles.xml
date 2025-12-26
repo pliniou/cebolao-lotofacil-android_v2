@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Estilo Base (Pai) -->
+    <style name="Widget.Cebolao" parent="android:Widget">
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Título do Widget (Cabeçalho) -->
+    <style name="Widget.Cebolao.Title" parent="Widget.Cebolao">
+        <item name="android:textSize">@dimen/widget_title_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/widget_text_primary</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- Texto Secundário / Legendas -->
+    <style name="Widget.Cebolao.Text.Secondary" parent="Widget.Cebolao">
+        <item name="android:textSize">@dimen/widget_subtitle_size</item>
+        <item name="android:textColor">@color/widget_text_secondary</item>
+    </style>
+
+    <!-- Texto de Destaque (Prêmios) -->
+    <style name="Widget.Cebolao.Text.Highlight" parent="Widget.Cebolao">
+        <item name="android:textSize">@dimen/widget_prize_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/brand_primary</item>
+    </style>
+
+    <!-- Texto da Bola Numerada -->
+    <style name="Widget.Cebolao.BallText" parent="Widget.Cebolao">
+        <item name="android:textSize">@dimen/widget_ball_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">sans-serif-condensed-medium</item>
+    </style>
+</resources>
