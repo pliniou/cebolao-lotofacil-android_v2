@@ -30,9 +30,6 @@ object GameAnalyzer {
         
         val stats = object : GameStatisticsProvider {
             override val numbers = numbers
-            override val sequences = 0 
-            override val lines = 0
-            override val columns = 0
         }
         
         val evals = listOf(

@@ -13,7 +13,7 @@ class FilterRuleTest {
         val metricsIn = GameComputedMetrics(
             sum = 0, evens = 6, primes = 0, frame = 0,
             fibonacci = 0, repeated = 0, sequences = 0,
-            lines = 0, columns = 0, quadrants = 0
+            multiplesOf3 = 0, center = 0
         )
         
         val metricsOutLow = metricsIn.copy(evens = 4)

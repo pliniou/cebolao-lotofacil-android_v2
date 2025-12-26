@@ -124,8 +124,10 @@ fun GeneratedGamesScreen(
                             m.evens,
                             m.primes,
                             m.frame,
-                            m.repeated.toString(),
+                            m.center,
                             m.fibonacci,
+                            m.multiplesOf3,
+                            m.repeated,
                             m.sequences
                         )
                         val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {

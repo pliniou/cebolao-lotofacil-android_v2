@@ -281,7 +281,7 @@
     <string name="game_card_pinned">Fixado</string>
 
     <!-- Share -->
-    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:\n%1$s\n\n📊 Estatísticas:\nSoma: %2$d | Pares: %3$d | Primos: %4$d\nMoldura: %5$d | Repet.: %6$s | Fib.: %7$d\nSeq.: %8$d\n\nGerado com Cebolão Lotofácil</string>
+    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:\n%1$s\n\n📊 Estatísticas:\nSoma: %2$d | Pares: %3$d\nPrimos: %4$d | Moldura: %5$d\nMiolo: %6$d | Fib.: %7$d\nMult. 3: %8$d | Repet.: %9$d\nSeq.: %10$d\n\nGerado com Cebolão Lotofácil</string>
     <string name="share_error_message">Erro ao compartilhar jogo</string>
 
     <!-- General -->
@@ -298,11 +298,10 @@
     <string name="stat_primes">Primos</string>
     <string name="stat_sequences">Seq.</string>
     <string name="stat_fibonacci">Fib.</string>
-    <string name="stat_lines">Linhas</string>
-    <string name="stat_cols">Colunas</string>
+    <string name="stat_multiples_of_3">Mult. 3</string>
+    <string name="stat_center">Miolo</string>
     <string name="stat_frame">Moldura</string>
     <string name="stat_repeated">Repet.</string>
-    <string name="stat_quadrants">Quad.</string>
     <string name="prize_table_title">Premiação</string>
     <string name="prize_table_header_prize">Faixa</string>
     <string name="prize_table_header_winners">Ganhadores</string>

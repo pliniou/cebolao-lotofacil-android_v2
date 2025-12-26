@@ -9,8 +9,7 @@ data class GameComputedMetrics(
     val frame: Int,
 
     val sequences: Int,
-    val lines: Int,
-    val columns: Int,
-    val quadrants: Int,
+    val multiplesOf3: Int,
+    val center: Int,
     val repeated: Int
 )

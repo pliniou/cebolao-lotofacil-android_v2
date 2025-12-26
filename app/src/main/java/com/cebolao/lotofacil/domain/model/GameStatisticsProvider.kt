@@ -15,7 +15,8 @@ interface GameStatisticsProvider {
     val primes: Int get() = if (this is BitmaskProvider) MaskUtils.countIf(mask) { GameConstants.PRIMOS.contains(it) } else numbers.count { it in GameConstants.PRIMOS }
     val fibonacci: Int get() = if (this is BitmaskProvider) MaskUtils.countIf(mask) { GameConstants.FIBONACCI.contains(it) } else numbers.count { it in GameConstants.FIBONACCI }
     val frame: Int get() = if (this is BitmaskProvider) MaskUtils.countIf(mask) { GameConstants.MOLDURA.contains(it) } else numbers.count { it in GameConstants.MOLDURA }
-    // Removed Portrait and MultiplesOf3
+    val multiplesOf3: Int get() = if (this is BitmaskProvider) MaskUtils.countIf(mask) { GameConstants.MULTIPLOS_DE_3.contains(it) } else numbers.count { it in GameConstants.MULTIPLOS_DE_3 }
+    val center: Int get() = if (this is BitmaskProvider) MaskUtils.countIf(mask) { GameConstants.MIOLO.contains(it) } else numbers.count { it in GameConstants.MIOLO }
 
     /** Número de sequências consecutivas de 3+ números */
     val sequences: Int
@@ -40,76 +41,8 @@ interface GameStatisticsProvider {
             if (run >= 3) count++
             return count
         }
-
-    /** Número de linhas horizontais com 3+ números (grid 5x5) */
-    val lines: Int
-        get() {
-            val rowCounts = IntArray(5)
-            if (this is BitmaskProvider) {
-                MaskUtils.forEachNumber(mask) { n ->
-                    val row = (n - 1) / 5
-                    if (row in 0..4) rowCounts[row]++
-                }
-            } else {
-                for (n in numbers) {
-                    val row = (n - 1) / 5
-                    if (row in 0..4) rowCounts[row]++
-                }
-            }
-            var count = 0
-            for (c in rowCounts) if (c >= 3) count++
-            return count
-        }
-
-    /** Número de colunas verticais com 3+ números (grid 5x5) */
-    val columns: Int
-        get() {
-            val colCounts = IntArray(5)
-            if (this is BitmaskProvider) {
-                MaskUtils.forEachNumber(mask) { n ->
-                    val col = (n - 1) % 5
-                    if (col in 0..4) colCounts[col]++
-                }
-            } else {
-                for (n in numbers) {
-                    val col = (n - 1) % 5
-                    if (col in 0..4) colCounts[col]++
-                }
-            }
-            var count = 0
-            for (c in colCounts) if (c >= 3) count++
-            return count
-        }
-
-    /** Número de quadrantes (4 regiões) que possuem pelo menos 1 número selecionado (0..4)
-     *  Grid 5x5 dividido em 4 quadrantes (top-left, top-right, bottom-left, bottom-right).
-     */
-    val quadrants: Int
-        get() {
-            val present = BooleanArray(4)
-            if (this is BitmaskProvider) {
-                MaskUtils.forEachNumber(mask) { n ->
-                    val row = (n - 1) / 5
-                    val col = (n - 1) % 5
-                    val qr = if (row < 2) 0 else 1
-                    val qc = if (col < 2) 0 else 1
-                    val q = qr * 2 + qc
-                    if (q in 0..3) present[q] = true
-                }
-            } else {
-                for (n in numbers) {
-                    val row = (n - 1) / 5
-                    val col = (n - 1) % 5
-                    val qr = if (row < 2) 0 else 1
-                    val qc = if (col < 2) 0 else 1
-                    val q = qr * 2 + qc
-                    if (q in 0..3) present[q] = true
-                }
-            }
-            var count = 0
-            for (p in present) if (p) count++
-            return count
-        }
+    
+    // Removed legacy Lines, Columns, Quadrants logic
 
     /** Quantidade de números do jogo que estão contidos em um sorteio anterior */
     fun repeatedFrom(lastDraw: Set<Int>?): Int {

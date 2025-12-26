@@ -15,9 +15,8 @@ class GameMetricsCalculator {
             frame = provider.frame,
 
             sequences = provider.sequences,
-            lines = provider.lines,
-            columns = provider.columns,
-            quadrants = provider.quadrants,
+            multiplesOf3 = provider.multiplesOf3,
+            center = provider.center,
             repeated = repeated
         )
     }

@@ -383,10 +383,11 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
                         R.string.stat_evens to metrics.evens,
                         R.string.stat_primes to metrics.primes,
                         R.string.stat_frame to metrics.frame,
+                        R.string.stat_center to metrics.center,
                         R.string.stat_fibonacci to metrics.fibonacci,
+                        R.string.stat_multiples_of_3 to metrics.multiplesOf3,
                         R.string.stat_repeated to metrics.repeated,
-                        R.string.stat_sequences to metrics.sequences,
-                        R.string.stat_quadrants to metrics.quadrants
+                        R.string.stat_sequences to metrics.sequences
                     )
                 }
                 

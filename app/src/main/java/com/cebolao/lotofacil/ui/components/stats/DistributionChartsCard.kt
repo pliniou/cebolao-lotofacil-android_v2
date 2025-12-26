@@ -45,7 +45,12 @@ fun DistributionChartsCard(
     // Calcule o valor do último sorteio para o padrão selecionado
     val highlightValue = remember(lastDraw, selectedPattern) {
         lastDraw?.let { draw ->
-            calculatePatternValue(draw, selectedPattern).toString()
+            val rawValue = calculatePatternValue(draw, selectedPattern)
+            if (selectedPattern == StatisticPattern.SUM) {
+                ((rawValue / GameConstants.SUM_STEP) * GameConstants.SUM_STEP).toString()
+            } else {
+                rawValue.toString()
+            }
         }
     }
 
@@ -108,10 +113,9 @@ private fun calculatePatternValue(draw: com.cebolao.lotofacil.domain.model.Draw,
         StatisticPattern.PRIMES -> draw.primes
         StatisticPattern.FRAME -> draw.frame
         StatisticPattern.FIBONACCI -> draw.fibonacci
-        StatisticPattern.LINES -> draw.lines
-        StatisticPattern.COLUMNS -> draw.columns
         StatisticPattern.SEQUENCES -> draw.sequences
-        StatisticPattern.QUADRANTS -> draw.quadrants
+        StatisticPattern.MULTIPLES_OF_3 -> draw.multiplesOf3
+        StatisticPattern.CENTER -> draw.center
     }
 }
 
@@ -148,10 +152,9 @@ private fun prepareData(
         StatisticPattern.PRIMES -> stats.primeDistribution
         StatisticPattern.FRAME -> stats.frameDistribution
         StatisticPattern.FIBONACCI -> stats.fibonacciDistribution
-        StatisticPattern.LINES -> stats.linesDistribution
-        StatisticPattern.COLUMNS -> stats.columnsDistribution
         StatisticPattern.SEQUENCES -> stats.sequencesDistribution
-        StatisticPattern.QUADRANTS -> stats.quadrantsDistribution
+        StatisticPattern.MULTIPLES_OF_3 -> stats.multiplesOf3Distribution
+        StatisticPattern.CENTER -> stats.centerDistribution
     }
 
     if (raw.isEmpty()) return emptyList()
@@ -208,9 +211,8 @@ private fun domainFor(pattern: StatisticPattern): IntRange? = when (pattern) {
     StatisticPattern.PRIMES -> 0..9
     StatisticPattern.FRAME -> 0..15
     StatisticPattern.FIBONACCI -> 0..7
-    StatisticPattern.LINES -> 0..5
-    StatisticPattern.COLUMNS -> 0..5
-    StatisticPattern.QUADRANTS -> 0..4
-    StatisticPattern.SEQUENCES -> null
+    StatisticPattern.SEQUENCES -> null // Sequences can vary
     StatisticPattern.SUM -> null
+    StatisticPattern.MULTIPLES_OF_3 -> 0..15
+    StatisticPattern.CENTER -> 0..9
 }

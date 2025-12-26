@@ -17,9 +17,8 @@ enum class StatisticPattern(val filterType: FilterType, val icon: ImageVector) {
     EVENS(FilterType.PARES, Icons.Outlined.LooksOne),
     PRIMES(FilterType.PRIMOS, Icons.Outlined.Percent),
     FRAME(FilterType.MOLDURA, Icons.Outlined.Grid4x4),
+    CENTER(FilterType.CENTER, Icons.Outlined.Dashboard),
     FIBONACCI(FilterType.FIBONACCI, Icons.Outlined.Timeline),
-    LINES(FilterType.LINHAS, Icons.Outlined.ViewHeadline),
-    COLUMNS(FilterType.COLUNAS, Icons.Outlined.ViewWeek),
-    SEQUENCES(FilterType.SEQUENCIAS, Icons.Outlined.LinearScale),
-    QUADRANTS(FilterType.QUADRANTES, Icons.Outlined.Dashboard)
+    MULTIPLES_OF_3(FilterType.MULTIPLES_OF_3, Icons.Outlined.Grid4x4),
+    SEQUENCES(FilterType.SEQUENCIAS, Icons.Outlined.LinearScale)
 }

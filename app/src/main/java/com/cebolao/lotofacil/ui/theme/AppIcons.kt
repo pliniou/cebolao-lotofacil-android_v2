@@ -68,7 +68,6 @@ val FilterType.filterIcon: ImageVector
         FilterType.FIBONACCI -> Icons.Default.Timeline
         FilterType.REPETIDAS_CONCURSO_ANTERIOR -> Icons.Default.Repeat
         FilterType.SEQUENCIAS -> Icons.Default.Link
-        FilterType.LINHAS -> Icons.Default.TableRows
-        FilterType.COLUNAS -> Icons.Default.ViewColumn
-        FilterType.QUADRANTES -> Icons.Default.Apps
+        FilterType.MULTIPLES_OF_3 -> Icons.Default.TableRows // Reusing TableRows or similar
+        FilterType.CENTER -> Icons.Default.ViewColumn // Reusing ViewColumn or similar
     }

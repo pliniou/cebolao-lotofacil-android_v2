@@ -30,8 +30,6 @@ class GameMetricsCalculatorTest {
         assertEquals(6, metrics.primes)
         
         // Frame (Moldura): 1, 2, 3, 4, 5, 11, 15, 21, 22, 23, 24, 25 -> 12
-        // Middle (Retrato): 12, 13, 14 -> 3
-        assertEquals(12, metrics.frame)
         assertEquals(12, metrics.frame)
         
         // Fibonacci: 1, 2, 3, 5, 13, 21 -> 6
@@ -39,5 +37,11 @@ class GameMetricsCalculatorTest {
         
         // Repeated: 1, 2, 3, 11, 12, 21, 22, 23, 24, 25 -> 10
         assertEquals(10, metrics.repeated)
+
+        // Multiples of 3: 3, 12, 15, 21, 24 -> 5
+        assertEquals(5, metrics.multiplesOf3)
+
+        // Center: 12, 13, 14 -> 3
+        assertEquals(3, metrics.center)
     }
 }

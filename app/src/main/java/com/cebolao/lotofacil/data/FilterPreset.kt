@@ -71,8 +71,7 @@ object FilterPresets {
                 FilterType.SOMA_DEZENAS to 190f..205f,
                 FilterType.PARES to 7f..8f,
                 FilterType.PRIMOS to 5f..6f,
-                FilterType.SEQUENCIAS to 1f..3f,
-                FilterType.QUADRANTES to 4f..4f // All 4 quadrants must be present
+                FilterType.SEQUENCIAS to 1f..3f
             )
         ),
         FilterPreset(

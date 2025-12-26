@@ -24,14 +24,12 @@ data class StatisticsReport(
     val sumDistribution: Map<Int, Int> = emptyMap(),
     @SerialName("fibonacci_distribution")
     val fibonacciDistribution: Map<Int, Int> = emptyMap(),
-    @SerialName("lines_distribution")
-    val linesDistribution: Map<Int, Int> = emptyMap(),
-    @SerialName("columns_distribution")
-    val columnsDistribution: Map<Int, Int> = emptyMap(),
+    @SerialName("multiples_of_3_distribution")
+    val multiplesOf3Distribution: Map<Int, Int> = emptyMap(),
+    @SerialName("center_distribution")
+    val centerDistribution: Map<Int, Int> = emptyMap(),
     @SerialName("sequences_distribution")
     val sequencesDistribution: Map<Int, Int> = emptyMap(),
-    @SerialName("quadrants_distribution")
-    val quadrantsDistribution: Map<Int, Int> = emptyMap(),
     @SerialName("average_sum")
     val averageSum: Float = 0f,
     @SerialName("total_draws_analyzed")

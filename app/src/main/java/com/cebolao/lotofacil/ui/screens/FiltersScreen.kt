@@ -123,9 +123,7 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
         allFilters.filter {
             it.type in listOf(
                 FilterType.MOLDURA,
-                FilterType.LINHAS,
-                FilterType.COLUNAS,
-                FilterType.QUADRANTES
+                FilterType.CENTER
             )
         }
     }
@@ -133,7 +131,8 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
     val matematicos = remember(allFilters) {
         allFilters.filter {
             it.type in listOf(
-                FilterType.FIBONACCI
+                FilterType.FIBONACCI,
+                FilterType.MULTIPLES_OF_3
             )
         }
     }

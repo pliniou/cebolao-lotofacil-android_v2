@@ -311,7 +311,7 @@ class GameGenerator @Inject constructor(
             onAttempt()
             
             // Construct metrics directly from state + lazy structure calculation
-            val structural = calculateStructuralMetrics(currentSelection)
+            val extraMetrics = calculateExtraMetrics(currentSelection)
             
             val metrics = GameComputedMetrics(
                 sum = sum,
@@ -320,10 +320,9 @@ class GameGenerator @Inject constructor(
                 fibonacci = fib,
                 frame = frame,
                 repeated = repeated,
-                sequences = structural.sequences,
-                lines = structural.lines,
-                columns = structural.columns,
-                quadrants = structural.quadrants
+                sequences = extraMetrics.sequences,
+                multiplesOf3 = extraMetrics.multiplesOf3,
+                center = extraMetrics.center
             )
             
             val failedRule = rules.firstOrNull { !it.matches(metrics) }
@@ -343,16 +342,13 @@ class GameGenerator @Inject constructor(
             return true
         }
 
-        private data class StructuralMetrics(val lines: Int, val columns: Int, val quadrants: Int, val sequences: Int)
+        private data class ExtraMetrics(val multiplesOf3: Int, val center: Int, val sequences: Int)
 
-        private fun calculateStructuralMetrics(selection: IntArray): StructuralMetrics {
+        private fun calculateExtraMetrics(selection: IntArray): ExtraMetrics {
              var sequences = 0
              var currentSeq = 0
-             
-             // Arrays for grid counts
-             val linesArr = IntArray(5)
-             val colsArr = IntArray(5)
-             val quadsArr = BooleanArray(4)
+             var multiplesOf3 = 0
+             var center = 0
 
              var prev = -1
              
@@ -361,43 +357,25 @@ class GameGenerator @Inject constructor(
                  if (prev != -1 && n == prev + 1) {
                      currentSeq++
                  } else {
-                     if (currentSeq >= 3) sequences++ // 3+ numbers sequence? Rule usually says "Sequencia de X numeros". 
-                     // Wait, standard definition is "sequence of numbers", usually handled by 'sequences' metric counting sequences of size >= 3? or just total numbers in sequence? 
-                     // StatisticAnalyzer says: "if (run >= 3) count++". Yes.
+                     if (currentSeq >= 3) sequences++ 
                      currentSeq = 1 // reset to 1 (the current number)
                  }
                  prev = n
 
-                 // Grid
-                 // Board is 1..25. Row = (n-1)/5. Col = (n-1)%5.
+                 // Multiples of 3
+                 if (n % 3 == 0) multiplesOf3++
+                 
+                 // Center (Miolo): 7, 8, 9, 12, 13, 14, 17, 18, 19
+                 // Center if row 1,2,3 and col 1,2,3 (indices 1..3)
+                 // n-1 / 5 => row. n-1 % 5 => col.
                  val idx = n - 1
                  val r = idx / 5
                  val c = idx % 5
-                 linesArr[r]++
-                 colsArr[c]++
-                 
-                 // Quadrants: 0 (TL), 1 (TR), 2 (BL), 3 (BR)
-                 // TL: r<2, c<2. TR: r<2, c>=2 (col 2,3,4? Wait 5 cols. 0,1 | 2,3,4? Or split at 2?)
-                 // StatisticAnalyzer: qr = if (row < 2) 0 else 1. qc = if (col < 2) 0 else 1. q = qr*2 + qc.
-                 // So rows 0,1 -> Top. Rows 2,3,4 -> Bottom. Cols 0,1 -> Left. Cols 2,3,4 -> Right.
-                 // This matches 2x2 split roughly.
-                 
-                 val qr = if (r < 2) 0 else 1
-                 val qc = if (c < 2) 0 else 1
-                 quadsArr[qr * 2 + qc] = true
+                 if (r in 1..3 && c in 1..3) center++
              }
              if (currentSeq >= 3) sequences++
 
-             var lCount = 0
-             for (c in linesArr) if (c >= 3) lCount++
-             
-             var cCount = 0
-             for (c in colsArr) if (c >= 3) cCount++
-             
-             var qCount = 0
-             for (b in quadsArr) if (b) qCount++
-             
-             return StructuralMetrics(lCount, cCount, qCount, sequences)
+             return ExtraMetrics(multiplesOf3, center, sequences)
         }
 
         private fun minSumAfter(lastNum: Int, count: Int): Int {

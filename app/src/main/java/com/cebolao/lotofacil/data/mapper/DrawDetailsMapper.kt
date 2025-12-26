@@ -12,7 +12,7 @@ fun DrawDetailsEntity.toDrawDetails(draw: Draw): DrawDetails {
         draw = draw,
         nextEstimatedPrize = nextEstimatedPrize,
         nextContestDate = nextContestDate,
-        nextContestNumber = nextContestNumber,
+        nextContestNumber = nextContestNumber ?: (draw.contestNumber + 1),
         accumulatedValue05 = accumulatedValue05,
         accumulatedValueSpecial = accumulatedValueSpecial,
         location = location,
@@ -26,7 +26,7 @@ fun LotofacilApiResult.toDrawDetailsEntity(): DrawDetailsEntity {
         contestNumber = numero,
         nextEstimatedPrize = valorEstimadoProximoConcurso,
         nextContestDate = dataProximoConcurso,
-        nextContestNumber = null, // API doesn't explicitly give this, usually numero + 1
+        nextContestNumber = numero + 1,
         accumulatedValue05 = valorAcumuladoConcurso05,
         accumulatedValueSpecial = valorAcumuladoConcursoEspecial,
         location = "$localSorteio - $nomeMunicipioUFSorteio",

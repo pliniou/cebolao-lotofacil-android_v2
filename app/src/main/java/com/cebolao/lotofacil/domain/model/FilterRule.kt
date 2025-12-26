@@ -32,8 +32,7 @@ fun FilterState.toRule(lastDraw: Set<Int>? = null): FilterRule? {
 
         FilterType.REPETIDAS_CONCURSO_ANTERIOR -> CountRangeFilter(type, r) { it.repeated }
         FilterType.SEQUENCIAS -> CountRangeFilter(type, r) { it.sequences }
-        FilterType.LINHAS -> CountRangeFilter(type, r) { it.lines }
-        FilterType.COLUNAS -> CountRangeFilter(type, r) { it.columns }
-        FilterType.QUADRANTES -> CountRangeFilter(type, r) { it.quadrants }
+        FilterType.MULTIPLES_OF_3 -> CountRangeFilter(type, r) { it.multiplesOf3 }
+        FilterType.CENTER -> CountRangeFilter(type, r) { it.center }
     }
 }

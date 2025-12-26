@@ -20,10 +20,9 @@ private const val HIST_SIZE_PRIMES = 16
 private const val HIST_SIZE_FRAME = 17
 private const val HIST_SIZE_FIB = 16
 private const val HIST_SIZE_SUM = 300
-private const val HIST_SIZE_LINES = 6
-private const val HIST_SIZE_COLS = 6
+private const val HIST_SIZE_MUL3 = 16
+private const val HIST_SIZE_CENTER = 10
 private const val HIST_SIZE_SEQ = 16
-private const val HIST_SIZE_QUAD = 5
 
 @Suppress("SameParameterValue")
 @Singleton
@@ -64,10 +63,9 @@ class StatisticsAnalyzer @Inject constructor(
         val frameDist = IntArray(HIST_SIZE_FRAME)
         val fibonacciDist = IntArray(HIST_SIZE_FIB)
         val sumDist = IntArray(HIST_SIZE_SUM)
-        val linesDist = IntArray(HIST_SIZE_LINES)
-        val colsDist = IntArray(HIST_SIZE_COLS)
+        val mul3Dist = IntArray(HIST_SIZE_MUL3)
+        val centerDist = IntArray(HIST_SIZE_CENTER)
         val seqDist = IntArray(HIST_SIZE_SEQ)
-        val quadDist = IntArray(HIST_SIZE_QUAD)
 
         var sumAccumulator = 0L
 
@@ -87,12 +85,12 @@ class StatisticsAnalyzer @Inject constructor(
             primesDist.safeIncrement(draw.primes)
             frameDist.safeIncrement(draw.frame)
             fibonacciDist.safeIncrement(draw.fibonacci)
-            linesDist.safeIncrement(draw.lines)
-            colsDist.safeIncrement(draw.columns)
+            mul3Dist.safeIncrement(draw.multiplesOf3)
+            centerDist.safeIncrement(draw.center)
             seqDist.safeIncrement(draw.sequences)
-            quadDist.safeIncrement(draw.quadrants)
 
-            val sumBucket = (draw.sum / 10) * 10
+            // Fix: Use correct step for sum buckets
+            val sumBucket = (draw.sum / GameConstants.SUM_STEP) * GameConstants.SUM_STEP
             sumDist.safeIncrement(sumBucket)
 
             sumAccumulator += draw.sum
@@ -109,10 +107,9 @@ class StatisticsAnalyzer @Inject constructor(
             frameDistribution = frameDist.toNonZeroMap(),
             fibonacciDistribution = fibonacciDist.toNonZeroMap(),
             sumDistribution = sumDist.toNonZeroMap(),
-            linesDistribution = linesDist.toNonZeroMap(),
-            columnsDistribution = colsDist.toNonZeroMap(),
+            multiplesOf3Distribution = mul3Dist.toNonZeroMap(),
+            centerDistribution = centerDist.toNonZeroMap(),
             sequencesDistribution = seqDist.toNonZeroMap(),
-            quadrantsDistribution = quadDist.toNonZeroMap(),
             averageSum = if (draws.isNotEmpty()) sumAccumulator.toFloat() / draws.size else 0f,
             totalDrawsAnalyzed = draws.size
         )
