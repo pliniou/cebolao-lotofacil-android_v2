@@ -300,14 +300,24 @@ private fun DrawScope.drawBars(
                 )
             }
         }
-        // Labels inclinados para legibilidade
-        if (data.size <= 15 || index % 2 == 0) {
-            // ... (label drawing code) ...
-            drawContext.canvas.nativeCanvas.withSave {
+        // Dynamic Label Skipping Logic
+        // Calculate how many labels we can reasonably fit
+        val labelWidthPx = 80f // Estimated width for rotated text or standard text
+        val maxLabels = (m.totalWidth / labelWidthPx).toInt().coerceAtLeast(1)
+        val skipInterval = (data.size / maxLabels).coerceAtLeast(1)
+
+        if (data.size <= 15 || index % skipInterval == 0 || index == data.size - 1) {
+             drawContext.canvas.nativeCanvas.withSave {
                 val centerX = x + m.barWidth / 2f
                 val baseY = size.height - 20f
-                rotate(-45f, centerX, baseY)
-                drawText(label, centerX, baseY, p.label)
+                
+                // Rotate only if necessary (many items)
+                if (data.size > 8) {
+                    rotate(-45f, centerX, baseY)
+                    drawText(label, centerX, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })
+                } else {
+                    drawText(label, centerX, baseY, p.label.apply { textAlign = Paint.Align.CENTER })
+                }
             }
         }
     }

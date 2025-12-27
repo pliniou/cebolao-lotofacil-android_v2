@@ -1,75 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:padding="@dimen/widget_content_padding">
 
-    <!-- Header -->
-
-    <!-- Conteúdo (Bolas) -->
     <LinearLayout
-        android:id="@+id/widget_numbers_container"
+        android:id="@+id/widget_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="@dimen/spacing_small"
-        android:gravity="center"
-        android:orientation="vertical">
-        <!-- Inflado via código -->
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="379dp"
+        <ImageView
+            android:layout_width="@dimen/icon_size_medium"
+            android:layout_height="@dimen/icon_size_medium"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_lotofacil_logo" />
+
+        <TextView
+            android:id="@+id/widget_title"
+            style="@style/Widget.Cebolao.Title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
+            android:layout_marginStart="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:text="@string/widget_last_draw_title" />
 
-            <ImageView
-                android:layout_width="43dp"
-                android:layout_height="48dp"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_lotofacil_logo" />
-
-            <TextView
-                android:id="@+id/widget_title"
-                style="@style/Widget.Cebolao.Title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/spacing_small"
-                android:layout_weight="0"
-                android:alpha="5"
-                android:text="@string/widget_last_draw_title"
-                android:textAlignment="viewStart"
-                android:textAllCaps="false"
-                android:textStyle="bold" />
-
-            <ImageButton
-                android:id="@+id/widget_refresh_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/content_desc_refresh"
-                android:padding="3dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_refresh"
-                android:tint="@color/widget_icon_tint"
-                android:visibility="visible" />
-
-        </LinearLayout>
-
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="@dimen/widget_refresh_button_size"
+            android:layout_height="@dimen/widget_refresh_button_size"
+            android:background="@drawable/widget_icon_button_background"
+            android:contentDescription="@string/content_desc_refresh"
+            android:padding="6dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_refresh"
+            android:tint="@color/widget_icon_tint" />
     </LinearLayout>
 
-    <!-- Loading -->
-    <TextView
-        android:id="@+id/widget_loading_text"
-        style="@style/Widget.Cebolao.Text.Secondary"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/widget_body"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/general_loading"
-        android:visibility="gone" />
+        android:layout_below="@id/widget_header"
+        android:layout_marginTop="@dimen/spacing_small">
+
+        <LinearLayout
+            android:id="@+id/widget_numbers_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/widget_loading_text"
+            style="@style/Widget.Cebolao.Text.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/general_loading"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </RelativeLayout>

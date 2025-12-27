@@ -15,9 +15,6 @@
     <string name="general_selected">Selecionado</string>
     <string name="general_cancel">Cancelar</string>
     <string name="general_save">Salvar</string>
-
-
-
     <string name="general_error_title">Algo deu errado</string>
     <string name="general_loading">Carregando…</string>
     <string name="open_external_link">Abrir link externo</string>
@@ -39,15 +36,12 @@
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sincronizar dados</string>
     <string name="home_sync_success_message">Base de dados atualizada. Agora a culpa não é da defasagem.</string>
     <string name="home_sync_failed_message">Falha na conexão. Verifique sua internet.</string>
-
-
     <string name="home_hot_numbers">Dezenas Quentes</string>
     <string name="home_overdue_numbers">Dezenas Atrasadas</string>
 
     <!-- Labels curtos usados em cards de estatística -->
-
-
-
+    <string name="widget_label_prize_estimate">Prêmio estimado</string>
+    <string name="widget_label_draw_date">Data do sorteio</string>
     <string name="home_analysis_period">Período de Análise</string>
     <string name="home_all_contests">Todos os concursos</string>
     <string name="home_last_contests_format" tools:ignore="PluralsCandidate">Últimos %1$d concursos</string>
@@ -191,17 +185,17 @@
     <string name="games_clear_confirm">Limpar</string>
     <string name="games_delete_dialog_title">Excluir Jogo?</string>
 
-    <!-- (demais chaves existentes do seu arquivo original permanecem inalteradas) -->
+    <!-- Widget Resources -->
     <string name="widget_last_draw_title">Último concurso</string>
     <string name="widget_next_contest_title_generic">Proximo</string>
     <string name="widget_pinned_game_title">Fixado</string>
-    <!-- Widget Resources -->
     <string name="content_desc_refresh">Atualizar</string>
     <string name="widget_next_contest_title">Próximo Concurso</string>
     <string name="widget_no_pinned_games">Nenhum jogo fixado</string>
     <string name="widget_last_draw_description">Mostra o resultado do último sorteio da Lotofácil</string>
     <string name="widget_next_contest_description">Mostra informações sobre o próximo concurso</string>
     <string name="widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
+
     <!-- Presets -->
     <string name="preset_standard">Padrão</string>
     <string name="preset_standard_desc">Estratégia mais comum, seguindo a média histórica da maioria dos sorteios.</string>
@@ -277,7 +271,6 @@
     <string name="games_empty_state_title">Nenhum jogo</string>
     <string name="games_empty_state_description">Use o gerador para criar novos jogos.</string>
     <string name="games_tab_new">Novos</string>
-
     <string name="game_card_unpinned">Desfixado</string>
     <string name="game_card_pinned">Fixado</string>
 
@@ -332,6 +325,7 @@
     <string name="game_generator_failure_no_history">Sem histórico suficiente.</string>
     <string name="game_generator_failure_generic">Falha na geração.</string>
     <string name="game_generator_failure_filters_strict">Filtros muito rigorosos. Tente relaxar as restrições.</string>
+    
     <!-- About / Settings -->
     <string name="settings_appearance_title">Aparência</string>
     <string name="settings_theme_mode_title">Modo de Tema</string>
@@ -344,20 +338,15 @@
     <string name="settings_accent_yellow">Amarelo</string>
     <string name="settings_accent_pink">Rosa</string>
     <string name="settings_accent_orange">Laranja</string>
-
     <string name="about_learn_more_title">Saiba Mais</string>
     <string name="about_learn_more_desc">Dicas e estratégias em breve.</string>
     <string name="about_learn_more_header">Aprenda Mais</string>
-
     <string name="about_source_title">Fonte dos Dados</string>
     <string name="about_source_desc">Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh.</string>
-
     <string name="about_important_title">Importante</string>
     <string name="about_important_desc">Este app organiza informações públicas. Não aumenta suas chances de ganhar, apenas evita combinações estatisticamente improváveis.</string>
-
     <string name="about_privacy_title">Privacidade</string>
     <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
-
     <string name="about_version_title">Versão</string>
 
     <!-- Home Loading States -->

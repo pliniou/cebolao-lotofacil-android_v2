@@ -11,6 +11,8 @@
         <!-- android:windowLightNavigationBar movido para values-v27 -->
     </style>
 
+    <style name="Theme" parent="Theme.CebolaoLotofacil" />
+
     <!-- Theme Splash Screen -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/surface_light</item>

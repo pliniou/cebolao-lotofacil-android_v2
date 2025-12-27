@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- Leve contraste com o widget_background, respeitando tema (app_background troca no night) -->
+    <solid android:color="@color/app_background" />
+</shape>
