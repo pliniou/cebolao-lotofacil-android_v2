@@ -104,7 +104,7 @@ fun BarChart(
                 }
         ) {
             val metrics = ChartMetrics(size, data.size)
-            drawGrid(maxValue, metrics, paints.axis, colors.line)
+            drawGrid(maxValue, metrics, paints.axis, paints.grid, colors.line)
             drawBars(
                 data = data,
                 max = maxValue,
@@ -128,7 +128,6 @@ fun BarChart(
                  )
             }
 
-            // Tooltip logic...
             selectedIndex?.let { idx ->
                 if (idx in data.indices) {
                     drawTooltip(
@@ -163,14 +162,30 @@ private class ChartMetrics(
     size: Size,
     val dataCount: Int
 ) {
+// Replaced drawBars with drawLineChart logic inside the main component or a new function
+// For clarity, I'm replacing the entire file content effectively with the new implementation in the next step
+// But since this tool requires contiguous block, I will replace the internal logic first.
+
+// NOTE: Strategy change. I will rewrite the whole file content to be clean, 
+// but using replace_file_content on a large file is risky if I don't match exactly.
+// I will target the ChartMetrics class first to adjust spacing.
+
     val drawHeight = size.height - X_AXIS_HEIGHT_PX - TOP_PADDING_PX
     val yAxisX = Y_AXIS_WIDTH_PX
     val totalWidth = size.width - yAxisX - 40f // Margin right
-    val barWidth = (totalWidth / dataCount) * 0.6f // 60% width
-    val spacing = (totalWidth / dataCount) * 0.4f // 40% spacing
+    
+    // Line Chart specific metrics
+    // We want points distributed evenly.
+    // If we have N points, we have N-1 segments.
+    // Spacing is totalWidth / (count - 1) if count > 1
+    
+    val pointSpacing = if (dataCount > 1) totalWidth / (dataCount - 1) else totalWidth
+    
+    // For hit testing (barWidth concept replaced by touch target width)
+    val touchTargetWidth = pointSpacing.coerceAtMost(60f) 
 
     fun getX(index: Int): Float {
-        return yAxisX + (index * (barWidth + spacing)) + (spacing / 2f)
+        return yAxisX + (index * pointSpacing)
     }
 
     fun getHeight(value: Int, max: Int): Float {
@@ -182,12 +197,17 @@ private class ChartMetrics(
     fun getHeight(value: Float, max: Int) = getHeight(value.toInt(), max)
 
     fun getBarIndexAt(x: Float): Int? {
-        if (x < yAxisX) return null
+        if (x < yAxisX - touchTargetWidth/2) return null
+        
+        // Find nearest index
         val relativeX = x - yAxisX
-        val step = barWidth + spacing
-        val index = (relativeX / step).toInt()
+        val index = (relativeX / pointSpacing).roundToInt()
+        
         return if (index in 0 until dataCount) index else null
     }
+
+    // Helper for rounding since we are in a class without imports potentially or use kotlin.math
+    private fun Float.roundToInt(): Int = kotlin.math.round(this).toInt()
 }
 
 @Stable
@@ -208,6 +228,7 @@ private class ChartPaints(
         color = colors.line.toArgb()
         strokeWidth = density.run { 1.dp.toPx() }
         style = Paint.Style.STROKE
+        pathEffect = android.graphics.DashPathEffect(floatArrayOf(10f, 10f), 0f)
     }
 
     val label = Paint().apply {
@@ -216,6 +237,27 @@ private class ChartPaints(
         textSize = density.run { 11.sp.toPx() }
         textAlign = Paint.Align.CENTER
         setTypeface(typeface)
+    }
+    
+    val linePaint = Paint().apply {
+        isAntiAlias = true
+        color = colors.primary.toArgb()
+        strokeWidth = density.run { 3.dp.toPx() }
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
+    
+    val dotPaint = Paint().apply {
+        isAntiAlias = true
+        color = colors.primary.toArgb()
+        style = Paint.Style.FILL
+    }
+    
+    val highlightDotPaint = Paint().apply {
+        isAntiAlias = true
+        color = colors.highlight.toArgb()
+        style = Paint.Style.FILL
     }
 
     val tooltip = Paint().apply {
@@ -230,7 +272,8 @@ private class ChartPaints(
 private fun DrawScope.drawGrid(
     max: Int,
     m: ChartMetrics,
-    textPaint: Paint, // Note: Paint from android.graphics
+    textPaint: Paint, 
+    gridPaint: Paint,
     lineColor: Color
 ) {
     val step = max / GRID_LINES.toFloat()
@@ -240,11 +283,8 @@ private fun DrawScope.drawGrid(
         val y = TOP_PADDING_PX + m.drawHeight - m.getHeight(value.toInt(), max)
         
         // Grid Line
-        drawLine(
-            color = lineColor,
-            start = Offset(m.yAxisX, y),
-            end = Offset(size.width, y),
-            strokeWidth = 1.5f
+        drawContext.canvas.nativeCanvas.drawLine(
+            m.yAxisX, y, size.width, y, gridPaint
         )
 
         // Axis Label
@@ -268,55 +308,54 @@ private fun DrawScope.drawBars(
     c: ChartColors,
     p: ChartPaints
 ) {
+    // Draw Line
+    val path = Path()
+    data.forEachIndexed { index, (_, value) ->
+        val height = m.getHeight(value, max) * prog
+        val x = m.getX(index)
+        val y = TOP_PADDING_PX + m.drawHeight - height
+        
+        if (index == 0) {
+            path.moveTo(x, y)
+        } else {
+            // Bezier curve for smoothness? Or straight lines? 
+            // Request says "improve chart... spacing... line chart".
+            // Straight lines are clearer for discreet data usually, but catmull-rom is nice.
+            // Let's stick to straight lines for accuracy of reading.
+            path.lineTo(x, y)
+        }
+    }
+    
+    drawContext.canvas.nativeCanvas.drawPath(path.asAndroidPath(), p.linePaint)
+    
+    // Draw Dots
     data.forEachIndexed { index, (label, value) ->
         val height = m.getHeight(value, max) * prog
         val x = m.getX(index)
         val y = TOP_PADDING_PX + m.drawHeight - height
+        
         val isHighlighted = label == highlightVal
         val meetsPredicate = highlightPred?.invoke(value) ?: false
-
-        if (height > 0f) {
-            val barColor = when {
-                selIdx == index -> c.secondary
-                isHighlighted -> c.highlight
-                meetsPredicate -> c.highlight
-                else -> c.primary
-            } // Prioridade: Seleção > Destaque > Normal
-            
-            drawRoundRect(
-                color = barColor,
-                topLeft = Offset(x, y),
-                size = Size(m.barWidth, height),
-                cornerRadius = CornerRadius(6f, 6f)
-            )
-
-            // Se for destaque (último sorteio), adiciona um indicador visual extra (bolinha ou texto)
-            if (isHighlighted) {
-                 drawContext.canvas.nativeCanvas.drawText(
-                    "Último",
-                    x + m.barWidth / 2f,
-                    y - 12f,
-                    p.label
-                )
-            }
-        }
-        // Dynamic Label Skipping Logic
-        // Calculate how many labels we can reasonably fit
-        val labelWidthPx = 80f // Estimated width for rotated text or standard text
+        val isSelected = selIdx == index
+        
+        val dotRadius = if (isSelected || isHighlighted || meetsPredicate) 6.dp.toPx() else 4.dp.toPx()
+        val paint = if (isHighlighted || meetsPredicate) p.highlightDotPaint else if (isSelected) p.highlightDotPaint else p.dotPaint
+        
+        drawContext.canvas.nativeCanvas.drawCircle(x, y, dotRadius, paint)
+        
+        // Label logic
+        val labelWidthPx = 80f
         val maxLabels = (m.totalWidth / labelWidthPx).toInt().coerceAtLeast(1)
         val skipInterval = (data.size / maxLabels).coerceAtLeast(1)
-
+        
         if (data.size <= 15 || index % skipInterval == 0 || index == data.size - 1) {
              drawContext.canvas.nativeCanvas.withSave {
-                val centerX = x + m.barWidth / 2f
                 val baseY = size.height - 20f
-                
-                // Rotate only if necessary (many items)
-                if (data.size > 8) {
-                    rotate(-45f, centerX, baseY)
-                    drawText(label, centerX, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })
+                if (data.size > 15) {
+                    rotate(-45f, x, baseY)
+                    drawText(label, x, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })
                 } else {
-                    drawText(label, centerX, baseY, p.label.apply { textAlign = Paint.Align.CENTER })
+                    drawText(label, x, baseY, p.label.apply { textAlign = Paint.Align.CENTER })
                 }
             }
         }

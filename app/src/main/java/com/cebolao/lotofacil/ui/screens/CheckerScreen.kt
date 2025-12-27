@@ -11,13 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -30,7 +26,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +51,6 @@ import com.cebolao.lotofacil.ui.components.stats.GameQualityCard
 import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberGrid
-import com.cebolao.lotofacil.ui.components.stats.SimpleStatsCard
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -361,7 +355,6 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
                 
                 // Informações de janela e timestamp
                 CheckReportInfoCard(
-                    drawWindow = state.report.drawWindow,
                     timestamp = state.report.timestamp,
                     isApproximate = state.report.financialMetrics.isApproximate,
                     disclaimer = state.report.financialMetrics.disclaimer
@@ -375,28 +368,9 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
                 // CheckResult Card
                 CheckResultCard(state.report.toCheckResult())
                 
-                // Stats Card with explicit mapping
-                val metrics = state.gameMetrics
-                val statsList = remember(metrics) {
-                    kotlinx.collections.immutable.persistentListOf(
-                        R.string.stat_sum to metrics.sum,
-                        R.string.stat_evens to metrics.evens,
-                        R.string.stat_primes to metrics.primes,
-                        R.string.stat_frame to metrics.frame,
-                        R.string.stat_center to metrics.center,
-                        R.string.stat_fibonacci to metrics.fibonacci,
-                        R.string.stat_multiples_of_3 to metrics.multiplesOf3,
-                        R.string.stat_repeated to metrics.repeated,
-                        R.string.stat_sequences to metrics.sequences
-                    )
-                }
                 
-                // Converting ResId keys to String for the generic card
-                val resolvedStats = statsList.map { (key, value) ->
-                    stringResource(key) to value.toString()
-                }.toImmutableList()
-
-                SimpleStatsCard(resolvedStats)
+                // Stats consolidated in GameQualityCard above
+                // Removed SimpleStatsCard as requested
             }
 
             is CheckerUiState.Loading -> {
@@ -436,66 +410,19 @@ private fun CheckerResultSection(state: CheckerUiState, gameScore: com.cebolao.l
 
 @Composable
 private fun CheckReportInfoCard(
-    drawWindow: com.cebolao.lotofacil.domain.model.DrawWindow,
     timestamp: Long,
     isApproximate: Boolean,
     disclaimer: String?,
     modifier: Modifier = Modifier
 ) {
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR")) }
-    val dateStr = dateFormat.format(Date(timestamp))
+    dateFormat.format(Date(timestamp))
     
     AppCard(
         modifier = modifier.fillMaxWidth(),
         outlined = true,
         color = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Column(
-            modifier = Modifier.padding(Dimen.Spacing16),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-        ) {
-
-            Text(
-                text = stringResource(R.string.checker_info_title),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.checker_info_window_label),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "${drawWindow.firstContest} - ${drawWindow.lastContest} (${drawWindow.totalDraws} concursos)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.checker_info_date_label),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = dateStr,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            
             if (isApproximate && disclaimer != null) {
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = Dimen.Spacing8),
@@ -508,5 +435,4 @@ private fun CheckReportInfoCard(
                 )
             }
         }
-    }
 }

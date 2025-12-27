@@ -23,7 +23,7 @@ fun CheckReport.toCheckResult(): CheckResult {
         scoreCounts = scoreCountsMutable.toImmutableMap(),
         lastHitContest = lastHit?.contestNumber,
         lastHitScore = lastHit?.score,
-        lastCheckedContest = drawWindow.lastContest,
+        lastCheckedContest = drawWindow.totalDraws,
         recentHits = recentHits
     )
 }

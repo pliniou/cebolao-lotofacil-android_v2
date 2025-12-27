@@ -33,6 +33,16 @@ object GameConstants {
     val PRIMES_ACCEPTABLE = 3..7
     val FRAME_IDEAL = 8..11
     val FRAME_ACCEPTABLE = 7..12
+    val FIBONACCI_IDEAL = 3..5
+    val FIBONACCI_ACCEPTABLE = 2..6
+    val MULTIPLES_OF_3_IDEAL = 4..6
+    val MULTIPLES_OF_3_ACCEPTABLE = 3..7
+    val CENTER_IDEAL = 3..5
+    val CENTER_ACCEPTABLE = 2..6
+    val REPEATED_IDEAL = 8..10
+    val REPEATED_ACCEPTABLE = 7..11
+    val SEQUENCES_IDEAL = 3..5 // Sequences of 3+ numbers
+    val SEQUENCES_ACCEPTABLE = 2..6
 
     // Financial Prizes (Estimated)
     val PRIZE_11 = BigDecimal("6.00")

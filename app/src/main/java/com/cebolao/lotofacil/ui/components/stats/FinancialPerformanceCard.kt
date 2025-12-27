@@ -92,7 +92,7 @@ fun FinancialPerformanceCard(
                          color = scheme.onSurface
                      )
                      Text(
-                         text = "Baseado no custo de R$ 3,50 por aposta", // Could be dynamic
+                         text = "Custo atual de R$ 3,50 por aposta", // Could be dynamic
                          style = MaterialTheme.typography.bodySmall,
                          color = scheme.onSurfaceVariant
                      )

@@ -246,7 +246,7 @@ private fun StatRow(
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
-                contentPadding = PaddingValues(horizontal = Dimen.Spacing4)
+                contentPadding = PaddingValues(horizontal = Dimen.SpacingShort)
             ) {
                 items(data) { (number, value) ->
                     StatItem(
@@ -254,7 +254,7 @@ private fun StatRow(
                         value = value,
                         highlightColor = highlightColor,
                         isOverdue = isOverdue,
-                        modifier = Modifier.widthIn(min = 98.dp, max = 120.dp)
+                        modifier = Modifier.widthIn(min = 80.dp)
                     )
                 }
             }
@@ -280,7 +280,8 @@ private fun StatItem(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+            modifier = Modifier.fillMaxWidth()
         ) {
             NumberBall(
                 number = number,
@@ -292,14 +293,16 @@ private fun StatItem(
                 text = value.toString(),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = highlightColor
+                color = highlightColor,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
             Text(
                 text = if (isOverdue) "dias" else "vezes",
                 style = MaterialTheme.typography.labelSmall,
                 color = scheme.onSurfaceVariant.copy(alpha = 0.7f),
-                fontSize = 10.sp
+                fontSize = 10.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
     }

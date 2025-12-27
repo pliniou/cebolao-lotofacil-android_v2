@@ -53,10 +53,16 @@ fun CheckResultCard(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = Alpha.DIVIDER)
             )
 
-            // Probabilidade simples de premiação ao longo dos concursos analisados
             if (totalWins > 0 && result.lastCheckedContest > 0) {
+                // Cálculo da taxa de sucesso sobre todo o histórico analisado
                 val winRate = (totalWins.toFloat() / result.lastCheckedContest.toFloat()) * 100f
-                val winRateFormatted = "%.2f%%".format(winRate)
+                // Formatado para mostrar chance 1 em X e porcentagem
+                val oneIn = if (winRate > 0) 100f / winRate else 0f
+                val winRateFormatted = if (oneIn >= 1.5f) {
+                     "1 em %.0f (%.2f%%)".format(oneIn, winRate)
+                } else {
+                     "%.2f%%".format(winRate)
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -106,8 +112,8 @@ fun CheckResultCard(
                     BarChart(
                         data = chartData,
                         maxValue = GameConstants.GAME_SIZE,
-                        modifier = Modifier.fillMaxWidth(),
-                        chartHeight = Dimen.CheckResultChartHeight,
+                        modifier = Modifier.fillMaxWidth().height(120.dp),
+                        chartHeight = 120.dp,
                         highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
                     )
                 }
@@ -224,19 +230,17 @@ private fun LastHit(res: CheckResult) {
         )
         Text(
             text = if (res.lastHitContest != null && res.lastHitScore != null) {
+                // Formatting to show "Contest X - Y pts" clearly
                 stringResource(
                     R.string.checker_last_hit_details_format,
                     res.lastHitContest,
                     res.lastHitScore
                 )
             } else {
-                stringResource(
-                    R.string.checker_last_hit_info,
-                    DEFAULT_PLACEHOLDER,
-                    DEFAULT_PLACEHOLDER
-                )
+                "Nenhuma premiação encontrada"
             },
             style = MaterialTheme.typography.labelMedium,
+            fontWeight = if (res.lastHitContest != null) FontWeight.SemiBold else FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

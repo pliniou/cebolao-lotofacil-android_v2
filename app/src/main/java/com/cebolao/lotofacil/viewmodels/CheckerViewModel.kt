@@ -82,6 +82,8 @@ class CheckerViewModel @Inject constructor(
     private val _events = Channel<Int>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
+    private val _lastDrawNumbers = MutableStateFlow<Set<Int>?>(null)
+
     init {
         savedStateHandle.get<String>(Screen.Checker.ARG_NUMBERS)?.let { arg ->
             val numbers = arg
@@ -92,6 +94,21 @@ class CheckerViewModel @Inject constructor(
 
             if (numbers.isNotEmpty()) {
                 _selectedNumbers.value = numbers
+            }
+        }
+        
+        loadInitialData()
+    }
+    
+    private fun loadInitialData() {
+        viewModelScope.launch {
+            // Load Last Draw for Analysis
+             historyRepository.getLastDraw()?.let { draw ->
+                _lastDrawNumbers.value = draw.numbers
+                // Re-analyze if we already have numbers selected
+                if (_selectedNumbers.value.isNotEmpty()) {
+                    analyzeScore(_selectedNumbers.value)
+                }
             }
         }
         
@@ -113,6 +130,9 @@ class CheckerViewModel @Inject constructor(
         
         if (_gameScore.value != null) _gameScore.value = null
         if (_uiState.value !is CheckerUiState.Idle) _uiState.value = CheckerUiState.Idle
+        
+        // Analyze immediately with cached last draw
+        analyzeScore(_selectedNumbers.value)
     }
 
     fun clearNumbers() {
@@ -122,7 +142,7 @@ class CheckerViewModel @Inject constructor(
     }
     
     private fun analyzeScore(numbers: Set<Int>) {
-        _gameScore.value = GameAnalyzer.analyze(numbers)
+        _gameScore.value = GameAnalyzer.analyze(numbers, _lastDrawNumbers.value)
     }
     
     private fun loadHeatmapData() {

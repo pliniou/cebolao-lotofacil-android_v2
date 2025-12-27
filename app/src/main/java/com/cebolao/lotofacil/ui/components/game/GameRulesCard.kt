@@ -91,7 +91,7 @@ fun GameRulesCard(
                         verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
                     ) {
                         Text(
-                            text = "Regras e Premiações",
+                            text = "Probabilidades e Bolões",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = scheme.onSurface,
