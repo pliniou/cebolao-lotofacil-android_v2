@@ -4,8 +4,6 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -14,19 +12,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -371,7 +371,7 @@ private fun DrawScope.drawTooltip(
     c: ChartColors,
     p: ChartPaints
 ) {
-    val xCenter = m.getX(i) + m.barWidth / 2f
+    val xCenter = m.getX(i)
     val barTop =
         TOP_PADDING_PX + m.drawHeight - (m.getHeight(v, max) * prog) - 12f
     val text = v.toString()
@@ -423,7 +423,7 @@ private fun DrawScope.drawNormalLine(
     var started = false
 
     data.forEachIndexed { i, (label, _) ->
-        val xCenter = m.getX(i) + m.barWidth / 2f
+        val xCenter = m.getX(i)
         val value = label.toFloatOrNull() ?: return@forEachIndexed
 
         // PDF formula: (1 / (std * sqrt(2pi))) * e^(-0.5 * ((x-u)/std)^2)
