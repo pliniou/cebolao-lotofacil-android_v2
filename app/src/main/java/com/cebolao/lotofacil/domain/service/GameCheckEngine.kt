@@ -1,7 +1,6 @@
 package com.cebolao.lotofacil.domain.service
 
 import com.cebolao.lotofacil.domain.GameConstants
-import com.cebolao.lotofacil.domain.model.BitmaskProvider
 import com.cebolao.lotofacil.domain.model.CheckResult
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.LotofacilGame
@@ -80,8 +79,4 @@ class GameCheckEngine @Inject constructor() {
             recentHits = recentHits
         )
     }
-
-        private const val RECENT_HITS_WINDOW = 100
-    }
-}
-
+    private val RECENT_HITS_WINDOW = 100}
