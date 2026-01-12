@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Theme -->
+    <style name="Theme.CebolaoLotofacil" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/surface_light</item>
+
+        <!-- Window Light Status Bar (true = dark icons) -->
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- android:windowLightNavigationBar movido para values-v27 -->
+    </style>
+
+    <style name="Theme" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Theme Splash Screen -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/surface_light</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="windowSplashScreenAnimationDuration">750</item>
+        <item name="postSplashScreenTheme">@style/Theme.CebolaoLotofacil</item>
+    </style>
+</resources>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_content_padding_large">
+
+    <LinearLayout
+        android:id="@+id/widget_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/icon_size_large"
+            android:layout_height="@dimen/icon_size_large"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_widget_proximo"
+            android:tint="@color/brand_primary" />
+
+        <TextView
+            android:id="@+id/widget_title"
+            style="@style/Widget.Cebolao.Title.Large"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:text="@string/widget_next_contest_title" />
+
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="@dimen/widget_refresh_button_size_large"
+            android:layout_height="@dimen/widget_refresh_button_size_large"
+            android:background="@drawable/widget_icon_button_background"
+            android:contentDescription="@string/content_desc_refresh"
+            android:padding="7dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_refresh"
+            android:tint="@color/widget_icon_tint" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/widget_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/widget_header"
+        android:layout_marginTop="10dp"
+        android:background="@color/widget_text_secondary"
+        android:alpha="0.25" />
+
+    <FrameLayout
+        android:id="@+id/widget_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_divider"
+        android:layout_marginTop="12dp">
+
+        <LinearLayout
+            android:id="@+id/widget_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Widget.Cebolao.Text.Secondary.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_label_prize_estimate" />
+
+            <TextView
+                android:id="@+id/widget_prize"
+                style="@style/Widget.Cebolao.Text.Highlight.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="--" />
+
+            <TextView
+                style="@style/Widget.Cebolao.Text.Secondary.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/widget_label_draw_date" />
+
+            <TextView
+                android:id="@+id/widget_date"
+                style="@style/Widget.Cebolao.Text.Secondary.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="--/--" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_loading_text"
+            style="@style/Widget.Cebolao.Text.Secondary.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/general_loading"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</RelativeLayout>

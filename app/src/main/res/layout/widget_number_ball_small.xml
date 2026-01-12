@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_ball_text"
+    style="@style/Widget.Cebolao.BallText.Small"
+    android:layout_width="@dimen/widget_ball_size_small"
+    android:layout_height="@dimen/widget_ball_size_small"
+    android:layout_margin="@dimen/widget_ball_margin_small"
+    android:background="@drawable/widget_ball_background"
+    android:text="00" />

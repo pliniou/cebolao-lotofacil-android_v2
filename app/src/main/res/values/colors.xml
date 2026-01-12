@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- PALETA PRINCIPAL (Material Design) -->
+    <color name="brand_primary">#0066FF</color>
+    <color name="brand_secondary">#0052CC</color>
+    <color name="brand_accent">#00B8D9</color>
+
+    <!-- Superfícies e textos (Material 3) -->
+    <color name="surface_light">#F8FAFC</color>
+    <color name="surface_variant_light">#FFFFFF</color>
+    <color name="on_surface_light">#0F172A</color>
+    <color name="on_surface_variant_light">#475569</color>
+
+    <color name="surface_dark">#0F172A</color>
+    <color name="surface_variant_dark">#1E293B</color>
+    <color name="on_surface_dark">#F8FAFC</color>
+    <color name="on_surface_variant_dark">#94A3B8</color>
+
+    <!-- Backgrounds -->
+    <color name="app_background">@color/surface_light</color>
+
+    <!-- Widget tokens -->
+    <color name="widget_background">@color/surface_variant_light</color>
+    <color name="widget_text_primary">@color/on_surface_light</color>
+    <color name="widget_text_secondary">@color/on_surface_variant_light</color>
+    <color name="widget_icon_tint">@color/on_surface_variant_light</color>
+
+    <!-- Removidas cores não utilizadas e duplicadas -->
+</resources>
