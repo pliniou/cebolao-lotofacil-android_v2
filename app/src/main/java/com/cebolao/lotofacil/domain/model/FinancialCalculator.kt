@@ -17,9 +17,7 @@ data class FinancialProjection(
     val isApproximate: Boolean = false,
     val disclaimer: String? = null
 ) {
-    val revenueDecimal: BigDecimal get() = BigDecimal(revenue)
-    val profitDecimal: BigDecimal get() = BigDecimal(profit)
-    
+
     companion object {
         fun fromBigDecimal(
             investment: BigDecimal,
@@ -45,8 +43,6 @@ data class FinancialProjection(
 
 object FinancialCalculator {
     
-    // Prêmios estimados/fixos são definidos em GameConstants.FinancialPrizes.
-
     /**
      * Calcula projeção financeira com custo real do jogo e dados históricos opcionais
      * 

@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
@@ -34,6 +35,7 @@ class CebolaoApplication : Application(), Configuration.Provider {
             )
             .build()
 
+    @SuppressLint("DefaultUncaughtExceptionDelegation")
     override fun onCreate() {
         super.onCreate()
         

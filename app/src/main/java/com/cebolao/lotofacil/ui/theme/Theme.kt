@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.cebolao.lotofacil.ui.theme
 
 import android.app.Activity

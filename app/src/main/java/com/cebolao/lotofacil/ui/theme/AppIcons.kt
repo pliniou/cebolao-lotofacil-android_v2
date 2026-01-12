@@ -8,9 +8,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.ListAlt
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
@@ -31,6 +35,7 @@ import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.TableRows
@@ -43,11 +48,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.cebolao.lotofacil.domain.model.FilterType
 
@@ -91,8 +91,8 @@ object AppIcons {
     val StarOutlined = Icons.Outlined.StarBorder
     val Wallet = Icons.Filled.AccountBalanceWallet
     val Paid = Icons.Filled.AttachMoney
-    val TrendingUp = Icons.Filled.TrendingUp
-    val TrendingDown = Icons.Filled.TrendingDown
+    val TrendingUp = Icons.AutoMirrored.Filled.TrendingUp
+    val TrendingDown = Icons.AutoMirrored.Filled.TrendingDown
 }
 
 val FilterType.filterIcon: ImageVector

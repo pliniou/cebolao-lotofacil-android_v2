@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.DefaultDispatcher
@@ -19,7 +20,6 @@ import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
 import com.cebolao.lotofacil.domain.usecase.CheckGameUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
-import androidx.navigation.toRoute
 import com.cebolao.lotofacil.navigation.CheckerRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -51,8 +51,8 @@ data class CheckerViewModelDependencies(
  * Coroutine dependencies for CheckerViewModel
  */
 data class CheckerViewModelCoroutineDependencies(
-    @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
-    @ApplicationScope val externalScope: CoroutineScope
+    @param:DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope val externalScope: CoroutineScope
 )
 
 /**
@@ -338,7 +338,7 @@ sealed interface CheckerUiEvent {
  * (Previously named CheckerEvent)
  */
 sealed interface CheckerEffect {
-    data class ShowMessage(@StringRes val messageResId: Int) : CheckerEffect
+    data class ShowMessage(@get:StringRes val messageResId: Int) : CheckerEffect
     data object RequestSaveConfirmation : CheckerEffect
     data object RequestReplaceConfirmation : CheckerEffect
 }

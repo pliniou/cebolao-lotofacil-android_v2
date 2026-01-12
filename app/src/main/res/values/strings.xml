@@ -11,9 +11,9 @@
 
     <!-- Common / Acessibilidade (Mantenha profissional para acessibilidade) -->
     <string name="number_ball_content_description">Dezena %1$d, %2$s.</string>
-    <string name="number_ball_status_hit">Acertou</string>
-    <string name="number_ball_status_miss">Errou</string>
-    <string name="number_ball_status_neutral">Neutro</string>
+    <string name="number_ball_status_hit" translatable="false">Acertou</string>
+    <string name="number_ball_status_miss" translatable="false">Errou</string>
+    <string name="number_ball_status_neutral" translatable="false">Neutro</string>
     <string name="general_back">Voltar</string>
     <string name="general_selected">Selecionado</string>
     <string name="general_cancel">Cancelar</string>
@@ -51,11 +51,11 @@
     <string name="game_quality_description_bad">Estatisticamente improvável</string>
 
     <!-- Financial Simulation Card -->
-    <string name="financial_simulation_title">Simulação Financeira</string>
-    <string name="financial_cost_hint">Custo atual de R$ 3,50 por aposta</string>
-    <string name="financial_recovery_label">Recuperação do Investimento</string>
-    <string name="financial_outcome_profit">LUCRO LÍQUIDO</string>
-    <string name="financial_outcome_loss">PREJUÍZO</string>
+    <string name="financial_simulation_title" tools:keep="@string/financial_simulation_title">Simulação Financeira</string>
+    <string name="financial_cost_hint" tools:keep="@string/financial_cost_hint">Custo atual de R$ 3,50 por aposta</string>
+    <string name="financial_recovery_label" tools:keep="@string/financial_recovery_label">Recuperação do Investimento</string>
+    <string name="financial_outcome_profit" tools:keep="@string/financial_outcome_profit">LUCRO LÍQUIDO</string>
+    <string name="financial_outcome_loss" tools:keep="@string/financial_outcome_loss">PREJUÍZO</string>
 
     <!-- Game Rules Card -->
     <string name="game_rules_title">Regras e Premiações</string>
@@ -63,8 +63,8 @@
     <string name="game_rules_how_to_play_p1">A Lotofácil é, como o próprio nome diz, fácil de apostar e ainda mais fácil de ganhar. Você marca entre 15 e 20 números, dentre os 25 disponíveis no volante, e fatura prêmio se acertar 11, 12, 13, 14 ou 15 números.</string>
     <string name="game_rules_how_to_play_p2">Surpresinha: deixe que o sistema escolha os números para você.\nTeimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concursos consecutivos.</string>
     <string name="game_rules_prices_title">Valores das Apostas</string>
-    <string name="game_rules_probabilities_title">Probabilidades (1 em...)</string>
-    <string name="game_rules_probabilities_and_pools">Probabilidades e Bolões</string>
+    <string name="game_rules_probabilities_title" tools:keep="@string/game_rules_probabilities_title">Probabilidades (1 em…)</string>
+    <string name="game_rules_probabilities_and_pools" tools:keep="@string/game_rules_probabilities_and_pools">Probabilidades e Bolões</string>
     <string name="table_header_numbers">Números</string>
     <string name="table_header_value">Valor</string>
     <string name="next_contest_final_five_label">Acumulado final 0/5</string>
@@ -127,7 +127,7 @@
 
     <!-- Generator / Presets -->
     <string name="preset_label">Estratégia</string>
-    <string name="preset_none">Personalizado</string>
+    <string name="preset_none" tools:keep="@string/preset_none">Personalizado</string>
 
     <!-- Education / Explainers -->
     <string name="edu_stats_title">Entendendo as Estatísticas</string>
@@ -175,14 +175,14 @@
     <string name="filter_sequencias_title">Sequências</string>
     <string name="filter_sequencias_desc">Presença de sequências consecutivas (ex.: 10–11–12). Sequências curtas são comuns; muitas sequências longas tendem a ser raras.</string>
 
-    <string name="filter_linhas_title">Linhas</string>
-    <string name="filter_linhas_desc">Distribuição por linhas horizontais. Evite concentrar muitas dezenas em poucas linhas; uma distribuição mais balanceada costuma aparecer com mais frequência.</string>
+    <string name="filter_linhas_title" tools:keep="@string/filter_linhas_title">Linhas</string>
+    <string name="filter_linhas_desc" tools:keep="@string/filter_linhas_desc">Distribuição por linhas horizontais. Evite concentrar muitas dezenas em poucas linhas; uma distribuição mais balanceada costuma aparecer com mais frequência.</string>
 
-    <string name="filter_colunas_title">Colunas</string>
-    <string name="filter_colunas_desc">Distribuição por colunas verticais. Assim como nas linhas, concentrações em poucas colunas são menos comuns; equilíbrio tende a ser mais frequente.</string>
+    <string name="filter_colunas_title" tools:keep="@string/filter_colunas_title">Colunas</string>
+    <string name="filter_colunas_desc" tools:keep="@string/filter_colunas_desc">Distribuição por colunas verticais. Assim como nas linhas, concentrações em poucas colunas são menos comuns; equilíbrio tende a ser mais frequente.</string>
 
-    <string name="filter_quadrantes_title">Quadrantes</string>
-    <string name="filter_quadrantes_desc">Distribuição entre regiões (quadrantes) da cartela. Serve para balancear o jogo e evitar que as dezenas fiquem concentradas em uma única área.</string>
+    <string name="filter_quadrantes_title" tools:keep="@string/filter_quadrantes_title">Quadrantes</string>
+    <string name="filter_quadrantes_desc" tools:keep="@string/filter_quadrantes_desc">Distribuição entre regiões (quadrantes) da cartela. Serve para balancear o jogo e evitar que as dezenas fiquem concentradas em uma única área.</string>
 
     <!-- About -->
     <string name="about_title">Sobre</string>
@@ -201,8 +201,8 @@
     <string name="studio_slogan">Estatística séria, mas nem tanto</string>
 
     <!-- Feedback -->
-    <string name="about_feedback_title">Feedback</string>
-    <string name="about_feedback_desc">Compartilhe suas sugestões e relatos de bugs.</string>
+    <string name="about_feedback_title" tools:keep="@string/about_feedback_title">Feedback</string>
+    <string name="about_feedback_desc" tools:keep="@string/about_feedback_desc">Compartilhe suas sugestões e relatos de bugs.</string>
 
     <!-- Checker -->
     <string name="checker_title">Conferidor</string>
@@ -227,9 +227,9 @@
     <string name="content_desc_refresh">Atualizar</string>
     <string name="widget_next_contest_title">Próximo Concurso</string>
     <string name="widget_no_pinned_games">Nenhum jogo fixado</string>
-    <string name="widget_last_draw_description">Mostra o resultado do último sorteio da Lotofácil</string>
-    <string name="widget_next_contest_description">Mostra informações sobre o próximo concurso</string>
-    <string name="widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
+    <string name="widget_last_draw_description" tools:keep="@string/widget_last_draw_description">Mostra o resultado do último sorteio da Lotofácil</string>
+    <string name="widget_next_contest_description" tools:keep="@string/widget_next_contest_description">Mostra informações sobre o próximo concurso</string>
+    <string name="widget_pinned_game_description" tools:keep="@string/widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
 
     <!-- Presets -->
     <string name="preset_standard">Padrão</string>
@@ -253,19 +253,19 @@
     <string name="checker_results_header_no_wins">Sem prêmios</string>
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analisado em %1$d concursos</string>
     <string name="checker_score_breakdown_hits_format" tools:ignore="PluralsCandidate">%1$d pontos</string>
-    <string name="checker_last_hit_info">Último acerto</string>
+    <string name="checker_last_hit_info" tools:keep="@string/checker_last_hit_info">Último acerto</string>
     <string name="checker_last_hit_details_format">concurso %1$d, fazendo %2$d pontos</string>
     <string name="checker_no_wins_message">Infelizmente, nenhum prêmio encontrado neste período.</string>
-    <string name="checker_simple_stats_title">Estatísticas Rápidas</string>
-    <string name="checker_incomplete_game_message">Complete os 15 números para conferir.</string>
-    <string name="checker_save_success_message">Jogo salvo com sucesso!</string>
+    <string name="checker_simple_stats_title" tools:keep="@string/checker_simple_stats_title">Estatísticas Rápidas</string>
+    <string name="checker_incomplete_game_message" tools:keep="@string/checker_incomplete_game_message">Complete os 15 números para conferir.</string>
+    <string name="checker_save_success_message" tools:keep="@string/checker_save_success_message">Jogo salvo com sucesso!</string>
     <string name="checker_save_fail_message">Erro ao salvar jogo.</string>
-    <string name="checker_replace_numbers_title">Números Já Selecionados</string>
-    <string name="checker_replace_numbers_message">Você já possui dezenas selecionadas. Confirme para substituir pelos novos números.</string>
-    <string name="checker_replace_confirm">Substituir</string>
-    <string name="checker_replace_cancel">Manter Atual</string>
-    <string name="checker_save_confirmation_title">Salvar Jogo</string>
-    <string name="checker_save_confirmation_message">Deseja salvar este jogo nos seus jogos salvos?</string>
+    <string name="checker_replace_numbers_title" tools:keep="@string/checker_replace_numbers_title">Números Já Selecionados</string>
+    <string name="checker_replace_numbers_message" tools:keep="@string/checker_replace_numbers_message">Você já possui dezenas selecionadas. Confirme para substituir pelos novos números.</string>
+    <string name="checker_replace_confirm" tools:keep="@string/checker_replace_confirm">Substituir</string>
+    <string name="checker_replace_cancel" tools:keep="@string/checker_replace_cancel">Manter Atual</string>
+    <string name="checker_save_confirmation_title" tools:keep="@string/checker_save_confirmation_title">Salvar Jogo</string>
+    <string name="checker_save_confirmation_message" tools:keep="@string/checker_save_confirmation_message">Deseja salvar este jogo nos seus jogos salvos?</string>
     <string name="checker_incomplete_selection">Selecione 15 dezenas para conferir</string>
     <string name="checker_game_saved">Jogo salvo com sucesso!</string>
 
@@ -275,7 +275,7 @@
     <string name="filters_max_label">Máx</string>
     <string name="filter_recommended_range">Recomendado: %1$d a %2$d</string>
     <string name="filters_button_generate">Gerar Jogos</string>
-    <string name="filters_button_generating_progress">Gerando…</string>
+    <string name="filters_button_generating_progress" tools:keep="@string/filters_button_generating_progress">Gerando…</string>
     <string name="filter_preset_applied">Estratégia aplicada: %1$s</string>
     <string name="filters_reset_dialog_title">Resetar Filtros</string>
     <string name="filters_reset_dialog_message">Deseja voltar para a configuração padrão?</string>
@@ -285,10 +285,10 @@
     <string name="filters_title">Filtros</string>
     <string name="filters_subtitle">Configure sua estratégia</string>
     <string name="filters_reset_button_description">Resetar</string>
-    <string name="filters_group_numeric">Numéricos</string>
-    <string name="filters_group_geometric">Geométricos</string>
-    <string name="filters_group_math">Matemáticos</string>
-    <string name="filters_group_context">Contextuais</string>
+    <string name="filters_group_numeric" tools:keep="@string/filters_group_numeric">Numéricos</string>
+    <string name="filters_group_geometric" tools:keep="@string/filters_group_geometric">Geométricos</string>
+    <string name="filters_group_math" tools:keep="@string/filters_group_math">Matemáticos</string>
+    <string name="filters_group_context" tools:keep="@string/filters_group_context">Contextuais</string>
     <string name="filters_button_generating">Gerando…</string>
     <string name="filters_generation_error">Erro ao gerar jogos. Tente novamente.</string>
     <string name="filters_save_error">Erro ao salvar jogos gerados.</string>
@@ -296,9 +296,9 @@
     <!-- Checker Details -->
     <string name="checker_hide_frequency">Ocultar Frequência</string>
     <string name="checker_show_frequency">Ver Frequência</string>
-    <string name="checker_info_title">Informações da Conferência</string>
-    <string name="checker_info_window_label">Janela de Concursos:</string>
-    <string name="checker_info_date_label">Data/Hora:</string>
+    <string name="checker_info_title" tools:keep="@string/checker_info_title">Informações da Conferência</string>
+    <string name="checker_info_window_label" tools:keep="@string/checker_info_window_label">Janela de Concursos:</string>
+    <string name="checker_info_date_label" tools:keep="@string/checker_info_date_label">Data/Hora:</string>
 
     <!-- Games -->
     <string name="game_card_title_format">Jogo %1$d</string>
@@ -341,7 +341,7 @@
     <string name="stat_multiples_of_3">Mult. 3</string>
     <string name="stat_center">Miolo</string>
     <string name="stat_frame">Moldura</string>
-    <string name="stat_repeated">Repet.</string>
+    <string name="stat_repeated" tools:keep="@string/stat_repeated">Repet.</string>
     <string name="prize_table_title">Premiação</string>
     <string name="prize_table_header_prize">Faixa</string>
     <string name="prize_table_header_winners">Ganhadores</string>
@@ -370,37 +370,37 @@
     <string name="widget_error_load">Erro ao carregar widget.</string>
 
     <!-- Generator -->
-    <string name="game_generator_random_start">Gerando aleatoriamente…</string>
-    <string name="game_generator_heuristic_start">Aplicando heurísticas…</string>
-    <string name="game_generator_random_fallback">Tentando alternativa…</string>
+    <string name="game_generator_random_start" tools:keep="@string/game_generator_random_start">Gerando aleatoriamente…</string>
+    <string name="game_generator_heuristic_start" tools:keep="@string/game_generator_heuristic_start">Aplicando heurísticas…</string>
+    <string name="game_generator_random_fallback" tools:keep="@string/game_generator_random_fallback">Tentando alternativa…</string>
     <string name="game_generator_failure_no_history">Sem histórico suficiente.</string>
     <string name="game_generator_failure_generic">Falha na geração.</string>
     <string name="game_generator_failure_filters_strict">Filtros muito rigorosos. Tente relaxar as restrições.</string>
     
     <!-- About / Settings -->
-    <string name="settings_appearance_title">Aparência</string>
-    <string name="settings_theme_mode_title">Modo de Tema</string>
-    <string name="settings_theme_light">Claro</string>
-    <string name="settings_theme_dark">Escuro</string>
-    <string name="settings_accent_color_title">Cor de Destaque</string>
-    <string name="settings_accent_blue">Azul</string>
-    <string name="settings_accent_purple">Roxo</string>
-    <string name="settings_accent_green">Verde</string>
-    <string name="settings_accent_yellow">Amarelo</string>
-    <string name="settings_accent_pink">Rosa</string>
-    <string name="settings_accent_orange">Laranja</string>
-    <string name="about_learn_more_title">Saiba Mais</string>
-    <string name="about_learn_more_desc">Dicas e estratégias em breve.</string>
-    <string name="about_learn_more_header">Aprenda Mais</string>
-    <string name="about_source_title">Fonte dos Dados</string>
-    <string name="about_source_desc">Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh.</string>
-    <string name="about_important_title">Importante</string>
-    <string name="about_important_desc">Este app organiza informações públicas. Não aumenta suas chances de ganhar, apenas evita combinações estatisticamente improváveis.</string>
-    <string name="about_privacy_title">Privacidade</string>
-    <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
-    <string name="about_version_title">Versão</string>
+    <string name="settings_appearance_title" tools:keep="@string/settings_appearance_title">Aparência</string>
+    <string name="settings_theme_mode_title" tools:keep="@string/settings_theme_mode_title">Modo de Tema</string>
+    <string name="settings_theme_light" tools:keep="@string/settings_theme_light">Claro</string>
+    <string name="settings_theme_dark" tools:keep="@string/settings_theme_dark">Escuro</string>
+    <string name="settings_accent_color_title" tools:keep="@string/settings_accent_color_title">Cor de Destaque</string>
+    <string name="settings_accent_blue" tools:keep="@string/settings_accent_blue">Azul</string>
+    <string name="settings_accent_purple" tools:keep="@string/settings_accent_purple">Roxo</string>
+    <string name="settings_accent_green" tools:keep="@string/settings_accent_green">Verde</string>
+    <string name="settings_accent_yellow" tools:keep="@string/settings_accent_yellow">Amarelo</string>
+    <string name="settings_accent_pink" tools:keep="@string/settings_accent_pink">Rosa</string>
+    <string name="settings_accent_orange" tools:keep="@string/settings_accent_orange">Laranja</string>
+    <string name="about_learn_more_title" tools:keep="@string/about_learn_more_title">Saiba Mais</string>
+    <string name="about_learn_more_desc" tools:keep="@string/about_learn_more_desc">Dicas e estratégias em breve.</string>
+    <string name="about_learn_more_header" tools:keep="@string/about_learn_more_header">Aprenda Mais</string>
+    <string name="about_source_title" tools:keep="@string/about_source_title">Fonte dos Dados</string>
+    <string name="about_source_desc" tools:keep="@string/about_source_desc">Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh.</string>
+    <string name="about_important_title" tools:keep="@string/about_important_title">Importante</string>
+    <string name="about_important_desc" tools:keep="@string/about_important_desc">Este app organiza informações públicas. Não aumenta suas chances de ganhar, apenas evita combinações estatisticamente improváveis.</string>
+    <string name="about_privacy_title" tools:keep="@string/about_privacy_title">Privacidade</string>
+    <string name="about_privacy_desc" tools:keep="@string/about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
+    <string name="about_version_title" tools:keep="@string/about_version_title">Versão</string>
 
     <!-- Home Loading States -->
-    <string name="home_updating_data">Atualizando dados…</string>
-    <string name="home_pull_to_refresh_hint">Puxe para baixo para sincronizar novamente.</string>
+    <string name="home_updating_data" tools:keep="@string/home_updating_data">Atualizando dados…</string>
+    <string name="home_pull_to_refresh_hint" tools:keep="@string/home_pull_to_refresh_hint">Puxe para baixo para sincronizar novamente.</string>
 </resources>
