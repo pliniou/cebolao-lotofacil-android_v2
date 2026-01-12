@@ -101,9 +101,9 @@ fun NumberBall(
 
     val statusString = when {
         isSelected -> stringResource(com.cebolao.lotofacil.R.string.general_selected)
-        variant == NumberBallVariant.Hit -> "Acertou"
-        variant == NumberBallVariant.Miss -> "Errou"
-        else -> "Neutro"
+        variant == NumberBallVariant.Hit -> stringResource(com.cebolao.lotofacil.R.string.number_ball_status_hit)
+        variant == NumberBallVariant.Miss -> stringResource(com.cebolao.lotofacil.R.string.number_ball_status_miss)
+        else -> stringResource(com.cebolao.lotofacil.R.string.number_ball_status_neutral)
     }
     val contentDesc = stringResource(
         com.cebolao.lotofacil.R.string.number_ball_content_description,

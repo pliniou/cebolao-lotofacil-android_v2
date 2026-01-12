@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,11 +82,12 @@ fun CheckerScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { effect ->
             when (effect) {
-                is CheckerEffect.ShowMessage -> snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                is CheckerEffect.ShowMessage -> snackbarHostState.showSnackbar(message = currentContext.getString(effect.messageResId))
                 is CheckerEffect.RequestSaveConfirmation -> { /* Handle dialog state if needed or show snackbar */ }
                 is CheckerEffect.RequestReplaceConfirmation -> { /* Handle dialog state */ }
             }
@@ -117,7 +119,7 @@ fun CheckerScreenContent(
     onNavigateBack: (() -> Unit)?,
     onEvent: (CheckerUiEvent) -> Unit
 ) {
-    var showClearDialog by remember { mutableStateOf(false) }
+    var showClearDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showClearDialog) {
         AppConfirmationDialog(
@@ -232,7 +234,10 @@ fun CheckerScreenContent(
                     ) {
                         Icon(
                             imageVector = if (isHeatmapEnabled) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                            contentDescription = null,
+                            contentDescription = stringResource(
+                                if (isHeatmapEnabled) R.string.checker_hide_frequency 
+                                else R.string.checker_show_frequency
+                            ),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(Dimen.SpacingTiny))
@@ -347,7 +352,7 @@ private fun CheckerBottomBar(
                         .height(Dimen.ActionButtonHeight),
                     shape = Shapes.medium
                 ) {
-                    Icon(AppIcons.Save, contentDescription = null)
+                    Icon(AppIcons.Save, contentDescription = stringResource(R.string.general_save))
                     Spacer(Modifier.width(Dimen.SpacingTiny))
                     Text(stringResource(R.string.general_save))
                 }
@@ -364,7 +369,7 @@ private fun CheckerBottomBar(
                         contentColor = scheme.onSecondaryContainer
                     )
                 ) {
-                    Icon(AppIcons.Success, contentDescription = null)
+                    Icon(AppIcons.Success, contentDescription = stringResource(R.string.checker_check_button))
                     Spacer(Modifier.width(Dimen.SpacingTiny))
                     Text(stringResource(R.string.checker_check_button))
                 }

@@ -50,8 +50,8 @@ fun Modifier.shimmerEffect(
         ),
         shape = shape
     )
-        .onGloballyPositioned {
-            it.size
+        .onGloballyPositioned { coordinates ->
+            size = coordinates.size
         }
         .clip(shape)
     }

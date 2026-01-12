@@ -24,11 +24,17 @@ object GameSharer {
             putExtra(Intent.EXTRA_TEXT, text)
         }
         
-        context.startActivity(
-            Intent.createChooser(
-                intent,
-                context.getString(R.string.games_share_chooser_title)
+        try {
+            context.startActivity(
+                Intent.createChooser(
+                    intent,
+                    context.getString(R.string.games_share_chooser_title)
+                )
             )
-        )
+        } catch (e: Exception) {
+            // Gracefully handle exceptions like SecurityException or ActivityNotFoundException
+            // Log the error or surface it through a callback if needed
+            e.printStackTrace()
+        }
     }
 }

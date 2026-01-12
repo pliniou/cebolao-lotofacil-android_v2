@@ -98,6 +98,7 @@ private fun Header(
     onToggle: (Boolean) -> Unit
 ) {
     val scheme = MaterialTheme.colorScheme
+    val interactionSource = remember { MutableInteractionSource() }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -114,7 +115,7 @@ private fun Header(
             modifier = Modifier
                 .weight(1f)
                 .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     indication = null, // No ripple for text tap, just action
                     enabled = !missing,
                     onClick = { onToggle(!state.isEnabled) }

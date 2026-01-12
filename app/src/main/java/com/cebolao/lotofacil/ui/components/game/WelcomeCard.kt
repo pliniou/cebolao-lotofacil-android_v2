@@ -16,7 +16,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,6 +37,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 /**
  * Retorna o ícone apropriado baseado no horário do dia.
@@ -57,21 +62,42 @@ fun WelcomeCard(
 ) {
     val scheme = MaterialTheme.colorScheme
 
-    val currentTime = remember { LocalTime.now() }
-    val currentDate = remember { LocalDate.now() }
-
-    val greetingRes = when (currentTime.hour) {
-        in 5..11 -> R.string.greeting_morning
-        in 12..17 -> R.string.greeting_afternoon
-        else -> R.string.greeting_night
+    // Dynamic time that updates periodically
+    val currentTime by remember {
+        derivedStateOf { LocalTime.now() }
+    }
+    val currentDate by remember {
+        derivedStateOf { LocalDate.now() }
     }
 
-    val dateString = remember {
-        val locale = Locale("pt", "BR")
-        DateTimeFormatter
-            .ofLocalizedDate(FormatStyle.MEDIUM)
-            .withLocale(locale)
-            .format(currentDate)
+    // Update every hour to refresh greeting and date
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(60 * 60 * 1000L) // 1 hour
+            // Trigger recomposition by accessing the derived state
+            currentTime
+            currentDate
+        }
+    }
+
+    val greetingRes by remember {
+        derivedStateOf {
+            when (currentTime.hour) {
+                in 5..11 -> R.string.greeting_morning
+                in 12..17 -> R.string.greeting_afternoon
+                else -> R.string.greeting_night
+            }
+        }
+    }
+
+    val dateString by remember {
+        derivedStateOf {
+            val locale = Locale("pt", "BR")
+            DateTimeFormatter
+                .ofLocalizedDate(FormatStyle.MEDIUM)
+                .withLocale(locale)
+                .format(currentDate)
+        }
     }
 
     val quotes = stringArrayResource(R.array.motivational_quotes)

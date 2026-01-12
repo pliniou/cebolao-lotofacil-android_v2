@@ -11,6 +11,9 @@
 
     <!-- Common / Acessibilidade (Mantenha profissional para acessibilidade) -->
     <string name="number_ball_content_description">Dezena %1$d, %2$s.</string>
+    <string name="number_ball_status_hit">Acertou</string>
+    <string name="number_ball_status_miss">Errou</string>
+    <string name="number_ball_status_neutral">Neutro</string>
     <string name="general_back">Voltar</string>
     <string name="general_selected">Selecionado</string>
     <string name="general_cancel">Cancelar</string>

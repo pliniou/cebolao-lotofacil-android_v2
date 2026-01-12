@@ -32,6 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -75,13 +77,15 @@ fun GeneratedGamesScreen(
     
     // Consumir eventos do ViewModel (share e snackbar)
     val context = androidx.compose.ui.platform.LocalContext.current
+    val currentContext by rememberUpdatedState(context)
+    
     androidx.compose.runtime.LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is GameEffect.ShareGame -> {
                     try {
                         val numbersFormatted = event.numbers.joinToString(" - ") { it.toString().padStart(2, '0') }
-                        val text = context.getString(
+                        val text = currentContext.getString(
                             R.string.share_game_text_format,
                             numbersFormatted,
                             event.metrics.sum,
@@ -100,22 +104,22 @@ fun GeneratedGamesScreen(
                         }
                         val chooserIntent = Intent.createChooser(
                             intent,
-                            context.getString(R.string.games_share_chooser_title)
+                            currentContext.getString(R.string.games_share_chooser_title)
                         )
-                        context.startActivity(chooserIntent)
+                        currentContext.startActivity(chooserIntent)
                     } catch (_: SecurityException) {
                         scope.launch {
-                            snackbarHostState.showSnackbar(context.getString(R.string.share_error_message))
+                            snackbarHostState.showSnackbar(currentContext.getString(R.string.share_error_message))
                         }
                     } catch (_: ActivityNotFoundException) {
                         scope.launch {
-                            snackbarHostState.showSnackbar(context.getString(R.string.share_error_message))
+                            snackbarHostState.showSnackbar(currentContext.getString(R.string.share_error_message))
                         }
                     }
                 }
                 is GameEffect.ShowSnackbar -> {
                     scope.launch {
-                        snackbarHostState.showSnackbar(context.getString(event.messageRes))
+                        snackbarHostState.showSnackbar(currentContext.getString(event.messageRes))
                     }
                 }
             }
@@ -161,8 +165,8 @@ fun GeneratedGamesScreenContent(
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
-    var showClearDialog by remember { mutableStateOf(false) }
-    var gameToPin by remember { mutableStateOf<UiLotofacilGame?>(null) }
+    var showClearDialog by rememberSaveable { mutableStateOf(false) }
+    var gameToPin by rememberSaveable { mutableStateOf<UiLotofacilGame?>(null) }
 
     if (showClearDialog) {
         AppConfirmationDialog(
@@ -195,7 +199,7 @@ fun GeneratedGamesScreenContent(
             title = if (isPinning) R.string.game_card_pin_confirm_title else R.string.game_card_unpin_confirm_title,
             message = if (isPinning) R.string.game_card_pin_confirm_msg else R.string.game_card_unpin_confirm_msg,
             confirmText = if (isPinning) R.string.general_save else R.string.general_close,
-            onConfirm = {
+            onConfirm = { 
                 onEvent(GameUiEvent.TogglePin(game))
                 gameToPin = null
             },
