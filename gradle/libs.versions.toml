@@ -4,7 +4,6 @@ agp = "8.13.2"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.25"
 desugar = "2.1.4"
-detekt = "1.23.7"
 
 # Android Core & Compose
 coreKtx = "1.13.1"
@@ -117,7 +116,6 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 [bundles]
 compose = [

@@ -12,21 +12,13 @@ object Dimen {
     val Spacing16 = 16.dp
     val Spacing20 = 20.dp
     val Spacing24 = 24.dp
-    val Spacing32 = 32.dp
 
+    // --- Semantic Spacing ---
     val SpacingShort = Spacing8
     val SpacingMedium = Spacing16
-    
-    val TrackingWidest = 2.sp
-
-    // --- Aliases for Legacy Compatibility ---
-    val SpacingXS = Spacing4
-    val SpacingS = Spacing8
-    val ExtraSmallPadding = SpacingXS
-    val SmallPadding = SpacingS
-
     val SectionSpacing = Spacing24
     val ItemSpacing = Spacing12
+    val TrackingWidest = 2.sp
 
     // --- Layout ---
     val ScreenPadding = Spacing16
@@ -41,19 +33,11 @@ object Dimen {
     // --- Indicators ---
     val IndicatorHeightSmall = 8.dp
     val IndicatorWidthActive = 32.dp
-    val IndicatorWidthInactive = 8.dp
 
     // --- Icons ---
     val IconSmall = 16.dp
     val IconMedium = 24.dp
     val IconLarge = 32.dp
-    val IconExtraLarge = 48.dp
-
-    // Legacy Aliases
-    val SmallIcon = IconSmall
-    val MediumIcon = IconMedium
-    val LargeIcon = IconLarge
-    val ExtraLargeIcon = IconExtraLarge
     val Logo = 80.dp
 
     // --- Lotofácil Balls ---
@@ -68,7 +52,6 @@ object Dimen {
 
     // --- Shapes ---
     val CardCornerRadius = 24.dp
-    val ButtonCornerRadius = 16.dp
 
     object Border {
         val Hairline = 0.5.dp
@@ -79,9 +62,6 @@ object Dimen {
     
     object Elevation {
         val None = 0.dp
-        val Level1 = 1.dp
         val Level2 = 2.dp
-        val Level3 = 4.dp
-        val Level4 = 8.dp
     }
 }

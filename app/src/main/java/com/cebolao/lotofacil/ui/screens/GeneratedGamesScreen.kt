@@ -349,7 +349,7 @@ private fun GameTabs(
                     Text(
                         text = stringResource(titleRes),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (selectedIndex == index) FontWeight.SemiBold else FontWeight.Normal
                     )
                 }
             )
@@ -379,13 +379,13 @@ private fun GameList(
                 .widthIn(max = 800.dp)
                 .fillMaxSize(),
             contentPadding = PaddingValues(
-                top = Dimen.Spacing16,
-                bottom = Dimen.Spacing24,
+                top = Dimen.ItemSpacing,
+                bottom = Dimen.SectionSpacing,
                 start = Dimen.ScreenPadding,
                 end = Dimen.ScreenPadding
             ),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16),
-            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing),
+            horizontalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
         ) {
             itemsIndexed(
                 items = games,

@@ -44,14 +44,14 @@ fun MessageState(
         Surface(
             color = iconTint.copy(alpha = 0.1f),
             shape = CircleShape,
-            modifier = Modifier.size(Dimen.ExtraLargeIcon * 1.5f)
+            modifier = Modifier.size(Dimen.IconLarge * 1.5f)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = iconTint,
-                    modifier = Modifier.size(Dimen.ExtraLargeIcon)
+                    modifier = Modifier.size(Dimen.IconLarge)
                 )
             }
         }

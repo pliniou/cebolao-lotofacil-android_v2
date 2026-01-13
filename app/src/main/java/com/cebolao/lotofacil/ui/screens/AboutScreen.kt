@@ -283,7 +283,7 @@ private fun ThemeModeOption(
         modifier = Modifier.fillMaxWidth(),
         outlined = !isSelected,
         color = if (isSelected) scheme.primaryContainer.copy(alpha = 0.55f) else scheme.surface,
-        contentPadding = Dimen.SmallPadding
+        contentPadding = Dimen.ItemSpacing
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -540,30 +540,6 @@ private fun CaixaCard(onClick: () -> Unit) {
                 contentDescription = stringResource(R.string.open_external_link),
                 tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.90f),
                 modifier = Modifier.size(Dimen.IconMedium)
-            )
-        }
-    }
-}
-
-@Composable
-private fun LearnMoreCard() {
-    AppCard(
-        modifier = Modifier.fillMaxWidth(),
-        outlined = true,
-        color = MaterialTheme.colorScheme.surface,
-        contentPadding = Dimen.CardContentPadding
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)) {
-            Text(
-                text = "Aprenda Mais",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Dicas e estratégias em breve.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

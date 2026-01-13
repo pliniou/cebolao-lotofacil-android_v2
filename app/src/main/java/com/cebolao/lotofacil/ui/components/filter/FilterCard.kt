@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +38,7 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
 import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.FontFamilyDisplay
@@ -65,11 +67,11 @@ fun FilterCard(
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize(animationSpec = com.cebolao.lotofacil.ui.theme.Motion.Spring.gentle()),
-        outlined = !active,
-        color = if (active) scheme.surface else scheme.surfaceContainerLow,
-        contentPadding = Dimen.Spacing8
+        variant = if (active) CardVariant.Solid else CardVariant.Outlined,
+        color = if (!active) MaterialTheme.colorScheme.surfaceContainerLow else Color.Unspecified,
+        contentPadding = Dimen.CardContentPadding
     ) {
-        Column(modifier = Modifier.padding(Dimen.Spacing8)) {
+        Column(modifier = Modifier.padding(Dimen.ItemSpacing)) {
             Header(
                 state = state,
                 active = active,
@@ -102,7 +104,7 @@ private fun Header(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+        horizontalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
     ) {
         Icon(
             imageVector = state.type.filterIcon,
@@ -169,7 +171,7 @@ private fun Content(
         max(0, delta - 1)
     }
 
-    Column(modifier = Modifier.padding(top = Dimen.Spacing8)) {
+    Column(modifier = Modifier.padding(top = Dimen.ItemSpacing)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -192,7 +194,7 @@ private fun Content(
             onValueChange = onRange,
             valueRange = state.type.fullRange,
             steps = steps,
-            modifier = Modifier.padding(top = Dimen.Spacing8)
+            modifier = Modifier.padding(top = Dimen.Spacing4),
         )
 
         // Visual guidance for recommended range

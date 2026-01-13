@@ -53,9 +53,7 @@ fun GenerationActionsPanel(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         variant = CardVariant.Solid,
-        color = scheme.surfaceContainer, // Use container color for panel background
-        contentPadding = Dimen.SpacingMedium,
-        hasBorder = false
+        contentPadding = Dimen.SpacingMedium
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

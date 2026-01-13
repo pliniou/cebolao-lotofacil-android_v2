@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.Dimen
 import java.time.LocalDate
 import java.time.LocalTime
@@ -105,8 +106,7 @@ fun WelcomeCard(
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        outlined = false,
-        color = scheme.surfaceContainer,
+        variant = CardVariant.Solid,
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(
@@ -124,7 +124,7 @@ fun WelcomeCard(
                     shape = MaterialTheme.shapes.small
                 ) {
                     Box(
-                        modifier = Modifier.padding(Dimen.ExtraSmallPadding),
+                        modifier = Modifier.padding(Dimen.Spacing4),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

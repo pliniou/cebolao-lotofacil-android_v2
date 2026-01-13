@@ -14,12 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -33,17 +35,16 @@ fun GameCard(
 ) {
     val scheme = MaterialTheme.colorScheme
     val isPinned = game.isPinned
-    val background = if (isPinned) {
-        scheme.secondaryContainer.copy(alpha = 0.2f)
-    } else {
-        scheme.surface
-    }
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        color = background,
-        outlined = isPinned,
-        contentPadding = Dimen.Spacing16
+        variant = if (isPinned) CardVariant.Outlined else CardVariant.Solid,
+        color = if (isPinned) {
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.15f)
+        } else {
+            Color.Unspecified
+        },
+        contentPadding = Dimen.CardContentPadding
     ) {
         Column(
             modifier = Modifier
@@ -58,7 +59,7 @@ fun GameCard(
                 Text(
                     text = stringResource(R.string.game_card_title_format, index),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     color = scheme.onSurface
                 )
 
@@ -71,7 +72,7 @@ fun GameCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(Dimen.Spacing8))
+            Spacer(modifier = Modifier.height(Dimen.ItemSpacing))
 
             NumberGrid(
                 selectedNumbers = game.numbers,
@@ -82,7 +83,7 @@ fun GameCard(
                 ballVariant = if (isPinned) NumberBallVariant.Secondary else NumberBallVariant.Neutral
             )
 
-            Spacer(modifier = Modifier.height(Dimen.Spacing8))
+            Spacer(modifier = Modifier.height(Dimen.ItemSpacing))
 
             GameCardActions(
                 onDelete = { onAction(GameCardAction.Delete) },

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
@@ -39,8 +40,8 @@ fun DisclaimerCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = 520.dp),
-            outlined = false,
-            color = scheme.inverseSurface,
+            variant = CardVariant.Solid,
+            color = MaterialTheme.colorScheme.inverseSurface,
             contentPadding = Dimen.CardContentPadding
         ) {
             Column(

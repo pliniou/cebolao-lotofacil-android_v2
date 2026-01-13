@@ -22,8 +22,6 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    // We need to fetch the start destination. 
-    // Ideally ViewModel exposes the Route Object directly.
     val startDestinationState by viewModel.startDestination.collectAsStateWithLifecycle()
     val startDestination = startDestinationState.destination // This needs to be Any, check MainViewModel
 

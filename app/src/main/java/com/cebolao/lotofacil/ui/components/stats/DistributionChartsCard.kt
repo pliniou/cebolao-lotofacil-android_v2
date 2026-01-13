@@ -70,7 +70,6 @@ fun DistributionChartsCard(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         variant = CardVariant.Solid,
-        color = scheme.surfaceContainer,
         title = stringResource(R.string.home_distribution_title),
         headerActions = {
             // Legenda do destaque (último concurso)
@@ -121,7 +120,7 @@ private fun PatternSelector(
 
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimen.SmallPadding),
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
         contentPadding = PaddingValues(horizontal = 0.dp)
     ) {
         items(patterns) { pattern ->

@@ -15,13 +15,3 @@ import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
-
-/**
- * Estado de feedback visual para operações
- */
-enum class FeedbackState {
-    IDLE,
-    LOADING,
-    SUCCESS,
-    ERROR
-}

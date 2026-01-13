@@ -29,7 +29,7 @@ fun InfoDialog(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(Dimen.LargeIcon)
+                modifier = Modifier.size(Dimen.IconLarge)
             )
         },
         title = {

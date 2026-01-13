@@ -78,14 +78,14 @@ fun TitleWithIcon(
                     shape = MaterialTheme.shapes.small
                 ) {
                     Box(
-                        modifier = Modifier.padding(Dimen.ExtraSmallPadding),
+                        modifier = Modifier.padding(Dimen.Spacing4),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = iconVector,
                             contentDescription = null,
                             tint = tint,
-                            modifier = Modifier.size(Dimen.MediumIcon)
+                            modifier = Modifier.size(Dimen.IconMedium)
                         )
                     }
                 }
@@ -99,13 +99,13 @@ fun TitleWithIcon(
                     shape = MaterialTheme.shapes.small
                 ) {
                     Box(
-                        modifier = Modifier.padding(Dimen.ExtraSmallPadding),
+                        modifier = Modifier.padding(Dimen.Spacing4),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = iconRes),
                             contentDescription = null,
-                            modifier = Modifier.size(Dimen.MediumIcon)
+                            modifier = Modifier.size(Dimen.IconMedium)
                         )
                     }
                 }
@@ -133,7 +133,7 @@ fun InfoPoint(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(Dimen.ExtraSmallPadding)
+        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
     ) {
         Text(
             text = title,

@@ -28,7 +28,7 @@ fun SectionHeader(
                 start = Dimen.ScreenPadding,
                 end = Dimen.ScreenPadding,
                 top = Dimen.SectionSpacing,
-                bottom = Dimen.SmallPadding
+                bottom = Dimen.ItemSpacing
             )
             // Acessibilidade: marca como heading para leitores de tela
             .semantics { heading() }

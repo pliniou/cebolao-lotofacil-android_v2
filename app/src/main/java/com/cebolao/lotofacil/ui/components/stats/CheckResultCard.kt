@@ -45,7 +45,6 @@ fun CheckResultCard(
 ) {
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainer,
         outlined = true
     ) {
         Column(

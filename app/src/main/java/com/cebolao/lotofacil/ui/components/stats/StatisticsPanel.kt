@@ -84,7 +84,7 @@ fun StatisticsPanel(
                 exit = scaleOut(animationSpec = Motion.Spring.gentle()) + fadeOut(animationSpec = Motion.Tween.exit())
             ) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(Dimen.SmallIcon),
+                    modifier = Modifier.size(Dimen.IconSmall),
                     strokeWidth = Dimen.Border.Thin,
                     color = scheme.secondary
                 )
@@ -131,7 +131,7 @@ private fun TimeWindowSelector(
 ) {
     val scheme = MaterialTheme.colorScheme
 
-    Column(verticalArrangement = Arrangement.spacedBy(Dimen.SmallPadding)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
         Text(
             text = stringResource(R.string.home_analysis_period),
             style = MaterialTheme.typography.labelMedium,
@@ -140,7 +140,7 @@ private fun TimeWindowSelector(
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Dimen.SmallPadding),
+            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
             items(GameConstants.TIME_WINDOWS) { window ->
@@ -195,7 +195,7 @@ private fun StatsContent(stats: UiStatisticsReport) {
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.SmallPadding)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
                     StatRow(
                         title = stringResource(R.string.home_hot_numbers),
@@ -206,7 +206,7 @@ private fun StatsContent(stats: UiStatisticsReport) {
 
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.SmallPadding)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
                     StatRow(
                         title = stringResource(R.string.home_overdue_numbers),
@@ -237,7 +237,7 @@ private fun StatRow(
         color = scheme.surfaceVariant,
         contentPadding = Dimen.CardContentPadding
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Dimen.SmallPadding)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,

@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -91,6 +92,7 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
     )
 }
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun FiltersScreenContent(
     uiState: FiltersScreenState,
@@ -184,10 +186,10 @@ fun FiltersScreenContent(
         bottomBar = {
             GenerationActionsPanel(
                 quantity = quantity,
-                onQuantityChanged = { quantity = it },
+                onQuantityChanged = { },
                 onGenerate = { onEvent(FiltersUiEvent.GenerateGames(quantity)) },
                 isGenerating = uiState.generationState is GenerationUiState.Loading,
-                modifier = Modifier.padding(bottom = Dimen.SpacingMedium)
+                modifier = Modifier.padding(bottom = Dimen.ItemSpacing)
             )
         }
     ) { innerPadding ->
@@ -197,12 +199,11 @@ fun FiltersScreenContent(
                     selectedPreset = selectedPreset,
                     presets = FilterPresets.all,
                     onPresetSelected = { 
-                        selectedPreset = it
-                        onEvent(FiltersUiEvent.ApplyPreset(it)) 
+                        onEvent(FiltersUiEvent.ApplyPreset(it))
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = Dimen.Spacing8)
+                        .padding(bottom = Dimen.ItemSpacing)
                 )
             }
 
@@ -210,7 +211,7 @@ fun FiltersScreenContent(
                 item(key = "filter_grid") {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+                        horizontalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing),
                         verticalAlignment = Alignment.Top
                     ) {
                         Column(modifier = Modifier.weight(0.5f)) {
@@ -225,7 +226,7 @@ fun FiltersScreenContent(
                                 onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                                 onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                                 onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
-                                modifier = Modifier.padding(top = Dimen.Spacing8)
+                                modifier = Modifier.padding(top = Dimen.ItemSpacing)
                             )
                         }
                         
@@ -241,7 +242,7 @@ fun FiltersScreenContent(
                                 onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                                 onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                                 onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
-                                modifier = Modifier.padding(top = Dimen.Spacing8)
+                                modifier = Modifier.padding(top = Dimen.ItemSpacing)
                             )
                         }
                     }

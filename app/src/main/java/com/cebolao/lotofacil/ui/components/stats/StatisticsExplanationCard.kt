@@ -54,7 +54,7 @@ fun StatisticsExplanationCard(
         outlined = true
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
+            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
         ) {
             // Header clicável (flat, sem “peso” excessivo)
             Row(
@@ -148,7 +148,7 @@ fun StatisticsExplanationCard(
                         text = stringResource(R.string.edu_hot_cold_desc)
                     )
 
-                    Spacer(Modifier.padding(top = Dimen.Spacing8))
+                    Spacer(Modifier.padding(top = Dimen.ItemSpacing))
 
                     FilterExplainerList()
                 }
@@ -209,7 +209,7 @@ private fun EduBullet(
         Spacer(Modifier.width(Dimen.SpacingShort))
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
         ) {
             if (title != null) {
                 Text(
@@ -246,7 +246,7 @@ private fun FilterExplainerList() {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(Dimen.SpacingMedium),
+                        .padding(Dimen.CardContentPadding),
                     verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
                 ) {
                     Text(

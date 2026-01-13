@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
@@ -187,12 +188,13 @@ fun HomeScreenContent(
 
                 item(key = "disclaimer") {
                     AnimateOnEntry(
-                        delayMillis = staggerDelay(2).toLong(),
+                        delayMillis = staggerDelay(3).toLong(),
                         animation = EntryAnimation.Fade
                     ) {
                         StandardAttentionCard(
                             title = stringResource(R.string.attention_title),
-                            message = stringResource(R.string.attention_message)
+                            message = stringResource(R.string.attention_message),
+                            modifier = Modifier.padding(top = Dimen.ItemSpacing)
                         )
                     }
                 }
@@ -210,7 +212,7 @@ private fun HeroLoadingCard(
             .fillMaxWidth()
             .height(120.dp),
         outlined = true,
-        color = MaterialTheme.colorScheme.surface
+        contentPadding = Dimen.CardContentPadding
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -219,9 +221,9 @@ private fun HeroLoadingCard(
         ) {
             CircularProgressIndicator(
                 modifier = Modifier.size(Dimen.IconMedium),
-                strokeWidth = 2.dp
+                strokeWidth = Dimen.Border.Thin
             )
-            Spacer(Modifier.width(Dimen.SpacingMedium))
+            Spacer(Modifier.width(Dimen.ItemSpacing))
             Column(
                 verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
                 horizontalAlignment = Alignment.Start

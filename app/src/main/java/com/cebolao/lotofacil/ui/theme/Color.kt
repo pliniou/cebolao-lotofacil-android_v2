@@ -22,7 +22,6 @@ val VividPurple = Color(0xFF8B5CF6)
 val VividPink = Color(0xFFEC4899)
 val VividAmber = Color(0xFFFBBF24)
 val VividGreen = Color(0xFF10B981)
-val VividBlue = Color(0xFF3B82F6)
 
 // Corporate Identity
 val BrandAzulCaixa = Color(0xFF005CA9)
@@ -58,22 +57,12 @@ val TextPrimaryLight = Slate900
 val TextSecondaryLight = Slate600
 val TextTertiaryLight = Slate500
 
-// Legacy Aliases for backward compatibility
-val TextPrimary = TextPrimaryDark
-val TextSecondary = TextSecondaryDark
-val TextTertiary = TextTertiaryDark
-
 // --- GLASSMORPHISM TOKENS ---
-val GlassWhite = Color(0xCCFFFFFF)
-val GlassBlack = Color(0x80000000)
 val GlassSurfaceLight = FlatWhite.copy(alpha = 0.72f)
 val GlassSurfaceDark = Slate900.copy(alpha = 0.65f)
 
 object Alpha {
-    const val HIGH = 0.87f
-    const val MEDIUM = 0.60f
     const val DISABLED = 0.38f
     const val DIVIDER = 0.12f
     const val SCRIM = 0.32f
-    const val GLASS = 0.12f
 }

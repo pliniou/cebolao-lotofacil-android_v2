@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.NextDrawInfo
 import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.Alpha
 import com.cebolao.lotofacil.ui.theme.Dimen
 
@@ -29,9 +30,7 @@ fun NextContestHeroCard(
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        outlined = true,
-        // Using surfaceContainer with a tint from primary for a "hero" feel without being overpowering
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        variant = CardVariant.Outlined,
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(
@@ -82,8 +81,7 @@ fun NextContestHeroCard(
                 // Date Box
                 AppCard(
                     modifier = Modifier.weight(1f),
-                    outlined = false,
-                    color = MaterialTheme.colorScheme.surface,
+                    variant = CardVariant.Solid,
                     contentPadding = Dimen.Spacing8
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -104,7 +102,7 @@ fun NextContestHeroCard(
                 // Final Five Accumulation Box
                 AppCard(
                     modifier = Modifier.weight(1f),
-                    outlined = false,
+                    variant = CardVariant.Solid,
                     color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
                     contentPadding = Dimen.Spacing8
                 ) {

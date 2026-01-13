@@ -185,9 +185,9 @@ fun CheckerScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = Dimen.Spacing8),
+                        .padding(vertical = Dimen.ItemSpacing),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
                     val scheme = MaterialTheme.colorScheme
                     val isComplete = selectedNumbers.size == GameConstants.GAME_SIZE
@@ -206,7 +206,7 @@ fun CheckerScreenContent(
                                 vertical = Dimen.Spacing8
                             ),
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
 
@@ -268,7 +268,7 @@ fun CheckerScreenContent(
                 item(key = "quality_meter") {
                     GameQualityCard(
                         score = gameScore,
-                        modifier = Modifier.padding(top = Dimen.Spacing16)
+                        modifier = Modifier.padding(top = Dimen.ItemSpacing),
                     )
                 }
             }
@@ -280,7 +280,7 @@ fun CheckerScreenContent(
                     AppCard(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = Dimen.Spacing8),
+                            .padding(top = Dimen.ItemSpacing),
                         outlined = false,
                         color = MaterialTheme.colorScheme.surfaceContainer,
                         contentPadding = Dimen.CardContentPadding
@@ -382,8 +382,8 @@ private fun CheckerBottomBar(
 @Composable
 private fun CheckerResultSection(state: CheckerUiState) {
     Column(
-        modifier = Modifier.padding(top = Dimen.Spacing16),
-        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+        modifier = Modifier.padding(top = Dimen.ItemSpacing),
+        verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
     ) {
         when (state) {
             is CheckerUiState.Success -> {
@@ -391,7 +391,7 @@ private fun CheckerResultSection(state: CheckerUiState) {
                     text = stringResource(R.string.checker_performance_analysis),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = Dimen.Spacing4),
+                    modifier = Modifier.padding(top = Dimen.ItemSpacing),
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 // New Financial Card

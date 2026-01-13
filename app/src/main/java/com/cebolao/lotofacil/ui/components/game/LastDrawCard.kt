@@ -59,8 +59,8 @@ fun LastDrawCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(Dimen.Spacing16),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing24),
+                .padding(Dimen.CardContentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimen.SectionSpacing),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
@@ -72,7 +72,7 @@ fun LastDrawCard(
                 Text(
                     text = stringResource(R.string.app_result_title, draw.contestNumber),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     color = scheme.onSurface
                 )
                 DrawDateSubtitle(draw)
@@ -92,8 +92,8 @@ fun LastDrawCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(Dimen.Spacing16),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+                        .padding(Dimen.CardContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
                     Text(
                         text = stringResource(R.string.statistics),
@@ -137,7 +137,7 @@ fun LastDrawCard(
             if (details != null) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
                     PrizeTableSection(details)
                     LocationInfoSection(details)

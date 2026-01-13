@@ -42,7 +42,6 @@ fun GameQualityCard(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         outlined = false,
-        color = MaterialTheme.colorScheme.surfaceContainer,
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(

@@ -60,9 +60,13 @@ interface CardScope : ColumnScope {
 val LocalCardNesting = compositionLocalOf { 0 }
 
 /**
- * AppCard Modernizado e Otimizado.
+ * AppCard Modernizado e Otimizado - Material Design Flat.
  *
- * Base para todos os cards do app, suportando aninhamento e variantes visuais.
+ * Base para todos os cards do app com:
+ * - Aninhamento automático com variantes recursivas
+ * - Design flat sem elevações desnecessárias
+ * - Feedback tátil sutil
+ * - Suporte a glassmorphism
  */
 @Composable
 fun AppCard(
@@ -100,7 +104,7 @@ fun AppCard(
         label = "cardScale"
     )
 
-    // Background selection with glassmorphism support
+    // Background selection com glassmorphism - sempre flat
     val effectiveBackground = when {
         color != Color.Unspecified -> color
         effectiveVariant == CardVariant.Glass -> if (isDark) GlassSurfaceDark else GlassSurfaceLight
@@ -108,19 +112,20 @@ fun AppCard(
         else -> scheme.surfaceContainer
     }
 
-    // Subtle border for premium feel
+    // Border flat para design moderno
     val border = if (hasBorder || effectiveVariant == CardVariant.Outlined) {
         BorderStroke(
             width = Dimen.Border.Thin,
             color = if (effectiveVariant == CardVariant.Glass) {
-                scheme.outlineVariant.copy(alpha = 0.3f)
+                scheme.outlineVariant.copy(alpha = 0.2f)
             } else {
-                scheme.outlineVariant.copy(alpha = 0.12f)
+                scheme.outlineVariant.copy(alpha = 0.08f)
             }
         )
     } else null
 
-    val cardElevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    // Sem elevação - flat design consistente
+    val cardElevation = CardDefaults.cardElevation(defaultElevation = Dimen.Elevation.None)
     val colors = CardDefaults.cardColors(containerColor = effectiveBackground)
 
     val baseModifier = if (onClick != null) {
@@ -190,7 +195,7 @@ private fun CardContent(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }

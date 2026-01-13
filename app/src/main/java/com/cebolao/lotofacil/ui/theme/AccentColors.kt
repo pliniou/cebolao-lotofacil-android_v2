@@ -48,9 +48,9 @@ private class ColorSchemeBuilder(
     
     private fun contentColor(emphasis: Int = 0): Color = when {
         isDark -> when (emphasis) {
-            0 -> TextPrimary
-            1 -> TextSecondary
-            else -> TextTertiary
+            0 -> TextPrimaryDark
+            1 -> TextSecondaryDark
+            else -> TextTertiaryDark
         }
         else -> when (emphasis) {
             0 -> TextPrimaryLight

@@ -41,7 +41,7 @@ fun AppConfirmationDialog(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(Dimen.LargeIcon),
+                modifier = Modifier.size(Dimen.IconLarge),
                 tint = iconTint
             )
         },
