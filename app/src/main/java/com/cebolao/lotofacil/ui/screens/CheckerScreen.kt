@@ -49,15 +49,17 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.toCheckResult
 import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
+import com.cebolao.lotofacil.ui.components.common.HeatmapToggle
 import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberGrid
-import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.stats.EnhancedStatsCard
 import com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard
 import com.cebolao.lotofacil.ui.components.stats.GameQualityCard
+import com.cebolao.lotofacil.ui.components.stats.RangeAnalysisCard
 import com.cebolao.lotofacil.ui.components.stats.SimpleStatsCard
+import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Shapes
@@ -230,20 +232,10 @@ fun CheckerScreenContent(
                    horizontalArrangement = Arrangement.End,
                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = { onEvent(CheckerUiEvent.ToggleHeatmap) }
-                    ) {
-                        Icon(
-                            imageVector = if (isHeatmapEnabled) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                            contentDescription = stringResource(
-                                if (isHeatmapEnabled) R.string.checker_hide_frequency 
-                                else R.string.checker_show_frequency
-                            ),
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(Modifier.width(Dimen.SpacingTiny))
-                        Text(if (isHeatmapEnabled) "Ocultar Frequência" else "Ver Frequência")
-                    }
+                    HeatmapToggle(
+                        isHeatmapEnabled = isHeatmapEnabled,
+                        onToggle = { onEvent(CheckerUiEvent.ToggleHeatmap) }
+                    )
                 }
             }
 

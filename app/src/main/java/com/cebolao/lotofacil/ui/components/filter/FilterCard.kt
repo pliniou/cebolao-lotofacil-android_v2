@@ -172,21 +172,41 @@ private fun Content(
     }
 
     Column(modifier = Modifier.padding(top = Dimen.ItemSpacing)) {
+        // Header com informações do range
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Dimen.Spacing8),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Label(
-                text = stringResource(R.string.filters_min_label),
-                value = state.selectedRange.start.toInt()
-            )
-            Label(
-                text = stringResource(R.string.filters_max_label),
-                value = state.selectedRange.endInclusive.toInt(),
-                align = Alignment.End
-            )
+            Column {
+                Text(
+                    text = stringResource(R.string.filters_current_range),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${state.selectedRange.start.toInt()} - ${state.selectedRange.endInclusive.toInt()}",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
+                Text(
+                    text = stringResource(R.string.filters_coverage),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                val coverage = calculateRangeCoverage(state)
+                Text(
+                    text = "${String.format("%.1f", coverage)}%",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (coverage >= 80f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
 
         RangeSlider(
@@ -194,40 +214,97 @@ private fun Content(
             onValueChange = onRange,
             valueRange = state.type.fullRange,
             steps = steps,
-            modifier = Modifier.padding(top = Dimen.Spacing4),
+            modifier = Modifier.padding(top = Dimen.Spacing8, horizontal = Dimen.Spacing8),
         )
 
-        // Visual guidance for recommended range
-        val defaultStart = state.type.defaultRange.start.toInt()
-        val defaultEnd = state.type.defaultRange.endInclusive.toInt()
-        val isDefault = state.selectedRange == state.type.defaultRange
+        // Informações detalhadas do range
+        RangeInfoSection(state)
+    }
+}
 
-        AnimatedVisibility(
-             visible = !isDefault,
-             enter = fadeIn() + expandVertically()
+@Composable
+private fun RangeInfoSection(state: FilterState) {
+    val currentRange = state.selectedRange.endInclusive - state.selectedRange.start
+    val totalRange = state.type.fullRange.endInclusive - state.type.fullRange.start
+    val coveragePercentage = (currentRange / totalRange * 100f)
+    
+    // Verificar se está usando range recomendado
+    val isRecommended = state.selectedRange == state.type.defaultRange
+    val isWideRange = coveragePercentage >= 75f
+    val isNarrowRange = coveragePercentage <= 25f
+    
+    AnimatedVisibility(
+        visible = true,
+        enter = fadeIn() + expandVertically()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Dimen.Spacing8, top = Dimen.Spacing4),
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = Dimen.Spacing4),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = AppIcons.Info,
-                    contentDescription = null,
-                    modifier = Modifier.size(12.dp),
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.filter_recommended_range, defaultStart, defaultEnd),
-                    style = MaterialTheme.typography.labelSmall,
+            // Indicador de range recomendado
+            if (!isRecommended) {
+                RangeIndicator(
+                    icon = AppIcons.Info,
+                    text = stringResource(
+                        R.string.filter_recommended_range,
+                        state.type.defaultRange.start.toInt(),
+                        state.type.defaultRange.endInclusive.toInt()
+                    ),
                     color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+            
+            // Indicadores de cobertura
+            if (isWideRange) {
+                RangeIndicator(
+                    icon = AppIcons.TrendingUp,
+                    text = stringResource(R.string.filter_wide_range),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            if (isNarrowRange) {
+                RangeIndicator(
+                    icon = AppIcons.TrendingDown,
+                    text = stringResource(R.string.filter_narrow_range),
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         }
     }
+}
+
+@Composable
+private fun RangeIndicator(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    color: androidx.compose.ui.graphics.Color
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(12.dp),
+            tint = color
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = color
+        )
+    }
+}
+
+private fun calculateRangeCoverage(state: FilterState): Float {
+    val currentRange = state.selectedRange.endInclusive - state.selectedRange.start
+    val totalRange = state.type.fullRange.endInclusive - state.type.fullRange.start
+    return if (totalRange > 0) (currentRange / totalRange * 100f) else 0f
 }
 
 @Composable

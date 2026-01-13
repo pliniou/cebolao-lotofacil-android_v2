@@ -403,4 +403,42 @@
     <!-- Home Loading States -->
     <string name="home_updating_data" tools:keep="@string/home_updating_data">Atualizando dados…</string>
     <string name="home_pull_to_refresh_hint" tools:keep="@string/home_pull_to_refresh_hint">Puxe para baixo para sincronizar novamente.</string>
+    
+    <!-- Filter Categories -->
+    <string name="filter_category_numeric">Numéricos</string>
+    <string name="filter_category_geometric">Geométricos</string>
+    <string name="filter_category_math">Matemáticos</string>
+    <string name="filter_category_context">Contextuais</string>
+    
+    <!-- Checker Screen Hard-coded Strings -->
+    <string name="checker_hide_frequency">Ocultar Frequência</string>
+    <string name="checker_show_frequency">Ver Frequência</string>
+    
+    <!-- About Screen Hard-coded Strings -->
+    <string name="about_appearance">Aparência</string>
+    <string name="about_source_title">Fonte dos Dados</string>
+    <string name="about_source_desc">Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh.</string>
+    <string name="about_important_title">Importante</string>
+    <string name="about_important_desc">Este app organiza informações públicas. Não aumenta suas chances de ganhar, apenas evita combinações estatisticamente improváveis.</string>
+    <string name="about_privacy_title">Privacidade</string>
+    <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
+    <string name="about_version_title">Versão</string>
+    
+    <!-- Checker Screen Range Analysis -->
+    <string name="checker_range_analysis_title">Análise por Faixa de Acertos</string>
+    <string name="checker_total_analyzed">Total Analisado</string>
+    <string name="checker_avg_hits">Média de Acertos</string>
+    <string name="checker_distribution_by_range">Distribuição por Faixa</string>
+    <string name="checker_range_0_5">0-5 Acertos</string>
+    <string name="checker_range_6_10">6-10 Acertos</string>
+    <string name="checker_range_11_15">11-15 Acertos</string>
+    <string name="checker_range_16_20">16-20 Acertos</string>
+    <string name="checker_most_common_range">Faixa mais comum: %s (%d jogos)</string>
+    <string name="checker_least_common_range">Faixa menos comum: %s (%d jogos)</string>
+    
+    <!-- Filter Range Improvements -->
+    <string name="filters_current_range">Range Atual</string>
+    <string name="filters_coverage">Cobertura</string>
+    <string name="filters_wide_range">Range Amplo</string>
+    <string name="filters_narrow_range">Range Restrito</string>
 </resources>

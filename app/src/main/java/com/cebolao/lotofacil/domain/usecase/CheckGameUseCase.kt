@@ -33,81 +33,66 @@ class CheckGameUseCase @Inject constructor(
 ) {
 
     operator fun invoke(gameNumbers: Set<Int>): Flow<AppResult<CheckReport>> = flow {
-        val result: AppResult<CheckReport> = try {
-            // Validar ticket antes de processar
-            when (val validation = ticketValidator.validate(gameNumbers)) {
-                is com.cebolao.lotofacil.domain.service.ValidationResult.Error -> {
-                    AppResult.Failure(AppError.Validation(validation.message))
-                }
-                is com.cebolao.lotofacil.domain.service.ValidationResult.Success -> {
-                    val history = historyRepository.getHistory()
-                    require(history.isNotEmpty()) { "History unavailable" }
-                    
-                    // Converter Set<Int> para LotofacilGame
-                    val game = LotofacilGame.fromNumbers(gameNumbers)
-                    
-                    // Calcular hash SHA-256 do ticket para auditoria
-                    val sourceHash = calculateTicketHash(game)
-                    
-                    // Delegar cálculo para GameCheckEngine
-                    val checkResult = gameCheckEngine.checkGame(game, history)
-                    
-                    // Criar DrawWindow a partir do histórico
-                    val drawWindow = DrawWindow(
-                        firstContest = history.lastOrNull()?.contestNumber ?: 0,
-                        lastContest = history.firstOrNull()?.contestNumber ?: 0,
-                        totalDraws = history.size
-                    )
-                    
-                    // Converter recentHits para List<Hit>
-                    val hits = checkResult.recentHits.map { (contestNumber, score) ->
-                        Hit(contestNumber = contestNumber, score = score)
-                    }
-                    
-                    // Calcular métricas financeiras com validação de dados históricos
-                    val financialMetrics = if (history.isNotEmpty()) {
-                        FinancialCalculator.calculate(
-                            checkResult = checkResult,
-                            totalDraws = history.size,
-                            gameCost = GameConstants.GAME_COST,
-                            historicalData = history
-                        )
-                    } else {
-                        FinancialCalculator.calculate(
-                            checkResult = checkResult,
-                            totalDraws = 0,
-                            gameCost = GameConstants.GAME_COST
-                        )
-                    }
-                    
-                    val timestamp = System.currentTimeMillis()
-                    
-                    val report = CheckReport(
-                        ticket = game,
-                        drawWindow = drawWindow,
-                        hits = hits,
-                        financialMetrics = financialMetrics,
-                        timestamp = timestamp,
-                        sourceHash = sourceHash
-                    )
-                    
-                    AppResult.Success(report)
-                }
+        try {
+            // 1. Validate Ticket
+            val validation = ticketValidator.validate(gameNumbers)
+            if (validation is com.cebolao.lotofacil.domain.service.ValidationResult.Error) {
+                emit(AppResult.Failure(AppError.Validation(validation.message)))
+                return@flow
             }
+
+            // 2. Fetch History
+            val history = historyRepository.getHistory()
+            if (history.isEmpty()) {
+                logger.warning(TAG, "History is empty during check")
+                // Ideally return a specific error or proceed with empty stats
+            }
+
+            // 3. Prepare Data
+            val game = LotofacilGame.fromNumbers(gameNumbers)
+            val sourceHash = calculateTicketHash(game)
+            
+            // 4. Delegate to Engine
+            val checkResult = gameCheckEngine.checkGame(game, history)
+            
+            // 5. Build Report
+            val drawWindow = DrawWindow(
+                firstContest = history.lastOrNull()?.contestNumber ?: 0,
+                lastContest = history.firstOrNull()?.contestNumber ?: 0,
+                totalDraws = history.size
+            )
+            
+            val hits = checkResult.recentHits.map { (contestNumber, score) ->
+                Hit(contestNumber = contestNumber, score = score)
+            }
+            
+            val financialMetrics = FinancialCalculator.calculate(
+                checkResult = checkResult,
+                totalDraws = history.size,
+                gameCost = GameConstants.GAME_COST,
+                historicalData = history
+            )
+            
+            val report = CheckReport(
+                ticket = game,
+                drawWindow = drawWindow,
+                hits = hits,
+                financialMetrics = financialMetrics,
+                timestamp = System.currentTimeMillis(),
+                sourceHash = sourceHash
+            )
+            
+            emit(AppResult.Success(report))
+
         } catch (e: CancellationException) {
             throw e
         } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
             logger.error(TAG, "Analysis failed", e)
-            AppResult.Failure(e.toAppError())
+            emit(AppResult.Failure(e.toAppError()))
         }
-
-        emit(result)
     }.flowOn(defaultDispatcher)
     
-    /**
-     * Calcula hash SHA-256 do ticket para auditoria
-     * Usa os números ordenados do ticket como entrada
-     */
+    // Hash calculation kept internal for now as moving to Model requires viewing Model first
     private fun calculateTicketHash(game: LotofacilGame): String {
         val numbers = game.numbers.sorted().joinToString(",")
         val digest = MessageDigest.getInstance("SHA-256")

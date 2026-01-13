@@ -1,11 +1,13 @@
 package com.cebolao.lotofacil.data.repository
 
+import com.cebolao.lotofacil.data.cache.DrawLruCache
 import com.cebolao.lotofacil.data.datasource.HistoryLocalDataSource
 import com.cebolao.lotofacil.data.mapper.toDraw
 import com.cebolao.lotofacil.data.mapper.toDrawDetails
 import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.di.ApplicationScope
+import com.cebolao.lotofacil.di.IoDispatcher
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
@@ -14,6 +16,7 @@ import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.util.toAppError
 import com.cebolao.lotofacil.domain.exception.SyncException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -25,6 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +41,8 @@ class HistoryRepositoryImpl @Inject constructor(
     private val localDataSource: HistoryLocalDataSource,
     private val syncManager: SyncManager,
     private val logger: Logger,
-    @param:ApplicationScope private val scope: CoroutineScope
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : HistoryRepository {
 
     // LRU cache for frequently accessed draws

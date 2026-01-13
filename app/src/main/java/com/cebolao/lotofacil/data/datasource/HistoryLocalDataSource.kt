@@ -3,7 +3,7 @@ package com.cebolao.lotofacil.data.datasource
 import android.content.Context
 import android.database.sqlite.SQLiteException
 import androidx.room.withTransaction
-import com.cebolao.lotofacil.data.HistoryParser
+import com.cebolao.lotofacil.data.util.HistoryParser
 import com.cebolao.lotofacil.data.local.db.AppDatabase
 import com.cebolao.lotofacil.data.local.db.DrawDao
 import com.cebolao.lotofacil.data.local.db.DrawDetailsDao

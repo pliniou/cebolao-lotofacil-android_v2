@@ -50,8 +50,8 @@ fun DistributionChartsCard(
 
     val (mean, stdDev) = remember(chartData) { calculateWeightedMeanAndStdDev(chartData) }
     val showNormalLine = remember(mean, stdDev, selectedPattern) {
-        // Linha normal só faz sentido quando o eixo X é numérico (ex.: soma)
-        selectedPattern == StatisticPattern.SUM && mean != null && stdDev != null && stdDev > 0.0
+        // Linha normal faz sentido quando temos dados numéricos suficientes e distribuição razoável
+        mean != null && stdDev != null && stdDev > 0.0 && chartData.size >= 3
     }
 
     // Valor do último sorteio para destacar no gráfico

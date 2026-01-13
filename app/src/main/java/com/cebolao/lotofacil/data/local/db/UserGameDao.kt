@@ -39,6 +39,9 @@ interface UserGameDao {
     @Query("SELECT * FROM user_games WHERE numbersMask = :mask LIMIT 1")
     suspend fun getGameByMask(mask: Long): UserGameEntity?
 
+    @Query("SELECT numbersMask FROM user_games WHERE numbersMask IN (:masks)")
+    suspend fun getExistingMasks(masks: List<Long>): List<Long>
+
     @Query("SELECT COUNT(*) FROM user_games")
     suspend fun count(): Int
 

@@ -1,4 +1,4 @@
-package com.cebolao.lotofacil.data
+package com.cebolao.lotofacil.data.util
 
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.Draw

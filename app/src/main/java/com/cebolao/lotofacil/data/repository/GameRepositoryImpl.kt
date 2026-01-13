@@ -50,21 +50,28 @@ class GameRepositoryImpl @Inject constructor(
         .stateIn(scope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), persistentListOf())
 
     override suspend fun addGeneratedGames(newGames: List<LotofacilGame>) = withContext(ioDispatcher) {
-        val entities = newGames.mapNotNull { game ->
-            // Verificar se já existe jogo com mesmo mask
-            val existing = userGameDao.getGameByMask(game.mask)
-            if (existing == null) {
+        if (newGames.isEmpty()) return@withContext
+
+        // 1. Gather all masks from input
+        val inputMasks = newGames.map { it.mask }
+
+        // 2. Fetch existing masks from DB in one query
+        val existingMasks = userGameDao.getExistingMasks(inputMasks).toSet()
+
+        // 3. Filter out games that already exist
+        val gamesToInsert = newGames.filter { game ->
+            game.mask !in existingMasks
+        }
+
+        // 4. Transform to entities and bulk insert
+        if (gamesToInsert.isNotEmpty()) {
+            val entities = gamesToInsert.map { game ->
                 game.toUserGameEntity(
                     source = "generated",
                     seed = null,
                     json = json
                 )
-            } else {
-                null
             }
-        }
-
-        if (entities.isNotEmpty()) {
             userGameDao.insertAll(entities)
         }
     }

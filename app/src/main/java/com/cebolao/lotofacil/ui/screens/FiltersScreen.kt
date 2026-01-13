@@ -40,18 +40,22 @@ import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.filter.filterSection
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.filterIcon
-
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersScreenState
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersViewModel
 import com.cebolao.lotofacil.presentation.viewmodel.NavigationEvent
 import com.cebolao.lotofacil.presentation.viewmodel.GenerationUiState
-import com.cebolao.lotofacil.data.FilterPreset
-import com.cebolao.lotofacil.data.FilterPresets
+import com.cebolao.lotofacil.domain.model.FilterPreset
+import com.cebolao.lotofacil.domain.model.FilterPresets
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.collectLatest
+
+data class FilterCategory(
+    val titleRes: Int,
+    val states: List<FilterState>
+)
 
 @Composable
 fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
@@ -207,6 +211,13 @@ fun FiltersScreenContent(
                 )
             }
 
+            val categories = listOf(
+                FilterCategory(R.string.filter_category_numeric, numericos),
+                FilterCategory(R.string.filter_category_geometric, geometricos),
+                FilterCategory(R.string.filter_category_math, matematicos),
+                FilterCategory(R.string.filter_category_context, contextuais)
+            )
+
             if (useColumnLayout) {
                 item(key = "filter_grid") {
                     Row(
@@ -215,63 +226,39 @@ fun FiltersScreenContent(
                         verticalAlignment = Alignment.Top
                     ) {
                         Column(modifier = Modifier.weight(0.5f)) {
-                            FilterGroupColumn(
-                                "Numéricos", numericos, uiState.lastDraw,
-                                onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                                onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                                onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
-                            )
-                            FilterGroupColumn(
-                                "Geométricos", geometricos, uiState.lastDraw,
-                                onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                                onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                                onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
-                                modifier = Modifier.padding(top = Dimen.ItemSpacing)
-                            )
+                            categories.take(2).forEachIndexed { index, category ->
+                                FilterGroupColumn(
+                                    stringResource(category.titleRes), category.states, uiState.lastDraw,
+                                    onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
+                                    onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
+                                    onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
+                                    modifier = if (index > 0) Modifier.padding(top = Dimen.ItemSpacing) else Modifier
+                                )
+                            }
                         }
                         
                         Column(modifier = Modifier.weight(0.5f)) {
-                            FilterGroupColumn(
-                                "Matemáticos", matematicos, uiState.lastDraw,
-                                onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                                onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                                onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
-                            )
-                            FilterGroupColumn(
-                                "Contextuais", contextuais, uiState.lastDraw,
-                                onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                                onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                                onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
-                                modifier = Modifier.padding(top = Dimen.ItemSpacing)
-                            )
+                            categories.drop(2).forEachIndexed { index, category ->
+                                FilterGroupColumn(
+                                    stringResource(category.titleRes), category.states, uiState.lastDraw,
+                                    onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
+                                    onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
+                                    onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
+                                    modifier = if (index > 0) Modifier.padding(top = Dimen.ItemSpacing) else Modifier
+                                )
+                            }
                         }
                     }
                 }
             } else {
-                filterSection(
-                    "Numéricos", numericos, uiState.lastDraw,
-                    onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                    onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                    onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
-                )
-                filterSection(
-                    "Geométricos", geometricos, uiState.lastDraw,
-                    onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                    onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                    onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
-                )
-                filterSection(
-                    "Matemáticos", matematicos, uiState.lastDraw,
-                    onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                    onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                    onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
-                )
-                filterSection(
-                    "Contextuais", contextuais, uiState.lastDraw,
-                    onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
-                    onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
-                    onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
-                )
+                categories.forEach { category ->
+                    filterSection(
+                        stringResource(category.titleRes), category.states, uiState.lastDraw,
+                        onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
+                        onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
+                        onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }
+                    )
+                }
             }
         }
     }

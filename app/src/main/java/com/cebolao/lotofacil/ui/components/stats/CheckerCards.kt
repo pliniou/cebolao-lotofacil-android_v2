@@ -58,23 +58,77 @@ fun SimpleStatsCard(
 ) {
     AppCard(
         modifier = modifier,
-        title = "Estatísticas Básicas",
+        title = "Estatísticas do Jogo",
         outlined = true
     ) {
-         Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Soma: ${gameMetrics.sum}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Pares: ${gameMetrics.evens}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Ímpares: ${15 - gameMetrics.evens}", style = MaterialTheme.typography.bodyMedium)
-            }
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Primos: ${gameMetrics.primes}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Fibonacci: ${gameMetrics.fibonacci}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Moldura: ${gameMetrics.frame}", style = MaterialTheme.typography.bodyMedium)
+        Column(
+            modifier = Modifier.padding(Dimen.CardContentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+        ) {
+            // Primeira linha: Soma, Pares, Ímpares
+            StatsRow(
+                items = listOf(
+                    StatItem("Soma", gameMetrics.sum.toString(), MaterialTheme.colorScheme.primary),
+                    StatItem("Pares", gameMetrics.evens.toString(), MaterialTheme.colorScheme.secondary),
+                    StatItem("Ímpares", (15 - gameMetrics.evens).toString(), MaterialTheme.colorScheme.tertiary)
+                )
+            )
+            
+            // Segunda linha: Primos, Fibonacci, Moldura
+            StatsRow(
+                items = listOf(
+                    StatItem("Primos", gameMetrics.primes.toString(), MaterialTheme.colorScheme.primary),
+                    StatItem("Fibonacci", gameMetrics.fibonacci.toString(), MaterialTheme.colorScheme.secondary),
+                    StatItem("Moldura", gameMetrics.frame.toString(), MaterialTheme.colorScheme.tertiary)
+                )
+            )
+            
+            // Terceira linha: Múltiplos de 3, Centro, Sequências
+            StatsRow(
+                items = listOf(
+                    StatItem("Mult. 3", gameMetrics.multiplesOf3.toString(), MaterialTheme.colorScheme.primary),
+                    StatItem("Centro", gameMetrics.center.toString(), MaterialTheme.colorScheme.secondary),
+                    StatItem("Sequências", gameMetrics.sequences.toString(), MaterialTheme.colorScheme.tertiary)
+                )
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatsRow(
+    items: List<StatItem>
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        items.forEach { item ->
+            Column(
+                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = item.value,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = item.color
+                )
+                Text(
+                    text = item.label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
 }
+
+private data class StatItem(
+    val label: String,
+    val value: String,
+    val color: androidx.compose.ui.graphics.Color
+)
 
 @Preview(showBackground = true)
 @Composable

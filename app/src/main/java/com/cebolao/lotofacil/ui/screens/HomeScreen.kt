@@ -35,6 +35,7 @@ import com.cebolao.lotofacil.navigation.navigateToChecker
 import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.stats.DistributionChartsCard
+import com.cebolao.lotofacil.ui.components.stats.EnhancedStatsCard
 import com.cebolao.lotofacil.ui.components.layout.EntryAnimation
 import com.cebolao.lotofacil.ui.components.game.LastDrawCard
 import com.cebolao.lotofacil.ui.components.game.NextContestHeroCard
@@ -44,6 +45,7 @@ import com.cebolao.lotofacil.ui.components.game.WelcomeCard
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.staggerDelay
 import com.cebolao.lotofacil.util.Formatters
+import com.cebolao.lotofacil.ui.components.common.LoadingCard
 import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
 import com.cebolao.lotofacil.presentation.viewmodel.HomeScreenState
 import com.cebolao.lotofacil.presentation.viewmodel.HomeUiEvent
@@ -129,7 +131,7 @@ fun HomeScreenContent(
                                 NextContestHeroCard(nextDrawInfoFromDetails)
                             }
                             uiState.screenState is HomeScreenState.Loading -> {
-                                HeroLoadingCard()
+                                LoadingCard()
                             }
                         }
                     }
@@ -198,47 +200,6 @@ fun HomeScreenContent(
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun HeroLoadingCard(
-    modifier: Modifier = Modifier
-) {
-    AppCard(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(120.dp),
-        outlined = true,
-        contentPadding = Dimen.CardContentPadding
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(Dimen.IconMedium),
-                strokeWidth = Dimen.Border.Thin
-            )
-            Spacer(Modifier.width(Dimen.ItemSpacing))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = "Atualizando dados…",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "Puxe para baixo para sincronizar novamente.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }

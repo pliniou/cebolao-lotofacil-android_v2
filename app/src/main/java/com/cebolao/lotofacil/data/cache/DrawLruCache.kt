@@ -1,4 +1,4 @@
-package com.cebolao.lotofacil.data.repository
+package com.cebolao.lotofacil.data.cache
 
 import com.cebolao.lotofacil.domain.model.Draw
 import kotlinx.coroutines.sync.Mutex

@@ -451,22 +451,34 @@ private fun DrawScope.drawNormalLine(
     if (data.isEmpty()) return
 
     val totalCount = data.sumOf { it.second }
-    val bucketWidth = if (data.size > 1) {
-        val v0 = data[0].first.toFloatOrNull()
-        val v1 = data[1].first.toFloatOrNull()
-        if (v0 != null && v1 != null) (v1 - v0).coerceAtLeast(1f) else 10f
-    } else 10f
+    val numericData = data.mapNotNull { (label, _) ->
+        label.toFloatOrNull()
+    }
+    
+    if (numericData.isEmpty()) return
+    
+    val dataRange = numericData.maxOrNull() ?: 0f - (numericData.minOrNull() ?: 0f)
+    val bucketWidth = if (dataRange > 0) dataRange / (numericData.size - 1).coerceAtLeast(1) else 1f
 
     val path = Path()
     var started = false
 
+    // Calcular distribuição normal para cada ponto de dados
     data.forEachIndexed { i, (label, _) ->
         val xCenter = m.getX(i)
         val value = label.toFloatOrNull() ?: return@forEachIndexed
 
         val z = (value - mean) / stdDev
         val pdf = (1f / (stdDev * sqrt(2f * PI.toFloat()))) * exp(-0.5f * z * z)
-        val predictedCount = (totalCount * bucketWidth * pdf).toInt().coerceAtLeast(0)
+        
+        // Ajustar a escala para melhor visualização
+        val scaleFactor = when {
+            bucketWidth > 10f -> 0.8f  // Para ranges grandes (como soma)
+            bucketWidth > 2f -> 1.2f   // Para ranges médios
+            else -> 1.5f              // Para ranges pequenos (como contagens)
+        }
+        
+        val predictedCount = (totalCount * bucketWidth * pdf * scaleFactor).toInt().coerceAtLeast(0)
         val y = TOP_PADDING_PX + m.drawHeight - m.getHeight(predictedCount, max)
 
         if (!started) {

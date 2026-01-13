@@ -1,4 +1,4 @@
-package com.cebolao.lotofacil.data
+package com.cebolao.lotofacil.domain.model
 
 import androidx.annotation.StringRes
 import com.cebolao.lotofacil.R

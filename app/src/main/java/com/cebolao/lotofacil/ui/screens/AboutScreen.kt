@@ -98,7 +98,7 @@ fun AboutScreenContent(
             }
 
             item(key = "theme_settings") {
-                SectionHeader("Aparência")
+                SectionHeader(stringResource(R.string.about_appearance))
                 ThemeSettingsCard(
                     currentTheme = themeMode,
                     currentAccent = accentPalette.name.lowercase(),
@@ -117,7 +117,7 @@ fun AboutScreenContent(
             }
 
             item(key = "learn_more") {
-                SectionHeader("Saiba Mais")
+                SectionHeader(stringResource(R.string.about_learn_more_header))
                 StatisticsExplanationCard()
                 GameRulesCard()
             }
@@ -136,8 +136,8 @@ fun AboutScreenContent(
                         // Fonte de dados
                         StandardInfoRow(
                             icon = AppIcons.Info,
-                            title = "Fonte dos Dados",
-                            description = "Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh."
+                            title = stringResource(R.string.about_source_title),
+                            description = stringResource(R.string.about_source_desc)
                         )
 
                         AppDivider()
@@ -145,8 +145,8 @@ fun AboutScreenContent(
                         // Disclaimer
                         StandardInfoRow(
                             icon = AppIcons.Error,
-                            title = "Importante",
-                            description = "Este app organiza informações públicas. Não aumenta suas chances de ganhar, apenas evita combinações estatisticamente improváveis."
+                            title = stringResource(R.string.about_important_title),
+                            description = stringResource(R.string.about_important_desc)
                         )
 
                         AppDivider()
@@ -154,8 +154,8 @@ fun AboutScreenContent(
                         // Privacidade
                         StandardInfoRow(
                             icon = AppIcons.InfoOutlined,
-                            title = "Privacidade",
-                            description = "Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo."
+                            title = stringResource(R.string.about_privacy_title),
+                            description = stringResource(R.string.about_privacy_desc)
                         )
 
                         AppDivider()
@@ -163,7 +163,7 @@ fun AboutScreenContent(
                         // Versão
                         StandardInfoRow(
                             icon = AppIcons.Info,
-                            title = "Versão",
+                            title = stringResource(R.string.about_version_title),
                             description = com.cebolao.lotofacil.BuildConfig.VERSION_NAME
                         )
 
