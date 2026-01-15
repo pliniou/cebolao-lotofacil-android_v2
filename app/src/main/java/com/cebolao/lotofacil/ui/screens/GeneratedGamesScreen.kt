@@ -1,31 +1,35 @@
 package com.cebolao.lotofacil.ui.screens
 
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +40,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,6 +53,7 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.navigation.FiltersRoute
 import com.cebolao.lotofacil.navigation.navigateToChecker
 import com.cebolao.lotofacil.presentation.viewmodel.GameEffect
+import com.cebolao.lotofacil.presentation.viewmodel.GameAnalysisUiState
 import com.cebolao.lotofacil.presentation.viewmodel.GameScreenUiState
 import com.cebolao.lotofacil.presentation.viewmodel.GameUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.GameViewModel
@@ -59,6 +66,7 @@ import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.util.Formatters
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -73,13 +81,11 @@ fun GeneratedGamesScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     
-    // Consumir eventos do ViewModel (share e snackbar)
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     
-    androidx.compose.runtime.LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is GameEffect.ShareGame -> {
@@ -101,6 +107,7 @@ fun GeneratedGamesScreen(
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
                             putExtra(Intent.EXTRA_TEXT, text)
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
                         val chooserIntent = Intent.createChooser(
                             intent,
@@ -108,19 +115,13 @@ fun GeneratedGamesScreen(
                         )
                         currentContext.startActivity(chooserIntent)
                     } catch (_: SecurityException) {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(currentContext.getString(R.string.share_error_message))
-                        }
+                        snackbarHostState.showSnackbar(currentContext.getString(R.string.share_error_message))
                     } catch (_: ActivityNotFoundException) {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(currentContext.getString(R.string.share_error_message))
-                        }
+                        snackbarHostState.showSnackbar(currentContext.getString(R.string.share_error_message))
                     }
                 }
                 is GameEffect.ShowSnackbar -> {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(currentContext.getString(event.messageRes))
-                    }
+                    snackbarHostState.showSnackbar(currentContext.getString(event.messageRes))
                 }
             }
         }
@@ -166,7 +167,7 @@ fun GeneratedGamesScreenContent(
     val scope = rememberCoroutineScope()
 
     var showClearDialog by rememberSaveable { mutableStateOf(false) }
-    var gameToPin by rememberSaveable { mutableStateOf<UiLotofacilGame?>(null) }
+    var gameToPin by remember { mutableStateOf<UiLotofacilGame?>(null) }
 
     if (showClearDialog) {
         AppConfirmationDialog(
@@ -206,6 +207,19 @@ fun GeneratedGamesScreenContent(
             onDismiss = { gameToPin = null },
             icon = if (isPinning) AppIcons.PinFilled else AppIcons.PinOutlined
         )
+    }
+
+    if (uiState.analysisState !is GameAnalysisUiState.Idle) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = { onEvent(GameUiEvent.DismissAnalysis) }
+        ) {
+            GameAnalysisSheetContent(
+                analysisState = uiState.analysisState,
+                onDismiss = { onEvent(GameUiEvent.DismissAnalysis) }
+            )
+        }
     }
 
     val onAction = remember(onEvent, onNavigateToChecker) {
@@ -256,10 +270,24 @@ fun GeneratedGamesScreenContent(
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(top = innerPadding.calculateTopPadding())) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             GameTabs(pagerState.currentPage) { index ->
                 scope.launch { pagerState.animateScrollToPage(index) }
             }
+
+            GameSummaryCard(
+                summary = uiState.summary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Dimen.ScreenPadding,
+                        vertical = Dimen.ItemSpacing
+                    )
+            )
 
             HorizontalPager(
                 state = pagerState,
@@ -268,27 +296,12 @@ fun GeneratedGamesScreenContent(
                 val games = if (page == 0) unpinned else pinned
                 val isNewGamesTab = page == 0
 
-                if (isNewGamesTab) {
-                    PullToRefreshBox(
-                        isRefreshing = false,
-                        onRefresh = onGenerateRequest,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        GameList(
-                            games = games,
-                            isNewGamesTab = true,
-                            onGenerateRequest = onGenerateRequest,
-                            onAction = onAction
-                        )
-                    }
-                } else {
-                    GameList(
-                        games = games,
-                        isNewGamesTab = false,
-                        onGenerateRequest = onGenerateRequest,
-                        onAction = onAction
-                    )
-                }
+                GameList(
+                    games = games,
+                    isNewGamesTab = isNewGamesTab,
+                    onGenerateRequest = onGenerateRequest,
+                    onAction = onAction
+                )
             }
         }
     }
@@ -299,14 +312,14 @@ private fun EmptyState(
     isNewGamesTab: Boolean,
     onGenerateRequest: () -> Unit
 ) {
-    androidx.compose.foundation.layout.Box(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(
                 horizontal = Dimen.ScreenPadding,
                 vertical = Dimen.SectionSpacing
             ),
-        contentAlignment = androidx.compose.ui.Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         AppCard(
             modifier = Modifier.fillMaxWidth(),
@@ -336,7 +349,7 @@ private fun GameTabs(
 ) {
     SecondaryTabRow(
         selectedTabIndex = selectedIndex,
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         divider = {}
     ) {
@@ -369,14 +382,14 @@ private fun GameList(
         return
     }
 
-    androidx.compose.foundation.layout.Box(
+    Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = androidx.compose.ui.Alignment.TopCenter
+        contentAlignment = Alignment.TopCenter
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(5),
+            columns = GridCells.Adaptive(minSize = 340.dp),
             modifier = Modifier
-                .widthIn(max = 800.dp)
+                .widthIn(max = 900.dp)
                 .fillMaxSize(),
             contentPadding = PaddingValues(
                 top = Dimen.ItemSpacing,
@@ -392,12 +405,165 @@ private fun GameList(
                 key = { _, game -> game.numbers.sorted().joinToString(separator = "-") },
                 contentType = { _, _ -> "game_card" }
             ) { index, game ->
-                AnimateOnEntry {
+                AnimateOnEntry(delayMillis = (index * 40).toLong()) {
                     GameCard(
                         game = game,
                         index = index + 1,
                         onAction = { action -> onAction(action, game) }
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GameSummaryCard(
+    summary: com.cebolao.lotofacil.presentation.viewmodel.GameSummary,
+    modifier: Modifier = Modifier
+) {
+    if (summary.totalGames <= 0) return
+
+    AppCard(
+        modifier = modifier,
+        outlined = true,
+        title = stringResource(R.string.games_summary_title)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SummaryItem(
+                label = stringResource(R.string.games_summary_total_games),
+                value = summary.totalGames.toString()
+            )
+            SummaryItem(
+                label = stringResource(R.string.games_summary_pinned_games),
+                value = summary.pinnedGames.toString()
+            )
+            SummaryItem(
+                label = stringResource(R.string.games_summary_total_cost),
+                value = Formatters.formatCurrency(summary.totalCost)
+            )
+        }
+    }
+}
+
+@Composable
+private fun SummaryItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun GameAnalysisSheetContent(
+    analysisState: GameAnalysisUiState,
+    onDismiss: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = Dimen.ScreenPadding,
+                end = Dimen.ScreenPadding,
+                bottom = Dimen.SectionSpacing
+            ),
+        verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.checker_performance_analysis),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+            IconButton(onClick = onDismiss) {
+                Icon(
+                    imageVector = AppIcons.CloseOutlined,
+                    contentDescription = stringResource(R.string.general_close)
+                )
+            }
+        }
+
+        when (analysisState) {
+            is GameAnalysisUiState.Idle -> Unit
+            is GameAnalysisUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = Dimen.SectionSpacing),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(36.dp))
+                }
+            }
+            is GameAnalysisUiState.Error -> {
+                Text(
+                    text = stringResource(analysisState.messageResId),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            is GameAnalysisUiState.Success -> {
+                Text(
+                    text = analysisState.result.game.numbers.sorted().joinToString(" - ") { it.toString().padStart(2, '0') },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+
+                com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard(
+                    report = analysisState.result.checkReport,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                AppCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    outlined = true,
+                    title = stringResource(R.string.games_analysis_stats_title)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
+                        analysisState.result.simpleStats.forEach { (k, v) ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = k,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = v,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

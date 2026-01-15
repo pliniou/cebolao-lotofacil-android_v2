@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +34,7 @@ import com.cebolao.lotofacil.presentation.viewmodel.HomeScreenState
 import com.cebolao.lotofacil.presentation.viewmodel.HomeUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.HomeUiState
 import com.cebolao.lotofacil.presentation.viewmodel.HomeViewModel
+import com.cebolao.lotofacil.ui.theme.AppIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,13 +70,13 @@ fun HomeScreenContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (HomeUiEvent) -> Unit,
     onNavigateToChecker: (Set<Int>) -> Unit
-) {
+    ) {
     AppScreen(
         title = stringResource(R.string.app_name),
         subtitle = stringResource(R.string.home_subtitle),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        val isRefreshing = uiState.screenState is HomeScreenState.Loading
+        val isRefreshing = uiState.isSyncing || uiState.screenState is HomeScreenState.Loading
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -95,25 +95,37 @@ fun HomeScreenContent(
                 }
 
                 item(key = "hero") {
+                    AnimateOnEntry(
+                        delayMillis = staggerDelay(1).toLong(),
+                        animation = EntryAnimation.Scale
+                    ) {
+                        when {
+                            successState != null -> NextContestHeroCard(successState.nextDrawInfo)
+                            uiState.screenState is HomeScreenState.Loading -> LoadingCard()
+                        }
+                    }
+                }
+
+                (uiState.screenState as? HomeScreenState.Error)?.let { error ->
+                    item(key = "error") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(1).toLong(),
-                            animation = EntryAnimation.Scale
+                            delayMillis = staggerDelay(2).toLong(),
+                            animation = EntryAnimation.SlideUp
                         ) {
-                            when {
-                                successState != null -> {
-                                    NextContestHeroCard(successState.nextDrawInfo)
-                                }
-                                uiState.screenState is HomeScreenState.Loading -> {
-                                    LoadingCard()
-                                }
-                            }
+                            StandardAttentionCard(
+                                title = stringResource(R.string.general_error_title),
+                                message = stringResource(error.messageResId),
+                                icon = AppIcons.Error,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
 
                 successState?.lastDraw?.let { draw ->
                     item(key = "last_draw") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(2).toLong(),
+                            delayMillis = staggerDelay(3).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             LastDrawCard(
@@ -132,7 +144,7 @@ fun HomeScreenContent(
                 if (stats != null) {
                     item(key = "stats_panel") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(2).toLong(),
+                            delayMillis = staggerDelay(4).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             StatisticsPanel(
@@ -147,7 +159,7 @@ fun HomeScreenContent(
 
                     item(key = "distribution_charts") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(2).toLong(),
+                            delayMillis = staggerDelay(5).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             DistributionChartsCard(
@@ -163,7 +175,7 @@ fun HomeScreenContent(
 
                 item(key = "disclaimer") {
                     AnimateOnEntry(
-                        delayMillis = staggerDelay(3).toLong(),
+                        delayMillis = staggerDelay(6).toLong(),
                         animation = EntryAnimation.Fade
                     ) {
                         StandardAttentionCard(

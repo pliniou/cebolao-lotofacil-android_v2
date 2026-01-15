@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.data.repository.THEME_MODE_DARK
 import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
@@ -30,7 +29,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val splash = installSplashScreen()
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setupSplashScreen(splash)
         splash.setKeepOnScreenCondition { !mainViewModel.uiState.value.isReady }

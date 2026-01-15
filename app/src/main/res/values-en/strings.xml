@@ -217,6 +217,14 @@
     <string name="games_clear_dialog_message">All unsaved games will be permanently removed. Are you sure?</string>
     <string name="games_clear_confirm">Clear</string>
     <string name="games_delete_dialog_title">Delete Game?</string>
+    <string name="games_summary_title">Summary</string>
+    <string name="games_summary_total_games">Games</string>
+    <string name="games_summary_pinned_games">Pinned</string>
+    <string name="games_summary_total_cost">Cost</string>
+    <string name="games_analysis_stats_title">Historical metrics</string>
+    <string name="game_card_action_analyze">Analyze game</string>
+    <string name="game_card_action_pin">Pin game</string>
+    <string name="game_card_action_unpin">Unpin game</string>
 
     <!-- Widget Resources -->
     <string name="widget_last_draw_title">Last Draw</string>

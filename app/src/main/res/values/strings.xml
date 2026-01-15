@@ -328,6 +328,9 @@
     <string name="games_share_chooser_title">Compartilhar jogo</string>
     <string name="games_delete_confirm">Excluir</string>
     <string name="game_card_action_check">Conferir</string>
+    <string name="game_card_action_analyze">Analisar jogo</string>
+    <string name="game_card_action_pin">Fixar jogo</string>
+    <string name="game_card_action_unpin">Desfixar jogo</string>
     <string name="games_delete_dialog_message">Deseja excluir este jogo?</string>
     <string name="game_card_pin_confirm_title">Jogo Fixado</string>
     <string name="game_card_unpin_confirm_title">Jogo Desfixado</string>
@@ -335,6 +338,11 @@
     <string name="game_card_unpin_confirm_msg">Jogo removido dos fixados.</string>
     <string name="games_title">Meus Jogos</string>
     <string name="games_subtitle">Gerencie seus palpites</string>
+    <string name="games_summary_title">Resumo</string>
+    <string name="games_summary_total_games">Jogos</string>
+    <string name="games_summary_pinned_games">Fixados</string>
+    <string name="games_summary_total_cost">Custo</string>
+    <string name="games_analysis_stats_title">Métricas históricas</string>
     <string name="games_clear_unpinned_button_description">Limpar não fixados</string>
     <string name="games_empty_state_title">Nenhum jogo</string>
     <string name="games_empty_state_description">Use o gerador para criar novos jogos.</string>

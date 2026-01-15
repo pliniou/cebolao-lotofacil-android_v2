@@ -46,9 +46,6 @@ data class GameSummary(
 /**
  * UI state for the Game screen.
  */
-/**
- * UI state for the Game screen.
- */
 @androidx.compose.runtime.Immutable
 data class GameScreenUiState(
     val gameToDelete: UiLotofacilGame? = null,
@@ -141,6 +138,7 @@ class GameViewModel @Inject constructor(
             is GameUiEvent.ClearUnpinned -> clearUnpinned()
             is GameUiEvent.AnalyzeGame -> analyzeGame(event.game)
             is GameUiEvent.ShareGame -> shareGame(event.game)
+            is GameUiEvent.DismissAnalysis -> dismissAnalysis()
         }
     }
 
@@ -164,7 +162,6 @@ class GameViewModel @Inject constructor(
                 throw ce
             } catch (e: Exception) {
                 _events.send(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed))
-                throw e
             }
         }
     }
@@ -222,6 +219,11 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    private fun dismissAnalysis() {
+        analyzeJob?.cancel()
+        _analysisState.value = GameAnalysisUiState.Idle
+    }
+
     private fun shareGame(game: UiLotofacilGame) {
         viewModelScope.launch {
             try {
@@ -253,6 +255,7 @@ sealed interface GameUiEvent {
     data object ClearUnpinned : GameUiEvent
     data class AnalyzeGame(val game: UiLotofacilGame) : GameUiEvent
     data class ShareGame(val game: UiLotofacilGame) : GameUiEvent
+    data object DismissAnalysis : GameUiEvent
 }
 
 /**

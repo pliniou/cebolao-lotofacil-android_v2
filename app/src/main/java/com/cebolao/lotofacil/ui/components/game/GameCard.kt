@@ -66,7 +66,9 @@ fun GameCard(
                 IconButton(onClick = { onAction(GameCardAction.Pin) }, modifier = Modifier.testTag("game_card_pin_$index")) {
                     Icon(
                         imageVector = if (isPinned) AppIcons.PinFilled else AppIcons.PinOutlined,
-                        contentDescription = stringResource(R.string.games_tab_pinned),
+                        contentDescription = stringResource(
+                            if (isPinned) R.string.game_card_action_unpin else R.string.game_card_action_pin
+                        ),
                         tint = if (isPinned) scheme.primary else scheme.onSurfaceVariant
                     )
                 }
@@ -86,6 +88,7 @@ fun GameCard(
             Spacer(modifier = Modifier.height(Dimen.Spacing8))
 
             GameCardActions(
+                onAnalyze = { onAction(GameCardAction.Analyze) },
                 onDelete = { onAction(GameCardAction.Delete) },
                 onShare = { onAction(GameCardAction.Share) },
                 onCheck = { onAction(GameCardAction.Check) }
@@ -96,6 +99,7 @@ fun GameCard(
 
 @Composable
 private fun GameCardActions(
+    onAnalyze: () -> Unit,
     onDelete: () -> Unit,
     onShare: () -> Unit,
     onCheck: () -> Unit
@@ -107,6 +111,13 @@ private fun GameCardActions(
         horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        IconButton(onClick = onAnalyze) {
+            Icon(
+                imageVector = AppIcons.Analytics,
+                contentDescription = stringResource(R.string.game_card_action_analyze),
+                tint = scheme.onSurfaceVariant
+            )
+        }
         IconButton(onClick = onShare) {
             Icon(
                 imageVector = AppIcons.Share,

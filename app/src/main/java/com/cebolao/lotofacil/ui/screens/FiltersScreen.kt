@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -61,8 +62,8 @@ data class FilterCategory(
 fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val configuration = LocalConfiguration.current
     val resources = LocalContext.current.resources
+    val currentResources by rememberUpdatedState(resources)
     
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -76,15 +77,13 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
                 }
 
                 is NavigationEvent.ShowSnackbar -> {
-                    @Suppress("DEPRECATION")
-                    configuration.locale // Read configuration to track changes
                     val message = if (event.labelRes != null) {
-                        resources.getString(
+                        currentResources.getString(
                             event.messageRes,
-                            resources.getString(event.labelRes)
+                            currentResources.getString(event.labelRes)
                         )
                     } else {
-                        resources.getString(event.messageRes)
+                        currentResources.getString(event.messageRes)
                     }
                     snackbarHostState.showSnackbar(message)
                 }
