@@ -80,7 +80,7 @@ object ComposePerformance {
     /**
      * Creates a stable callback that won't cause unnecessary recompositions
      */
-    inline fun <T> stableCallback(crossinline callback: (T) -> Unit): StableCallback<T> {
+    inline fun <T> stableCallback(noinline callback: (T) -> Unit): StableCallback<T> {
         return StableCallback(callback)
     }
     

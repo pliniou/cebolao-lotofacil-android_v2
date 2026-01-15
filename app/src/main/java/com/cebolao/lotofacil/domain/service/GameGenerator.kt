@@ -7,10 +7,10 @@ import com.cebolao.lotofacil.domain.model.FilterType
 import com.cebolao.lotofacil.domain.model.GameComputedMetrics
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.model.toRule
+import com.cebolao.lotofacil.di.DefaultDispatcher
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.util.Logger
-import com.cebolao.lotofacil.domain.util.NoOpLogger
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +26,9 @@ private const val TAG = "GameGenerator"
 
 class GameGenerator @Inject constructor(
     private val historyRepository: HistoryRepository,
-    private val logger: Logger = NoOpLogger()
+    private val metricsCalculator: GameMetricsCalculator,
+    private val logger: Logger,
+    @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
     /**
      * Generates lottery games based on configured filters.
@@ -56,8 +58,8 @@ class GameGenerator @Inject constructor(
         emit(GenerationProgress.step(GenerationStep.HEURISTIC_START, 0, quantity))
 
         val result = executeGenerationLoop(context, config)
-        finalizeGeneration(result, context, quantity)
-    }.flowOn(Dispatchers.Default)
+        finalizeGeneration(result, context, quantity, seedVal)
+    }.flowOn(defaultDispatcher)
 
     private suspend fun initializeGenerationContext(
         quantity: Int,
@@ -83,7 +85,7 @@ class GameGenerator @Inject constructor(
             rejections = mutableMapOf(),
             totalAttempts = 0,
             rules = activeFilters.mapNotNull { it.toRule() },
-            metricsCalculator = GameMetricsCalculator(),
+            metricsCalculator = metricsCalculator,
             rnd = rnd,
             history = history
         )
@@ -200,12 +202,13 @@ class GameGenerator @Inject constructor(
     private suspend fun FlowCollector<GenerationProgress>.finalizeGeneration(
         result: GenerationResult,
         context: GenerationContext,
-        quantity: Int
+        quantity: Int,
+        seedVal: Long
     ) {
         logger.info(TAG, "Generation completed: ${result.games.size}/$quantity games in ${result.duration}ms, attempts=${result.totalAttempts}")
         
         if (result.games.isNotEmpty()) {
-            val telemetry = createTelemetry(result, context)
+            val telemetry = createTelemetry(result, context, seedVal)
             logTelemetryDetails(telemetry, context.rejections)
             emit(GenerationProgress.finished(result.games, telemetry))
         } else {
@@ -213,9 +216,13 @@ class GameGenerator @Inject constructor(
         }
     }
     
-    private fun createTelemetry(result: GenerationResult, context: GenerationContext): GenerationTelemetry {
+    private fun createTelemetry(
+        result: GenerationResult,
+        context: GenerationContext,
+        seedVal: Long
+    ): GenerationTelemetry {
         return GenerationTelemetry(
-            seed = context.rnd.nextInt().toLong(),
+            seed = seedVal,
             strategy = result.strategy,
             durationMs = result.duration,
             totalAttempts = result.totalAttempts,

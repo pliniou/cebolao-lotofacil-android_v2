@@ -201,7 +201,7 @@ private fun Content(
                 )
                 val coverage = calculateRangeCoverage(state)
                 Text(
-                    text = "${String.format("%.1f", coverage)}%",
+                    text = "${String.format(java.util.Locale.getDefault(), "%.1f", coverage)}%",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = if (coverage >= 80f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
@@ -214,7 +214,7 @@ private fun Content(
             onValueChange = onRange,
             valueRange = state.type.fullRange,
             steps = steps,
-            modifier = Modifier.padding(top = Dimen.Spacing8, horizontal = Dimen.Spacing8),
+            modifier = Modifier.padding(top = Dimen.Spacing8, start = Dimen.Spacing8, end = Dimen.Spacing8),
         )
 
         // Informações detalhadas do range
@@ -240,7 +240,7 @@ private fun RangeInfoSection(state: FilterState) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimen.Spacing8, top = Dimen.Spacing4),
+                .padding(start = Dimen.Spacing8, end = Dimen.Spacing8, top = Dimen.Spacing4),
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             // Indicador de range recomendado

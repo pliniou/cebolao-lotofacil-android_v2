@@ -51,6 +51,7 @@ class HistoryRepositoryImpl @Inject constructor(
     // Session-only cache: valid for a short freshness window and cleared on sync failure.
     @Volatile
     private var latestApiResult: LotofacilApiResult? = null
+    @Volatile
     private var latestApiResultTimestamp: Long? = null
 
     private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)

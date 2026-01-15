@@ -97,7 +97,6 @@ dependencies {
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.gson)
 
     implementation(libs.androidx.datastore.preferences)
 

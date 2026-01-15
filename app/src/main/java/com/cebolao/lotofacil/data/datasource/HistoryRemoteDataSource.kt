@@ -1,4 +1,4 @@
-package com.cebolao.lotofacil.data.datasource
+﻿package com.cebolao.lotofacil.data.datasource
 
 import com.cebolao.lotofacil.data.network.ApiService
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
@@ -12,7 +12,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -50,7 +52,7 @@ internal suspend fun <T> retryOnHttp429(
             return result
         }
 
-        // Última tentativa: devolve o erro 429
+        // Last attempt: return the 429 error.
         if (attempt == maxRetries) return result
 
         val retryAfterSeconds = exception.response()?.headers()?.get(RETRY_AFTER_HEADER)?.toLongOrNull()
@@ -74,8 +76,8 @@ class HistoryRemoteDataSourceImpl @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : HistoryRemoteDataSource {
 
-    private val dateFormat: ThreadLocal<SimpleDateFormat> =
-        ThreadLocal.withInitial { SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR")) }
+    private val dateFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("pt", "BR"))
 
     override suspend fun getLatestDraw(): LotofacilApiResult? = withContext(ioDispatcher) {
         retryOnHttp429(logger, tag = "getLatestDraw") {
@@ -92,7 +94,7 @@ class HistoryRemoteDataSourceImpl @Inject constructor(
         val size = (range.last - range.first + 1).coerceAtLeast(0)
         if (size == 0) return@withContext emptyList()
 
-        // Mantém ordem do range (comportamento anterior do awaitAll() sobre map()).
+        // Keep range order (previous behavior of awaitAll() over map()).
         val output = arrayOfNulls<Draw>(size)
         val nextIndex = AtomicInteger(0)
         val workers = min(MAX_CONCURRENT_REQUESTS, size)
@@ -123,12 +125,18 @@ class HistoryRemoteDataSourceImpl @Inject constructor(
             val contest = apiResult.numero
             val numbers = apiResult.listaDezenas.mapNotNull { it.toIntOrNull() }.toSet()
 
-            // Basic validation
             if (contest <= 0 || numbers.size != 15) return null
 
             val dateMillis = apiResult.dataApuracao
                 ?.takeIf { it.isNotBlank() }
-                ?.let { dateStr -> runCatching { dateFormat.get()?.parse(dateStr)?.time }.getOrNull() }
+                ?.let { dateStr ->
+                    runCatching {
+                        LocalDate.parse(dateStr, dateFormatter)
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+                            .toEpochMilli()
+                    }.getOrNull()
+                }
 
             Draw.fromNumbers(contest, numbers, dateMillis)
         }.getOrNull()

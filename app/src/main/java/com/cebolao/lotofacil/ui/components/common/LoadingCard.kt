@@ -24,9 +24,9 @@ import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
 fun LoadingCard(
+    modifier: Modifier = Modifier,
     title: String = stringResource(R.string.home_updating_data),
     description: String = stringResource(R.string.home_pull_to_refresh_hint),
-    modifier: Modifier = Modifier,
     height: androidx.compose.ui.unit.Dp = 120.dp
 ) {
     AppCard(

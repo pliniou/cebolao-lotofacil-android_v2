@@ -16,6 +16,25 @@ import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 /**
+ * Data class para itens estatísticos com suporte recursivo.
+ */
+public data class StatItem(
+    val label: String,
+    val value: String,
+    val subItems: List<StatItem> = emptyList()
+) {
+    public companion object {
+        public fun createRecursive(
+            label: String,
+            value: String,
+            vararg subItems: StatItem
+        ) = StatItem(label, value, subItems.toList())
+        
+        public fun fromPair(label: String, value: String) = StatItem(label, value)
+    }
+}
+
+/**
  * Componente recursivo para exibir estatísticas hierárquicas.
  * Suporta aninhamento automático com indentação progressiva.
  */
@@ -96,25 +115,6 @@ private fun StatItemRow(
                 )
             }
         }
-    }
-}
-
-/**
- * Data class para itens estatísticos com suporte recursivo.
- */
-data class StatItem(
-    val label: String,
-    val value: String,
-    val subItems: List<StatItem> = emptyList()
-) {
-    companion object {
-        fun createRecursive(
-            label: String,
-            value: String,
-            vararg subItems: StatItem
-        ) = StatItem(label, value, subItems.toList())
-        
-        fun fromPair(label: String, value: String) = StatItem(label, value)
     }
 }
 

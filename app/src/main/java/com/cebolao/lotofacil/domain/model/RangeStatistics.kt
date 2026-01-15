@@ -107,7 +107,7 @@ object RangeStatisticsCalculator {
         
         // Calcular estatísticas
         val averageHits = hitsList.average().toFloat()
-        val variance = hitsList.map { (it - averageHits).pow(2) }.average()
+        val variance = hitsList.map { (it - averageHits).let { diff -> diff * diff } }.average()
         val standardDeviation = kotlin.math.sqrt(variance).toFloat()
         
         val ranges = mapOf(

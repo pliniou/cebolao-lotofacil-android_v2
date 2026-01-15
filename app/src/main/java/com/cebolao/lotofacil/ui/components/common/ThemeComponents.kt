@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -16,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -74,12 +78,12 @@ fun AccentColorButton(
             .padding(4.dp),
         shape = MaterialTheme.shapes.medium,
         color = color,
-        tonalElevation = if (isSelected) Dimen.Elevation.Small else Dimen.Elevation.None,
+        tonalElevation = if (isSelected) Dimen.Elevation.Level2 else Dimen.Elevation.None,
         shadowElevation = 0.dp
     ) {
         val contentColor = if (color.luminance() > 0.5f) Color.Black else Color.White
         Icon(
-            imageVector = if (isSelected) androidx.compose.material.icons.Icons.Default.Check else androidx.compose.material.icons.Icons.Default.Circle,
+            imageVector = if (isSelected) Icons.Filled.Check else Icons.Filled.Circle,
             contentDescription = colorName,
             tint = contentColor,
             modifier = Modifier

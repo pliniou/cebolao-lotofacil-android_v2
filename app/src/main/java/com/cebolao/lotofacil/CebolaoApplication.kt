@@ -1,4 +1,4 @@
-package com.cebolao.lotofacil
+﻿package com.cebolao.lotofacil
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -13,8 +13,8 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 /**
- * Application class principal do app CebolaoLotofacil.
- * Configurado com Hilt para injeção de dependências e WorkManager.
+ * Application principal do app CebolaoLotofacil.
+ * Configurado com Hilt para injecao de dependencias e WorkManager.
  */
 @HiltAndroidApp
 class CebolaoApplication : Application(), Configuration.Provider {
@@ -38,11 +38,11 @@ class CebolaoApplication : Application(), Configuration.Provider {
     @SuppressLint("DefaultUncaughtExceptionDelegation")
     override fun onCreate() {
         super.onCreate()
-        
+
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             android.util.Log.e("CRASH_REPORT", "Uncaught exception in thread ${thread.name}", throwable)
-            // Opcional: chamar o handler padrão antigo se necessário, mas para debug isso basta
-            // exitProcess(1) // Pode ser necessário terminar o processo
+            defaultHandler?.uncaughtException(thread, throwable)
         }
 
         scheduleWidgetUpdate()

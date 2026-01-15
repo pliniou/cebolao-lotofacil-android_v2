@@ -5,7 +5,7 @@ import com.cebolao.lotofacil.data.datasource.HistoryRemoteDataSource
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.domain.exception.SyncException
-import com.google.gson.JsonSyntaxException
+import kotlinx.serialization.SerializationException
 import kotlinx.coroutines.CancellationException
 import java.io.IOException
 import javax.inject.Inject
@@ -79,7 +79,7 @@ class SyncManager @Inject constructor(
         } catch (e: IOException) {
             logger.error(TAG, "Network error during sync", e)
             throw SyncException("Network sync failed", e)
-        } catch (e: JsonSyntaxException) {
+        } catch (e: SerializationException) {
             logger.error(TAG, "Invalid response format during sync", e)
             throw SyncException("Invalid response format", e)
         } catch (e: CancellationException) {
@@ -100,7 +100,7 @@ class SyncManager @Inject constructor(
         } catch (e: IOException) {
             logger.warning(TAG, "Network error checking sync status", e)
             throw SyncException("Network check failed", e)
-        } catch (e: JsonSyntaxException) {
+        } catch (e: SerializationException) {
             logger.warning(TAG, "Invalid response format checking sync status", e)
             throw SyncException("Invalid response format", e)
         }

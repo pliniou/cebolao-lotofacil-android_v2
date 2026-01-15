@@ -184,6 +184,7 @@
     <!-- About -->
     <string name="about_title">About</string>
     <string name="about_subtitle">Preferences and info</string>
+    <string name="about_appearance">Appearance</string>
     <string name="about_resources_title">Resources</string>
     <string name="about_legal_title">Legal</string>
     <string name="about_terms">Terms of Use</string>
@@ -251,7 +252,7 @@
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analyzed in %1$d draws</string>
     <string name="checker_score_breakdown_hits_format" tools:ignore="PluralsCandidate">%1$d points</string>
     <string name="checker_last_hit_info">Last hit</string>
-    <string name="checker_last_hit_details_format">draw %1$d, making %2$d points</string>
+    <string name="checker_last_hit_details_format" tools:ignore="PluralsCandidate">draw %1$d, making %2$d points</string>
     <string name="checker_no_wins_message">Unfortunately, no prizes found in this period.</string>
     <string name="checker_simple_stats_title">Quick Stats</string>
     <string name="checker_incomplete_game_message">Complete the 15 numbers to check.</string>
@@ -265,12 +266,26 @@
     <string name="checker_save_confirmation_message">Do you want to save this game to your saved games?</string>
     <string name="checker_incomplete_selection">Select 15 numbers to check</string>
     <string name="checker_game_saved">Game saved successfully!</string>
+    <string name="checker_range_analysis_title">Hit Range Analysis</string>
+    <string name="checker_total_analyzed" tools:ignore="PluralsCandidate">Total analyzed: %1$d games</string>
+    <string name="checker_avg_hits">Average hits: %.1f</string>
+    <string name="checker_distribution_by_range">Distribution by Range</string>
+    <string name="checker_range_0_5">0–5 hits</string>
+    <string name="checker_range_6_10">6–10 hits</string>
+    <string name="checker_range_11_15">11–15 hits</string>
+    <string name="checker_range_16_20">16–20 hits</string>
+    <string name="checker_most_common_range">Most common range: %1$s</string>
+    <string name="checker_least_common_range">Least common range: %1$s</string>
 
     <!-- Filters -->
     <string name="filters_unavailable_data">Data unavailable</string>
     <string name="filters_min_label">Min</string>
     <string name="filters_max_label">Max</string>
+    <string name="filters_current_range">Current Range</string>
+    <string name="filters_coverage">Coverage</string>
     <string name="filter_recommended_range">Recommended: %1$d to %2$d</string>
+    <string name="filter_wide_range">Wide range</string>
+    <string name="filter_narrow_range">Narrow range</string>
     <string name="filters_button_generate">Generate Games</string>
     <string name="filters_button_generating_progress">Generating…</string>
     <string name="filter_preset_applied">Strategy applied: %1$s</string>
@@ -282,6 +297,10 @@
     <string name="filters_title">Filters</string>
     <string name="filters_subtitle">Configure your strategy</string>
     <string name="filters_reset_button_description">Reset</string>
+    <string name="filter_category_numeric">Numeric</string>
+    <string name="filter_category_geometric">Geometric</string>
+    <string name="filter_category_math">Mathematical</string>
+    <string name="filter_category_context">Contextual</string>
     <string name="filters_group_numeric">Numeric</string>
     <string name="filters_group_geometric">Geometric</string>
     <string name="filters_group_math">Mathematical</string>
@@ -349,7 +368,7 @@
     <string name="uf">State</string>
     <string name="city">City</string>
     <string name="count_short">Qty</string>
-    <string name="and_more_count">and %1$d more…</string>
+    <string name="and_more_count" tools:ignore="PluralsCandidate">and %1$d more…</string>
 
     <!-- Onboarding -->
     <string name="onboarding_skip">Skip</string>

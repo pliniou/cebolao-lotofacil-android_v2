@@ -186,6 +186,7 @@
 
     <!-- About -->
     <string name="about_title">Sobre</string>
+    <string name="about_appearance">Aparência</string>
     <string name="about_subtitle">Preferências e informações</string>
     <string name="about_resources_title">Recursos</string>
     <string name="about_legal_title">Legal</string>
@@ -230,6 +231,9 @@
     <string name="widget_last_draw_description" tools:keep="@string/widget_last_draw_description">Mostra o resultado do último sorteio da Lotofácil</string>
     <string name="widget_next_contest_description" tools:keep="@string/widget_next_contest_description">Mostra informações sobre o próximo concurso</string>
     <string name="widget_pinned_game_description" tools:keep="@string/widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
+    <string name="widget_placeholder_dash" translatable="false">--</string>
+    <string name="widget_placeholder_date" translatable="false">--/--</string>
+    <string name="widget_placeholder_number" translatable="false">00</string>
 
     <!-- Presets -->
     <string name="preset_standard">Padrão</string>
@@ -254,7 +258,7 @@
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analisado em %1$d concursos</string>
     <string name="checker_score_breakdown_hits_format" tools:ignore="PluralsCandidate">%1$d pontos</string>
     <string name="checker_last_hit_info" tools:keep="@string/checker_last_hit_info">Último acerto</string>
-    <string name="checker_last_hit_details_format">concurso %1$d, fazendo %2$d pontos</string>
+    <string name="checker_last_hit_details_format" tools:ignore="PluralsCandidate">concurso %1$d, fazendo %2$d pontos</string>
     <string name="checker_no_wins_message">Infelizmente, nenhum prêmio encontrado neste período.</string>
     <string name="checker_simple_stats_title" tools:keep="@string/checker_simple_stats_title">Estatísticas Rápidas</string>
     <string name="checker_incomplete_game_message" tools:keep="@string/checker_incomplete_game_message">Complete os 15 números para conferir.</string>
@@ -273,7 +277,11 @@
     <string name="filters_unavailable_data">Dados indisponíveis</string>
     <string name="filters_min_label">Mín</string>
     <string name="filters_max_label">Máx</string>
+    <string name="filters_current_range">Range Atual</string>
+    <string name="filters_coverage">Cobertura</string>
     <string name="filter_recommended_range">Recomendado: %1$d a %2$d</string>
+    <string name="filter_wide_range">Range amplo</string>
+    <string name="filter_narrow_range">Range estreito</string>
     <string name="filters_button_generate">Gerar Jogos</string>
     <string name="filters_button_generating_progress" tools:keep="@string/filters_button_generating_progress">Gerando…</string>
     <string name="filter_preset_applied">Estratégia aplicada: %1$s</string>
@@ -289,13 +297,27 @@
     <string name="filters_group_geometric" tools:keep="@string/filters_group_geometric">Geométricos</string>
     <string name="filters_group_math" tools:keep="@string/filters_group_math">Matemáticos</string>
     <string name="filters_group_context" tools:keep="@string/filters_group_context">Contextuais</string>
+    <string name="filter_category_numeric">Numéricos</string>
+    <string name="filter_category_geometric">Geométricos</string>
+    <string name="filter_category_math">Matemáticos</string>
+    <string name="filter_category_context">Contextuais</string>
     <string name="filters_button_generating">Gerando…</string>
     <string name="filters_generation_error">Erro ao gerar jogos. Tente novamente.</string>
     <string name="filters_save_error">Erro ao salvar jogos gerados.</string>
 
     <!-- Checker Details -->
     <string name="checker_hide_frequency">Ocultar Frequência</string>
-    <string name="checker_show_frequency">Ver Frequência</string>
+    <string name="checker_show_frequency">Mostrar Frequência</string>
+    <string name="checker_range_analysis_title">Análise por Faixa de Acertos</string>
+    <string name="checker_total_analyzed" tools:ignore="PluralsCandidate">Total analisado: %1$d jogos</string>
+    <string name="checker_avg_hits">Média de acertos: %.1f</string>
+    <string name="checker_distribution_by_range">Distribuição por Faixa</string>
+    <string name="checker_range_0_5">0–5 acertos</string>
+    <string name="checker_range_6_10">6–10 acertos</string>
+    <string name="checker_range_11_15">11–15 acertos</string>
+    <string name="checker_range_16_20">16–20 acertos</string>
+    <string name="checker_most_common_range">Faixa mais comum: %1$s</string>
+    <string name="checker_least_common_range">Faixa menos comum: %1$s</string>
     <string name="checker_info_title" tools:keep="@string/checker_info_title">Informações da Conferência</string>
     <string name="checker_info_window_label" tools:keep="@string/checker_info_window_label">Janela de Concursos:</string>
     <string name="checker_info_date_label" tools:keep="@string/checker_info_date_label">Data/Hora:</string>
@@ -392,30 +414,12 @@
     <string name="about_learn_more_title" tools:keep="@string/about_learn_more_title">Saiba Mais</string>
     <string name="about_learn_more_desc" tools:keep="@string/about_learn_more_desc">Dicas e estratégias em breve.</string>
     <string name="about_learn_more_header" tools:keep="@string/about_learn_more_header">Aprenda Mais</string>
-    <string name="about_source_title" tools:keep="@string/about_source_title">Fonte dos Dados</string>
-    <string name="about_source_desc" tools:keep="@string/about_source_desc">Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh.</string>
-    <string name="about_important_title" tools:keep="@string/about_important_title">Importante</string>
-    <string name="about_important_desc" tools:keep="@string/about_important_desc">Este app organiza informações públicas. Não aumenta suas chances de ganhar, apenas evita combinações estatisticamente improváveis.</string>
-    <string name="about_privacy_title" tools:keep="@string/about_privacy_title">Privacidade</string>
-    <string name="about_privacy_desc" tools:keep="@string/about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
-    <string name="about_version_title" tools:keep="@string/about_version_title">Versão</string>
 
     <!-- Home Loading States -->
     <string name="home_updating_data" tools:keep="@string/home_updating_data">Atualizando dados…</string>
     <string name="home_pull_to_refresh_hint" tools:keep="@string/home_pull_to_refresh_hint">Puxe para baixo para sincronizar novamente.</string>
-    
-    <!-- Filter Categories -->
-    <string name="filter_category_numeric">Numéricos</string>
-    <string name="filter_category_geometric">Geométricos</string>
-    <string name="filter_category_math">Matemáticos</string>
-    <string name="filter_category_context">Contextuais</string>
-    
-    <!-- Checker Screen Hard-coded Strings -->
-    <string name="checker_hide_frequency">Ocultar Frequência</string>
-    <string name="checker_show_frequency">Ver Frequência</string>
-    
+
     <!-- About Screen Hard-coded Strings -->
-    <string name="about_appearance">Aparência</string>
     <string name="about_source_title">Fonte dos Dados</string>
     <string name="about_source_desc">Resultados oficiais da Lotofácil via API pública. Atualização manual via pull-to-refresh.</string>
     <string name="about_important_title">Importante</string>
@@ -423,22 +427,4 @@
     <string name="about_privacy_title">Privacidade</string>
     <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
     <string name="about_version_title">Versão</string>
-    
-    <!-- Checker Screen Range Analysis -->
-    <string name="checker_range_analysis_title">Análise por Faixa de Acertos</string>
-    <string name="checker_total_analyzed">Total Analisado</string>
-    <string name="checker_avg_hits">Média de Acertos</string>
-    <string name="checker_distribution_by_range">Distribuição por Faixa</string>
-    <string name="checker_range_0_5">0-5 Acertos</string>
-    <string name="checker_range_6_10">6-10 Acertos</string>
-    <string name="checker_range_11_15">11-15 Acertos</string>
-    <string name="checker_range_16_20">16-20 Acertos</string>
-    <string name="checker_most_common_range">Faixa mais comum: %s (%d jogos)</string>
-    <string name="checker_least_common_range">Faixa menos comum: %s (%d jogos)</string>
-    
-    <!-- Filter Range Improvements -->
-    <string name="filters_current_range">Range Atual</string>
-    <string name="filters_coverage">Cobertura</string>
-    <string name="filters_wide_range">Range Amplo</string>
-    <string name="filters_narrow_range">Range Restrito</string>
 </resources>

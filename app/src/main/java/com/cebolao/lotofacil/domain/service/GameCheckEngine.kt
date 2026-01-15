@@ -1,4 +1,4 @@
-package com.cebolao.lotofacil.domain.service
+﻿package com.cebolao.lotofacil.domain.service
 
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.CheckResult
@@ -16,19 +16,15 @@ import javax.inject.Singleton
 import kotlin.math.min
 
 /**
- * Engine otimizado para verificar jogos contra histórico usando bitmasks.
- * Operações de interseção são O(1) usando operações bitwise em vez de O(n) com Sets.
+ * Engine otimizado para verificar jogos contra historico usando bitmasks.
+ * Operacoes de intersecao sao O(1) usando bitwise em vez de O(n) com Sets.
  */
 @Singleton
 class GameCheckEngine @Inject constructor() {
 
     /**
-     * Calcula o resultado da verificação de um jogo contra o histórico de sorteios.
-     * Usa bitmasks para otimizar operações de interseção.
-     *
-     * @param game O jogo a ser verificado (deve implementar BitmaskProvider)
-     * @param history Lista de sorteios históricos (devem implementar BitmaskProvider)
-     * @return CheckResult com estatísticas de acertos
+     * Calcula o resultado da verificacao de um jogo contra o historico de sorteios.
+     * Usa bitmasks para otimizar operacoes de intersecao.
      */
     fun checkGame(game: LotofacilGame, history: List<Draw>): CheckResult {
         if (history.isEmpty()) {
@@ -46,11 +42,10 @@ class GameCheckEngine @Inject constructor() {
         var lastHitContest: Int? = null
         var lastHitScore: Int? = null
 
-        val recentWindow = min(recenthitswindow, history.size)
+        val recentWindow = min(RECENT_HITS_WINDOW, history.size)
         val recentBuffer = ArrayList<Pair<Int, Int>>(recentWindow)
 
         for ((index, draw) in history.withIndex()) {
-            // Otimização: usar bitmasks para calcular interseção
             val hits = MaskUtils.intersectCount(gameMask, draw.mask)
             val contestNumber = draw.contestNumber
 
@@ -78,4 +73,8 @@ class GameCheckEngine @Inject constructor() {
             recentHits = recentHits
         )
     }
-    private val recenthitswindow = 100}
+
+    private companion object {
+        const val RECENT_HITS_WINDOW = 100
+    }
+}

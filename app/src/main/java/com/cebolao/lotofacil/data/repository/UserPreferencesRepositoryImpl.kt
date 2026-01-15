@@ -45,7 +45,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         val PALETTE = stringPreferencesKey("accent_palette")
     }
 
-    override val themeMode: Flow<String> = getValue(Keys.THEME, THEME_MODE_DARK)
+    override val themeMode: Flow<String> = getValue(Keys.THEME, THEME_MODE_LIGHT)
     override val hasCompletedOnboarding: Flow<Boolean> = getValue(Keys.ONBOARDING, false)
     override val accentPalette: Flow<String> = getValue(Keys.PALETTE, "AZUL")
 

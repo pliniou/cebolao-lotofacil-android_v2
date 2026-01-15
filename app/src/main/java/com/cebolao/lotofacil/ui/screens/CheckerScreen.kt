@@ -49,8 +49,10 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.toCheckResult
 import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
 import com.cebolao.lotofacil.ui.components.common.HeatmapToggle
 import com.cebolao.lotofacil.ui.components.common.MessageState
+import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberGrid

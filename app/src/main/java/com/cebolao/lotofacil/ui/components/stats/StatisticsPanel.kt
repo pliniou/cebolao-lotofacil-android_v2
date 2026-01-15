@@ -169,7 +169,9 @@ private fun StatsContent(stats: UiStatisticsReport) {
         )
     }
 
+    @Suppress("ConfigurationScreenWidthHeight")
     val configuration = LocalConfiguration.current
+    @Suppress("ConfigurationScreenWidthHeight")
     val useColumnLayout = configuration.screenWidthDp < PHONE_BREAKPOINT_DP
 
     val tertiary = MaterialTheme.colorScheme.tertiary

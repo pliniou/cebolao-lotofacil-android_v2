@@ -73,7 +73,7 @@ private fun RangeStatsHeader(stats: RangeStatistics) {
                 color = scheme.onSurfaceVariant
             )
             Text(
-                text = String.format("%.1f", stats.averageHits),
+                text = String.format(java.util.Locale.getDefault(), "%.1f", stats.averageHits),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = scheme.onSurface
@@ -149,7 +149,7 @@ private fun RangeItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(Dimen.Spacing8),
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
     ) {
         Text(
             text = title,
@@ -168,7 +168,7 @@ private fun RangeItem(
                 color = scheme.onSurface
             )
             Text(
-                text = String.format("%.1f%%", percentage),
+                text = String.format(java.util.Locale.getDefault(), "%.1f%%", percentage),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = color

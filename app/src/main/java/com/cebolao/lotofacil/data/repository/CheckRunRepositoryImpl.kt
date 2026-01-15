@@ -6,6 +6,7 @@ import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.DrawWindow
 import com.cebolao.lotofacil.domain.model.FinancialProjection
 import com.cebolao.lotofacil.domain.repository.CheckRunRepository
+import com.cebolao.lotofacil.domain.util.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
@@ -16,7 +17,8 @@ import javax.inject.Singleton
 @Singleton
 class CheckRunRepositoryImpl @Inject constructor(
     private val checkRunDao: CheckRunDao,
-    private val json: Json
+    private val json: Json,
+    private val logger: Logger
 ) : CheckRunRepository {
 
     override suspend fun saveCheckRun(report: CheckReport, lotteryId: String): Long {
@@ -67,6 +69,7 @@ class CheckRunRepositoryImpl @Inject constructor(
                 sourceHash = sourceHash
             )
         } catch (_: Exception) {
+            logger.warning("CheckRunRepository", "Failed to decode CheckRunEntity id=$id", null)
             null
         }
     }

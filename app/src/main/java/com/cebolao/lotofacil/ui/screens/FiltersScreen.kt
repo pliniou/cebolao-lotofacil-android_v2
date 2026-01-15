@@ -61,7 +61,8 @@ data class FilterCategory(
 fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val resources = LocalContext.current.resources
     
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -75,13 +76,15 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
                 }
 
                 is NavigationEvent.ShowSnackbar -> {
+                    @Suppress("DEPRECATION")
+                    configuration.locale // Read configuration to track changes
                     val message = if (event.labelRes != null) {
-                        context.getString(
+                        resources.getString(
                             event.messageRes,
-                            context.getString(event.labelRes)
+                            resources.getString(event.labelRes)
                         )
                     } else {
-                        context.getString(event.messageRes)
+                        resources.getString(event.messageRes)
                     }
                     snackbarHostState.showSnackbar(message)
                 }
@@ -197,6 +200,15 @@ fun FiltersScreenContent(
             )
         }
     ) { innerPadding ->
+        val categories = listOf(
+            FilterCategory(R.string.filter_category_numeric, numericos),
+            FilterCategory(R.string.filter_category_geometric, geometricos),
+            FilterCategory(R.string.filter_category_math, matematicos),
+            FilterCategory(R.string.filter_category_context, contextuais)
+        )
+
+        val categoryTitles = categories.map { stringResource(it.titleRes) }
+
         StandardPageLayout(scaffoldPadding = innerPadding) {
             item(key = "preset_selector") {
                 FilterPresetSelector(
@@ -211,13 +223,6 @@ fun FiltersScreenContent(
                 )
             }
 
-            val categories = listOf(
-                FilterCategory(R.string.filter_category_numeric, numericos),
-                FilterCategory(R.string.filter_category_geometric, geometricos),
-                FilterCategory(R.string.filter_category_math, matematicos),
-                FilterCategory(R.string.filter_category_context, contextuais)
-            )
-
             if (useColumnLayout) {
                 item(key = "filter_grid") {
                     Row(
@@ -228,7 +233,7 @@ fun FiltersScreenContent(
                         Column(modifier = Modifier.weight(0.5f)) {
                             categories.take(2).forEachIndexed { index, category ->
                                 FilterGroupColumn(
-                                    stringResource(category.titleRes), category.states, uiState.lastDraw,
+                                    categoryTitles[index], category.states, uiState.lastDraw,
                                     onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                                     onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                                     onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
@@ -239,8 +244,9 @@ fun FiltersScreenContent(
                         
                         Column(modifier = Modifier.weight(0.5f)) {
                             categories.drop(2).forEachIndexed { index, category ->
+                                val globalIndex = index + 2
                                 FilterGroupColumn(
-                                    stringResource(category.titleRes), category.states, uiState.lastDraw,
+                                    categoryTitles[globalIndex], category.states, uiState.lastDraw,
                                     onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                                     onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                                     onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
@@ -251,9 +257,9 @@ fun FiltersScreenContent(
                     }
                 }
             } else {
-                categories.forEach { category ->
+                categories.forEachIndexed { index, category ->
                     filterSection(
-                        stringResource(category.titleRes), category.states, uiState.lastDraw,
+                        categoryTitles[index], category.states, uiState.lastDraw,
                         onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                         onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                         onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }

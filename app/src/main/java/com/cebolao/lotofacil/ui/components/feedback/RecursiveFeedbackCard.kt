@@ -54,11 +54,11 @@ enum class FeedbackState {
  */
 @Composable
 fun RecursiveFeedbackCard(
+    modifier: Modifier = Modifier,
     state: FeedbackState,
     title: String? = null,
     message: String,
     subMessages: List<String> = emptyList(),
-    modifier: Modifier = Modifier,
     nestingLevel: Int = 0
 ) {
     val scale by animateFloatAsState(

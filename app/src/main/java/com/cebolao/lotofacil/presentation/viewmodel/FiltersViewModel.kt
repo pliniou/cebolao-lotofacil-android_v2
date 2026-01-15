@@ -94,6 +94,19 @@ data class FiltersScreenState(
     val generationTelemetry: GenerationTelemetry? = null
 )
 
+private data class FiltersUiInputs(
+    val filterStates: List<FilterState>,
+    val generationState: GenerationUiState,
+    val lastDraw: Set<Int>?,
+    val successProbability: Float
+)
+
+private data class FiltersUiFlags(
+    val showResetDialog: Boolean,
+    val filterInfoToShow: FilterType?,
+    val generationTelemetry: GenerationTelemetry?
+)
+
 /**
  * ViewModel for the Filters/Generator screen.
  * Manages filter configuration, game generation, and preset strategies.
@@ -133,26 +146,44 @@ class FiltersViewModel @Inject constructor(
     /**
      * Combined UI state for the Filters screen.
      */
-    val uiState: StateFlow<FiltersScreenState> = combine(
-        listOf(
-            _filterStates,
-            _generationState,
-            _lastDraw,
-            successProbability,
-            _showResetDialog,
-            _filterInfoToShow,
-            _generationTelemetry
+    private val uiInputs = combine(
+        _filterStates,
+        _generationState,
+        _lastDraw,
+        successProbability
+    ) { filterStates, generationState, lastDraw, successProbability ->
+        FiltersUiInputs(
+            filterStates = filterStates,
+            generationState = generationState,
+            lastDraw = lastDraw,
+            successProbability = successProbability
         )
-    ) { values ->
-        @Suppress("UNCHECKED_CAST")
+    }
+
+    private val uiFlags = combine(
+        _showResetDialog,
+        _filterInfoToShow,
+        _generationTelemetry
+    ) { showResetDialog, filterInfoToShow, generationTelemetry ->
+        FiltersUiFlags(
+            showResetDialog = showResetDialog,
+            filterInfoToShow = filterInfoToShow,
+            generationTelemetry = generationTelemetry
+        )
+    }
+
+    val uiState: StateFlow<FiltersScreenState> = combine(
+        uiInputs,
+        uiFlags
+    ) { inputs, flags ->
         FiltersScreenState(
-            filterStates = values[0] as List<FilterState>,
-            generationState = values[1] as GenerationUiState,
-            lastDraw = values[2] as? Set<Int>?,
-            successProbability = values[3] as Float,
-            showResetDialog = values[4] as Boolean,
-            filterInfoToShow = values[5] as? FilterType?,
-            generationTelemetry = values[6] as? GenerationTelemetry?
+            filterStates = inputs.filterStates,
+            generationState = inputs.generationState,
+            lastDraw = inputs.lastDraw,
+            successProbability = inputs.successProbability,
+            showResetDialog = flags.showResetDialog,
+            filterInfoToShow = flags.filterInfoToShow,
+            generationTelemetry = flags.generationTelemetry
         )
     }.stateIn(
         viewModelScope,

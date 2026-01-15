@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,8 +24,8 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 object AppCardDefaults {
-    const val DEFAULT_ELEVATION = 0.dp
-    const val DEFAULT_ROUNDED_CORNER_RADIUS = 16.dp
+    val DEFAULT_ELEVATION = 0.dp
+    val DEFAULT_ROUNDED_CORNER_RADIUS = 16.dp
 }
 
 @Composable
@@ -77,11 +78,11 @@ fun LoadingIndicator(
 
 @Composable
 fun EmptyState(
+    modifier: Modifier = Modifier,
     title: String,
     description: String,
     actionLabel: String? = null,
-    onActionClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    onActionClick: (() -> Unit)? = null
 ) {
     AppCardDefaults(
         modifier = modifier.fillMaxWidth(),

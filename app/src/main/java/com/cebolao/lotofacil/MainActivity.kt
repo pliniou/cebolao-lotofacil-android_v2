@@ -22,8 +22,6 @@ import com.cebolao.lotofacil.ui.util.SplashAnimationHelper
 import com.cebolao.lotofacil.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-private const val TAG = "MainActivity"
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -31,71 +29,37 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        android.util.Log.d(TAG, "onCreate called")
         val splash = installSplashScreen()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setupSplashScreen(splash)
         splash.setKeepOnScreenCondition { !mainViewModel.uiState.value.isReady }
 
-        try {
-            setContent {
-                val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-                val themeMode by mainViewModel.themeMode.collectAsStateWithLifecycle()
-                val accentPalette by mainViewModel.accentPalette.collectAsStateWithLifecycle()
+        setContent {
+            val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+            val themeMode by mainViewModel.themeMode.collectAsStateWithLifecycle()
+            val accentPalette by mainViewModel.accentPalette.collectAsStateWithLifecycle()
 
-                val darkTheme = when (themeMode) {
-                    THEME_MODE_DARK -> true
-                    THEME_MODE_LIGHT -> false
-                    else -> isSystemInDarkTheme()
-                }
+            val darkTheme = when (themeMode) {
+                THEME_MODE_DARK -> true
+                THEME_MODE_LIGHT -> false
+                else -> isSystemInDarkTheme()
+            }
 
-                CebolaoLotofacilTheme(
-                    darkTheme = darkTheme,
-                    accentPalette = accentPalette
+            CebolaoLotofacilTheme(
+                darkTheme = darkTheme,
+                accentPalette = accentPalette
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        if (uiState.isReady) {
-                            MainScreen()
-                        }
+                    if (uiState.isReady) {
+                        MainScreen()
                     }
                 }
             }
-        } catch (e: IllegalStateException) {
-            android.util.Log.e(TAG, "Illegal state in setContent", e)
-            throw e
-        } catch (e: RuntimeException) {
-            android.util.Log.e(TAG, "Runtime error in setContent", e)
-            throw e
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        android.util.Log.d(TAG, "onStart called")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        android.util.Log.d(TAG, "onResume called")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        android.util.Log.d(TAG, "onPause called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        android.util.Log.d(TAG, "onStop called")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        android.util.Log.d(TAG, "onDestroy called")
     }
 
     private fun setupSplashScreen(splash: SplashScreen) {

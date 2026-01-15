@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.domain.model.CheckReport
@@ -68,27 +69,27 @@ fun SimpleStatsCard(
             // Primeira linha: Soma, Pares, Ímpares
             StatsRow(
                 items = listOf(
-                    StatItem("Soma", gameMetrics.sum.toString(), MaterialTheme.colorScheme.primary),
-                    StatItem("Pares", gameMetrics.evens.toString(), MaterialTheme.colorScheme.secondary),
-                    StatItem("Ímpares", (15 - gameMetrics.evens).toString(), MaterialTheme.colorScheme.tertiary)
+                    SimpleStatItem("Soma", gameMetrics.sum.toString(), MaterialTheme.colorScheme.primary),
+                    SimpleStatItem("Pares", gameMetrics.evens.toString(), MaterialTheme.colorScheme.secondary),
+                    SimpleStatItem("Ímpares", (15 - gameMetrics.evens).toString(), MaterialTheme.colorScheme.tertiary)
                 )
             )
             
             // Segunda linha: Primos, Fibonacci, Moldura
             StatsRow(
                 items = listOf(
-                    StatItem("Primos", gameMetrics.primes.toString(), MaterialTheme.colorScheme.primary),
-                    StatItem("Fibonacci", gameMetrics.fibonacci.toString(), MaterialTheme.colorScheme.secondary),
-                    StatItem("Moldura", gameMetrics.frame.toString(), MaterialTheme.colorScheme.tertiary)
+                    SimpleStatItem("Primos", gameMetrics.primes.toString(), MaterialTheme.colorScheme.primary),
+                    SimpleStatItem("Fibonacci", gameMetrics.fibonacci.toString(), MaterialTheme.colorScheme.secondary),
+                    SimpleStatItem("Moldura", gameMetrics.frame.toString(), MaterialTheme.colorScheme.tertiary)
                 )
             )
             
             // Terceira linha: Múltiplos de 3, Centro, Sequências
             StatsRow(
                 items = listOf(
-                    StatItem("Mult. 3", gameMetrics.multiplesOf3.toString(), MaterialTheme.colorScheme.primary),
-                    StatItem("Centro", gameMetrics.center.toString(), MaterialTheme.colorScheme.secondary),
-                    StatItem("Sequências", gameMetrics.sequences.toString(), MaterialTheme.colorScheme.tertiary)
+                    SimpleStatItem("Mult. 3", gameMetrics.multiplesOf3.toString(), MaterialTheme.colorScheme.primary),
+                    SimpleStatItem("Centro", gameMetrics.center.toString(), MaterialTheme.colorScheme.secondary),
+                    SimpleStatItem("Sequências", gameMetrics.sequences.toString(), MaterialTheme.colorScheme.tertiary)
                 )
             )
         }
@@ -97,7 +98,7 @@ fun SimpleStatsCard(
 
 @Composable
 private fun StatsRow(
-    items: List<StatItem>
+    items: List<SimpleStatItem>
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -124,7 +125,7 @@ private fun StatsRow(
     }
 }
 
-private data class StatItem(
+private data class SimpleStatItem(
     val label: String,
     val value: String,
     val color: androidx.compose.ui.graphics.Color

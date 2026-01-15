@@ -60,7 +60,7 @@
                 style="@style/Widget.Cebolao.Text.Highlight.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="--" />
+                android:text="@string/widget_placeholder_dash" />
 
             <TextView
                 android:id="@+id/widget_date"
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="--/--" />
+                android:text="@string/widget_placeholder_date" />
         </LinearLayout>
 
         <TextView

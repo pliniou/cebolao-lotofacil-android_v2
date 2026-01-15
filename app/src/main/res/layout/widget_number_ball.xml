@@ -6,4 +6,4 @@
     android:layout_height="@dimen/widget_ball_size"
     android:layout_margin="@dimen/widget_ball_margin"
     android:background="@drawable/widget_ball_background"
-    android:text="00" />
+    android:text="@string/widget_placeholder_number" />

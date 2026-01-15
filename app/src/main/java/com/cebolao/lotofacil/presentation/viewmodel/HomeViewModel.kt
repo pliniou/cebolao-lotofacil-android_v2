@@ -58,9 +58,6 @@ sealed interface HomeScreenState {
     /**
      * Success state containing all home screen data.
      */
-    /**
-     * Success state containing all home screen data.
-     */
     data class Success(
         val lastDraw: UiDraw?,
         val lastDrawSimpleStats: ImmutableList<Pair<String, String>>,
