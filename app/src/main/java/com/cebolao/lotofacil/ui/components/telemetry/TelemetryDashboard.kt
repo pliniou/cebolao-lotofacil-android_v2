@@ -46,7 +46,7 @@ fun TelemetryDashboard(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
                 ) {
                     // Header
                     Row(
@@ -91,7 +91,7 @@ fun TelemetryDashboard(
                     // Total Stats
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+                        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
                     ) {
                         StatText(
                             label = "Tentativas",
@@ -128,7 +128,7 @@ private fun MetricItem(
         tonalElevation = 2.dp
     ) {
         Column(
-            modifier = Modifier.padding(Dimen.Spacing12),
+            modifier = Modifier.padding(Dimen.Spacing8),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {

@@ -48,8 +48,8 @@ fun CheckResultCard(
         outlined = true
     ) {
         Column(
-            modifier = Modifier.padding(Dimen.Spacing16),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            modifier = Modifier.padding(Dimen.CardContentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             val totalWins = result.scoreCounts.values.sum()
             ResultHeader(totalWins, result.lastCheckedContest)
@@ -116,8 +116,8 @@ fun CheckResultCard(
                     BarChart(
                         data = chartData,
                         maxValue = GameConstants.GAME_SIZE,
-                        modifier = Modifier.fillMaxWidth().height(120.dp),
-                        chartHeight = 120.dp,
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                        chartHeight = 100.dp,
                         highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
                     )
                 }
@@ -152,7 +152,7 @@ private fun ResultHeader(wins: Int, checked: Int) {
     val hasWins = wins > 0
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
     ) {
         Icon(
             imageVector = if (hasWins) AppIcons.StarFilled else AppIcons.Analytics,
@@ -268,7 +268,7 @@ private fun NoWins() {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(start = Dimen.Spacing16)
+            modifier = Modifier.padding(start = Dimen.Spacing12)
         )
     }
 }

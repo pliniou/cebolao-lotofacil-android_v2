@@ -93,7 +93,7 @@ fun StatisticsPanel(
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
             modifier = Modifier.animateContentSize(animationSpec = Motion.Spring.gentle())
         ) {
             TimeWindowSelector(
@@ -140,7 +140,7 @@ private fun TimeWindowSelector(
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
             items(GameConstants.TIME_WINDOWS) { window ->
@@ -177,7 +177,7 @@ private fun StatsContent(stats: UiStatisticsReport) {
     val tertiary = MaterialTheme.colorScheme.tertiary
     val error = MaterialTheme.colorScheme.error
 
-    Column(verticalArrangement = Arrangement.spacedBy(Dimen.SectionSpacing)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny)) {
         if (useColumnLayout) {
             StatRow(
                 title = stringResource(R.string.home_hot_numbers),

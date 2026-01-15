@@ -60,7 +60,7 @@ fun LastDrawCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Dimen.CardContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimen.SectionSpacing),
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header

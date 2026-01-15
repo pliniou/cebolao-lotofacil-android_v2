@@ -57,7 +57,7 @@ fun NumberGrid(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                        .defaultMinSize(minWidth = 36.dp, minHeight = 36.dp)
                         .clip(CircleShape)
                         .clickable(enabled = clickable) { onNumberClick(number) }
                 ) {

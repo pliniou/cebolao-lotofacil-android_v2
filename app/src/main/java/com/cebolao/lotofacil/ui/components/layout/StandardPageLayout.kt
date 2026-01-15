@@ -43,16 +43,17 @@ fun StandardPageLayout(
     ) {
         LazyColumn(
             modifier = Modifier
-                .widthIn(max = 840.dp) // Adjusted for modern aspect ratios
+                .widthIn(max = 900.dp) // Aumentado para better use em tablets
                 .fillMaxWidth()
                 .imePadding(),
             contentPadding = PaddingValues(
-                top = scaffoldPadding.calculateTopPadding() + Dimen.Spacing16,
+                top = scaffoldPadding.calculateTopPadding() + Dimen.Spacing12,
                 start = scaffoldPadding.calculateStartPadding(layoutDirection) + Dimen.ScreenPadding,
                 end = scaffoldPadding.calculateEndPadding(layoutDirection) + Dimen.ScreenPadding,
                 bottom = bottomPadding
             ),
             verticalArrangement = Arrangement.spacedBy(Dimen.SectionSpacing),
+            horizontalAlignment = Alignment.CenterHorizontally,
             content = content
         )
     }

@@ -36,20 +36,20 @@ fun NextContestHeroCard(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
         ) {
             // Header with Contest Number
             Surface(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = MaterialTheme.shapes.extraLarge,
-                modifier = Modifier.padding(bottom = Dimen.Spacing8)
+                modifier = Modifier.padding(bottom = Dimen.Spacing4)
             ) {
                  Text(
                     text = stringResource(R.string.home_next_contest, info.contestNumber),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = Dimen.Spacing16, vertical = Dimen.Spacing4)
+                    modifier = Modifier.padding(horizontal = Dimen.Spacing12, vertical = Dimen.Spacing4)
                 )
             }
 
@@ -75,7 +75,7 @@ fun NextContestHeroCard(
             // Date and Accumulation section
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing16),
+                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Date Box

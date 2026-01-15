@@ -25,7 +25,7 @@ fun FilterGroupColumn(
     onInfoRequest: (FilterType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)) {
         SectionHeader(title)
         filters.forEach { filter ->
             FilterCard(
@@ -48,7 +48,7 @@ fun LazyListScope.filterSection(
     onInfoRequest: (FilterType) -> Unit
 ) {
     item(key = "header_$title") {
-        SectionHeader(title, modifier = Modifier.padding(top = Dimen.Spacing8))
+        SectionHeader(title, modifier = Modifier.padding(top = Dimen.Spacing4))
     }
 
     items(
@@ -61,7 +61,7 @@ fun LazyListScope.filterSection(
             onRange = { onRangeAdjustment(filter.type, it) },
             onInfo = { onInfoRequest(filter.type) },
             lastDraw = lastDraw,
-            modifier = Modifier.padding(vertical = Dimen.Spacing8)
+            modifier = Modifier.padding(vertical = Dimen.Spacing4)
         )
     }
 }

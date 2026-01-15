@@ -13,16 +13,16 @@ object Dimen {
     val Spacing20 = 20.dp
     val Spacing24 = 24.dp
 
-    // --- Semantic Spacing ---
-    val SpacingShort = Spacing8
-    val SpacingMedium = Spacing16
-    val SectionSpacing = Spacing24
-    val ItemSpacing = Spacing12
+    // --- Semantic Spacing (Compactado para melhor aproveitamento) ---
+    val SpacingShort = Spacing4
+    val SpacingMedium = Spacing12
+    val SectionSpacing = Spacing16
+    val ItemSpacing = Spacing8
     val TrackingWidest = 2.sp
 
-    // --- Layout ---
-    val ScreenPadding = Spacing16
-    val CardContentPadding = Spacing20
+    // --- Layout (Compactado) ---
+    val ScreenPadding = Spacing12
+    val CardContentPadding = Spacing16
     val BottomContentPadding = 112.dp
 
     // --- Component Sizes ---
@@ -40,15 +40,15 @@ object Dimen {
     val IconLarge = 32.dp
     val Logo = 80.dp
 
-    // --- Lotofácil Balls ---
-    val BallSizeLarge = 48.dp
-    val BallSizeMedium = 32.dp 
-    val BallSizeSmall = 24.dp
-    val BallSpacing = 6.dp
-    val BallTextLarge = 18.sp
-    val BallTextMedium = 14.sp
-    val BallTextSmall = 10.sp
-    val BarChartHeight = 180.dp
+    // --- Lotofácil Balls (Compactado) ---
+    val BallSizeLarge = 40.dp
+    val BallSizeMedium = 28.dp 
+    val BallSizeSmall = 20.dp
+    val BallSpacing = 4.dp
+    val BallTextLarge = 16.sp
+    val BallTextMedium = 12.sp
+    val BallTextSmall = 9.sp
+    val BarChartHeight = 160.dp
 
     // --- Shapes ---
     val CardCornerRadius = 24.dp

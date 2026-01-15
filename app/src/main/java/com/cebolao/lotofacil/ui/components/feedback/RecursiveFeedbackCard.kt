@@ -75,13 +75,13 @@ fun RecursiveFeedbackCard(
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing),
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Feedback principal com ícone e mensagem
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+                horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
             ) {
                 FeedbackIcon(
                     state = state,
@@ -113,7 +113,7 @@ fun RecursiveFeedbackCard(
             if (subMessages.isNotEmpty()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
-                    modifier = Modifier.padding(start = Dimen.SectionSpacing)
+                    modifier = Modifier.padding(start = Dimen.SpacingMedium)
                 ) {
                     subMessages.forEach { subMessage ->
                         SubMessageRow(

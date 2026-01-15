@@ -40,14 +40,14 @@ fun ThemeModeOption(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = Dimen.Spacing16, vertical = Dimen.Spacing12),
+            .padding(horizontal = Dimen.Spacing12, vertical = Dimen.Spacing8),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = isSelected,
             onClick = onClick
         )
-        Spacer(Modifier.width(Dimen.Spacing12))
+        Spacer(Modifier.width(Dimen.Spacing8))
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,

@@ -99,8 +99,8 @@ fun DistributionChartsCard(
                 maxValue = maxValue,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
-                chartHeight = 180.dp,
+                    .height(160.dp),
+                chartHeight = 160.dp,
                 chartType = ChartType.LINE,
                 showNormalLine = showNormalLine,
                 mean = mean?.toFloat(),

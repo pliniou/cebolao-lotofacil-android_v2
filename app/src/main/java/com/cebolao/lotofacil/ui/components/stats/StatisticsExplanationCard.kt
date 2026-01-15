@@ -66,7 +66,7 @@ fun StatisticsExplanationCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
                 ) {
                     Surface(
                         color = scheme.secondaryContainer,
@@ -176,7 +176,7 @@ private fun EduSectionCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Dimen.CardContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             TitleWithIcon(
                 text = title,
@@ -206,7 +206,7 @@ private fun EduBullet(
             color = scheme.onSurfaceVariant
         )
 
-        Spacer(Modifier.width(Dimen.SpacingShort))
+        Spacer(Modifier.width(Dimen.Spacing4))
 
         Column(
             verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)

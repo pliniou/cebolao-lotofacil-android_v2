@@ -52,9 +52,9 @@ import kotlin.math.max
 import kotlin.math.round
 import kotlin.math.sqrt
 
-private const val Y_AXIS_WIDTH_PX = 70f
-private const val X_AXIS_HEIGHT_PX = 70f
-private const val TOP_PADDING_PX = 40f
+private const val Y_AXIS_WIDTH_PX = 60f
+private const val X_AXIS_HEIGHT_PX = 60f
+private const val TOP_PADDING_PX = 30f
 private const val GRID_LINES = 4
 
 enum class ChartType { BAR, LINE }
@@ -112,7 +112,7 @@ fun BarChart(
     Box(
         modifier = modifier
             .height(chartHeight)
-            .padding(vertical = Dimen.Spacing16)
+            .padding(vertical = Dimen.Spacing12)
     ) {
         Canvas(
             modifier = Modifier

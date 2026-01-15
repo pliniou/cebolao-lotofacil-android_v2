@@ -71,7 +71,7 @@ fun FilterCard(
         color = if (!active) MaterialTheme.colorScheme.surfaceContainerLow else Color.Unspecified,
         contentPadding = Dimen.CardContentPadding
     ) {
-        Column(modifier = Modifier.padding(Dimen.ItemSpacing)) {
+        Column(modifier = Modifier.padding(Dimen.SpacingShort)) {
             Header(
                 state = state,
                 active = active,
@@ -104,7 +104,7 @@ private fun Header(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+        horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
     ) {
         Icon(
             imageVector = state.type.filterIcon,
@@ -171,12 +171,12 @@ private fun Content(
         max(0, delta - 1)
     }
 
-    Column(modifier = Modifier.padding(top = Dimen.ItemSpacing)) {
+    Column(modifier = Modifier.padding(top = Dimen.SpacingShort)) {
         // Header com informações do range
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimen.Spacing8),
+                .padding(horizontal = Dimen.Spacing4),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
@@ -214,7 +214,7 @@ private fun Content(
             onValueChange = onRange,
             valueRange = state.type.fullRange,
             steps = steps,
-            modifier = Modifier.padding(top = Dimen.Spacing8, start = Dimen.Spacing8, end = Dimen.Spacing8),
+            modifier = Modifier.padding(top = Dimen.Spacing4, start = Dimen.Spacing4, end = Dimen.Spacing4),
         )
 
         // Informações detalhadas do range
@@ -240,7 +240,7 @@ private fun RangeInfoSection(state: FilterState) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = Dimen.Spacing8, end = Dimen.Spacing8, top = Dimen.Spacing4),
+                .padding(start = Dimen.Spacing4, end = Dimen.Spacing4, top = Dimen.Spacing4),
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             // Indicador de range recomendado
@@ -292,7 +292,7 @@ private fun RangeIndicator(
             modifier = Modifier.size(12.dp),
             tint = color
         )
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(Dimen.Spacing4))
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,

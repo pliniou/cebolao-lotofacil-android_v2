@@ -48,6 +48,8 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.cebolao.lotofacil.domain.model.FilterType
 
@@ -74,8 +76,10 @@ object AppIcons {
     val Success = Icons.Filled.CheckCircle
     val Check = Icons.Filled.Check
     val Error = Icons.Filled.Error
+    val Warning = Icons.Filled.Warning
     val Info = Icons.Filled.Info
     val InfoOutlined = Icons.Outlined.Info
+    val CloseOutlined = Icons.Outlined.Close
     val Save = Icons.Filled.Save
     val Feedback = Icons.Filled.Lightbulb
 

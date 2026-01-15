@@ -301,7 +301,7 @@ private fun EmptyState(
 ) {
     androidx.compose.foundation.layout.Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(
                 horizontal = Dimen.ScreenPadding,
                 vertical = Dimen.SectionSpacing
@@ -374,7 +374,7 @@ private fun GameList(
         contentAlignment = androidx.compose.ui.Alignment.TopCenter
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 160.dp),
+            columns = GridCells.Fixed(5),
             modifier = Modifier
                 .widthIn(max = 800.dp)
                 .fillMaxSize(),

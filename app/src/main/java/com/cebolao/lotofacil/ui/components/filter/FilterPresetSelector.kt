@@ -71,7 +71,7 @@ fun FilterPresetSelector(
                     modifier = Modifier.size(Dimen.IconSmall)
                 )
 
-                Spacer(modifier = Modifier.width(Dimen.Spacing12))
+                Spacer(modifier = Modifier.width(Dimen.Spacing8))
 
                 AnimatedContent(
                     targetState = selectedPreset,

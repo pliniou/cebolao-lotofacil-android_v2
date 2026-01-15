@@ -35,7 +35,7 @@ fun StudioHero(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
             Surface(
                 color = scheme.secondaryContainer,
@@ -48,7 +48,7 @@ fun StudioHero(
                     painter = painterResource(id = R.drawable.ic_lotofacil_logo),
                     contentDescription = stringResource(R.string.studio_name),
                     modifier = Modifier
-                        .padding(Dimen.SpacingMedium)
+                        .padding(Dimen.SpacingShort)
                         .size(Dimen.Logo)
                 )
             }

@@ -111,7 +111,7 @@ fun WelcomeCard(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -174,7 +174,7 @@ fun WelcomeCard(
                         color = scheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(Dimen.SpacingMedium)
+                        modifier = Modifier.padding(Dimen.Spacing8)
                     )
                 }
             }

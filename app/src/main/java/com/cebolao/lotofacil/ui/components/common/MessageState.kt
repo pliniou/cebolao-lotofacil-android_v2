@@ -37,7 +37,7 @@ fun MessageState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(Dimen.Spacing24),
+            .padding(Dimen.SpacingMedium),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -56,7 +56,7 @@ fun MessageState(
             }
         }
 
-        Spacer(Modifier.height(Dimen.Spacing16))
+        Spacer(Modifier.height(Dimen.Spacing12))
 
         Text(
             text = title,
@@ -78,7 +78,7 @@ fun MessageState(
         )
 
         if (actionLabel != null && onActionClick != null) {
-            Spacer(Modifier.height(Dimen.Spacing24))
+            Spacer(Modifier.height(Dimen.Spacing4))
             PrimaryActionButton(
                 text = actionLabel,
                 onClick = onActionClick,

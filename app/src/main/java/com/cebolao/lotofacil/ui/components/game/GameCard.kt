@@ -72,7 +72,7 @@ fun GameCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(Dimen.ItemSpacing))
+            Spacer(modifier = Modifier.height(Dimen.Spacing8))
 
             NumberGrid(
                 selectedNumbers = game.numbers,
@@ -83,7 +83,7 @@ fun GameCard(
                 ballVariant = if (isPinned) NumberBallVariant.Secondary else NumberBallVariant.Neutral
             )
 
-            Spacer(modifier = Modifier.height(Dimen.ItemSpacing))
+            Spacer(modifier = Modifier.height(Dimen.Spacing8))
 
             GameCardActions(
                 onDelete = { onAction(GameCardAction.Delete) },
@@ -104,7 +104,7 @@ private fun GameCardActions(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onShare) {

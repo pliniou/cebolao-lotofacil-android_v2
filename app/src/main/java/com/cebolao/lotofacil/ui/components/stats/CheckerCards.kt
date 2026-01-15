@@ -64,7 +64,7 @@ fun SimpleStatsCard(
     ) {
         Column(
             modifier = Modifier.padding(Dimen.CardContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
             // Primeira linha: Soma, Pares, Ímpares
             StatsRow(

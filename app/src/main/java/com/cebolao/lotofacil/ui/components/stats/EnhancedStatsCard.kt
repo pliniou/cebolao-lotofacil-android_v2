@@ -53,7 +53,7 @@ fun EnhancedStatsCard(
     ) {
         Column(
             modifier = Modifier.padding(Dimen.CardContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
         ) {
             // Métricas principais com visualização aprimorada
             EnhancedMetricsRow(gameMetrics)
@@ -73,7 +73,7 @@ private fun EnhancedMetricsRow(
     // Primeira linha com as métricas mais importantes
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
     ) {
         EnhancedMetricItem(
             label = "Soma",
@@ -104,7 +104,7 @@ private fun EnhancedMetricsRow(
     // Segunda linha com métricas secundárias
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
     ) {
         EnhancedMetricItem(
             label = "Fibonacci",
@@ -175,7 +175,7 @@ private fun EnhancedMetricItem(
                 .background(scheme.surfaceVariant)
         ) {
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp),
@@ -205,8 +205,8 @@ private fun MetricsBarChart(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .padding(horizontal = Dimen.Spacing8)
+            .height(100.dp)
+            .padding(horizontal = Dimen.Spacing4)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawEnhancedBarChart(chartData, size)

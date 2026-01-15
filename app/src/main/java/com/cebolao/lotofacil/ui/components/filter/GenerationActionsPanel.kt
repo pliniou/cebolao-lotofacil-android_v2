@@ -53,11 +53,11 @@ fun GenerationActionsPanel(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         variant = CardVariant.Solid,
-        contentPadding = Dimen.SpacingMedium
+        contentPadding = Dimen.SpacingShort
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
             Text(
                 text = stringResource(R.string.count_short),
@@ -95,7 +95,7 @@ private fun QuantitySelector(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium),
+        horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
         modifier = Modifier
             .background(scheme.surface, CircleShape) // Inner background for selector
             .padding(Dimen.Spacing4) // Padding around the controls

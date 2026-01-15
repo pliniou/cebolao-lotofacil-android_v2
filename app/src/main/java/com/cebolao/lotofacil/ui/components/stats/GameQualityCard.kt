@@ -45,7 +45,7 @@ fun GameQualityCard(
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
         ) {
             // Header: Total Score
             Row(
@@ -74,7 +74,7 @@ fun GameQualityCard(
 
             // Metrics List
             Column(
-                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
             ) {
                 score.evaluations.forEach { evaluation ->
                     MetricRow(evaluation)
@@ -117,7 +117,7 @@ private fun MetricRow(metric: MetricEvaluation) {
                 .background(getStatusColor(metric.status))
         )
 
-        Spacer(modifier = Modifier.width(Dimen.Spacing12))
+        Spacer(modifier = Modifier.width(Dimen.Spacing8))
 
         Column(modifier = Modifier.weight(1f)) {
             Row(

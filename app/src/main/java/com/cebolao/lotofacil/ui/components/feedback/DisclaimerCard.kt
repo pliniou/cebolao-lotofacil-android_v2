@@ -46,11 +46,11 @@ fun DisclaimerCard(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Warning,

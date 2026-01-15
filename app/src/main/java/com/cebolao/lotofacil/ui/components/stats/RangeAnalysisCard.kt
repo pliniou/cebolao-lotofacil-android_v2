@@ -30,7 +30,7 @@ fun RangeAnalysisCard(
     ) {
         Column(
             modifier = Modifier.padding(Dimen.CardContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
             // Header com estatísticas gerais
             RangeStatsHeader(rangeStats)
@@ -91,7 +91,7 @@ private fun RangeDistributionGrid(stats: RangeStatistics) {
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.SemiBold,
         color = scheme.onSurface,
-        modifier = Modifier.padding(bottom = Dimen.Spacing8)
+        modifier = Modifier.padding(bottom = Dimen.Spacing4)
     )
     
     // Grid 2x2 para as faixas principais
@@ -100,7 +100,7 @@ private fun RangeDistributionGrid(stats: RangeStatistics) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             RangeItem(
                 title = stringResource(R.string.checker_range_0_5),
@@ -118,7 +118,7 @@ private fun RangeDistributionGrid(stats: RangeStatistics) {
         
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             RangeItem(
                 title = stringResource(R.string.checker_range_11_15),
