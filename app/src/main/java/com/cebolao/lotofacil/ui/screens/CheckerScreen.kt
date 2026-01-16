@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -52,18 +49,14 @@ import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.toCheckResult
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
-import com.cebolao.lotofacil.ui.components.common.HeatmapToggle
 import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberGrid
-import com.cebolao.lotofacil.ui.components.stats.EnhancedStatsCard
 import com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard
 import com.cebolao.lotofacil.ui.components.stats.GameQualityCard
-import com.cebolao.lotofacil.ui.components.stats.RangeAnalysisCard
 import com.cebolao.lotofacil.ui.components.stats.SimpleStatsCard
-import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Shapes
@@ -145,8 +138,9 @@ fun CheckerScreenContent(
         )
     }
 
-    val heatmapColors = remember(isHeatmapEnabled, heatmapIntensities) {
-        if (isHeatmapEnabled) {
+    val shouldShowHeatmap = isHeatmapEnabled && uiState is CheckerUiState.Success
+    val heatmapColors = remember(shouldShowHeatmap, heatmapIntensities) {
+        if (shouldShowHeatmap) {
             heatmapIntensities.mapValues { (_, intensity) ->
                 getHeatmapColor(intensity)
             }
@@ -233,22 +227,6 @@ fun CheckerScreenContent(
                 }
             }
 
-            // Grid Header with Heatmap Toggle
-            item(key = "grid_header") {
-                Row(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .padding(horizontal = Dimen.Spacing16, vertical = Dimen.Spacing8),
-                   horizontalArrangement = Arrangement.End,
-                   verticalAlignment = Alignment.CenterVertically
-                ) {
-                    HeatmapToggle(
-                        isHeatmapEnabled = isHeatmapEnabled,
-                        onToggle = { onEvent(CheckerUiEvent.ToggleHeatmap) }
-                    )
-                }
-            }
-
             // Grid centralizado
             item(key = "grid") {
                 NumberGrid(
@@ -264,17 +242,6 @@ fun CheckerScreenContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            
-            // Termômetro de Qualidade (Novo)
-            if (gameScore != null) {
-                item(key = "quality_meter") {
-                    GameQualityCard(
-                        score = gameScore,
-                        modifier = Modifier.padding(top = Dimen.ItemSpacing),
-                    )
-                }
-            }
-
             // Card de instruções (Idle)
             // Show only if no game score and no results (pure idle)
             if (uiState is CheckerUiState.Idle && gameScore == null) {
@@ -298,7 +265,7 @@ fun CheckerScreenContent(
 
             // Resultados
             item(key = "results") {
-                CheckerResultSection(uiState)
+                CheckerResultSection(uiState, gameScore)
             }
         }
     }
@@ -382,7 +349,10 @@ private fun CheckerBottomBar(
 }
 
 @Composable
-private fun CheckerResultSection(state: CheckerUiState) {
+private fun CheckerResultSection(
+    state: CheckerUiState,
+    gameScore: com.cebolao.lotofacil.domain.model.GameScore?
+) {
     Column(
         modifier = Modifier.padding(top = Dimen.ItemSpacing),
         verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
@@ -396,6 +366,12 @@ private fun CheckerResultSection(state: CheckerUiState) {
                     modifier = Modifier.padding(top = Dimen.ItemSpacing),
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                gameScore?.let {
+                    GameQualityCard(
+                        score = it,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 // New Financial Card
                 FinancialPerformanceCard(
                     report = state.report,

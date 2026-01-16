@@ -255,6 +255,8 @@
 
     <!-- Checker -->
     <string name="checker_recent_hits_chart_title">Recent Hits</string>
+    <string name="checker_recent_hits_toggle_table">View table</string>
+    <string name="checker_recent_hits_limited">Showing last %1$d draws</string>
     <string name="checker_results_header_wins">Prizes</string>
     <string name="checker_results_header_no_wins">No prizes</string>
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analyzed in %1$d draws</string>

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -63,6 +64,7 @@ class HistoryRepositoryImpl @Inject constructor(
 
     override fun observeHistory(): Flow<List<Draw>> =
         localDataSource.observeLocalHistory()
+            .map { normalizeHistory(it) }
 
     override fun observeLastDraw(): Flow<Draw?> = 
         localDataSource.observeLastDraw()
@@ -71,7 +73,7 @@ class HistoryRepositoryImpl @Inject constructor(
         // Always fetch full history from database for statistics accuracy.
         // The LRU cache only holds a subset (e.g., 100), so returning it
         // would result in incorrect statistics calculation.
-        val draws = localDataSource.getLocalHistory()
+        val draws = normalizeHistory(localDataSource.getLocalHistory())
         
         // Optimistically update cache with recent ones (last 100)
         // We reverse or takeLast depending on sort order, but cache logic handles eviction.
@@ -219,5 +221,19 @@ class HistoryRepositoryImpl @Inject constructor(
     private fun isLatestApiResultFresh(now: Long = System.currentTimeMillis()): Boolean {
         val timestamp = latestApiResultTimestamp ?: return false
         return now - timestamp <= API_RESULT_FRESHNESS_MS
+    }
+
+    /**
+     * Normaliza lista de concursos para garantir ordenaÇõÇœo (desc) e remoÇõÇœo de duplicidades,
+     * evitando contagens incorretas nas estatisticas e no checker.
+     */
+    private fun normalizeHistory(draws: List<Draw>): List<Draw> {
+        if (draws.isEmpty()) return emptyList()
+        val sorted = draws.sortedByDescending { it.contestNumber }
+        val deduped = sorted.distinctBy { it.contestNumber }
+        if (deduped.size != sorted.size) {
+            logger.warning(TAG, "Histórico continha duplicados; normalizado para ${deduped.size} registros")
+        }
+        return deduped
     }
 }

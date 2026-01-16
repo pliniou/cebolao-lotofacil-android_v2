@@ -88,7 +88,8 @@ fun AppCard(
     val scheme = MaterialTheme.colorScheme
     val isDark = scheme.background.luminance() < 0.5f
     val nestingLevel = LocalCardNesting.current
-    val shape = MaterialTheme.shapes.large
+    // Usamos cantos mais contidos para compactar a UI
+    val shape = MaterialTheme.shapes.medium
 
     // Retro-compatibility and variant logic
     val effectiveVariant = if (outlined) CardVariant.Outlined else when (nestingLevel) {

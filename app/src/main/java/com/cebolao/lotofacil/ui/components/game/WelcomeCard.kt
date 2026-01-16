@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.layout.AppCard
@@ -80,21 +81,22 @@ fun WelcomeCard(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         variant = CardVariant.Solid,
-        contentPadding = Dimen.CardContentPadding
+        contentPadding = Dimen.Spacing12
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12, Alignment.CenterHorizontally)
             ) {
                 Surface(
                     color = scheme.secondaryContainer,
                     contentColor = scheme.onSecondaryContainer,
-                    shape = MaterialTheme.shapes.small
+                    shape = MaterialTheme.shapes.medium
                 ) {
                     Box(
                         modifier = Modifier.padding(Dimen.Spacing4),
@@ -114,21 +116,21 @@ fun WelcomeCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
                 ) {
-                    Text(
-                        text = stringResource(
-                            R.string.welcome_message_format,
-                            stringResource(greetingRes)
-                        ),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = scheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                        Text(
+                            text = stringResource(
+                                R.string.welcome_message_format,
+                                stringResource(greetingRes)
+                            ),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = scheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
 
-                    Text(
-                        text = dateString,
-                        style = MaterialTheme.typography.labelLarge,
+                        Text(
+                            text = dateString,
+                            style = MaterialTheme.typography.labelLarge,
                         color = scheme.onSurfaceVariant
                     )
                 }
@@ -138,7 +140,7 @@ fun WelcomeCard(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = scheme.surfaceVariant,
-                    shape = MaterialTheme.shapes.large
+                    shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
                         text = randomQuote,
@@ -147,6 +149,7 @@ fun WelcomeCard(
                         color = scheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.padding(Dimen.Spacing8)
                     )
                 }

@@ -198,7 +198,7 @@ fun FiltersScreenContent(
         bottomBar = {
             GenerationActionsPanel(
                 quantity = quantity,
-                onQuantityChanged = { },
+                onQuantityChanged = { quantity = it.coerceIn(1, 50) },
                 onGenerate = { onEvent(FiltersUiEvent.GenerateGames(quantity)) },
                 isGenerating = uiState.generationState is GenerationUiState.Loading,
                 modifier = Modifier.padding(bottom = Dimen.ItemSpacing)

@@ -44,6 +44,13 @@ fun NumberGrid(
     val isFull = remember(maxSelection, selectedNumbers.size) {
         derivedStateOf { maxSelection != null && selectedNumbers.size >= maxSelection }
     }.value
+    val minSize = remember(sizeVariant) {
+        when (sizeVariant) {
+            NumberBallSize.Large -> 44.dp
+            NumberBallSize.Medium -> 32.dp
+            NumberBallSize.Small -> 26.dp
+        }
+    }
 
     FlowRow(
         modifier = modifier.fillMaxWidth(),
@@ -61,7 +68,7 @@ fun NumberGrid(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .defaultMinSize(minWidth = 36.dp, minHeight = 36.dp)
+                        .defaultMinSize(minWidth = minSize, minHeight = minSize)
                         .clip(CircleShape)
                         .clickable(enabled = clickable) { onNumberClick(number) }
                 ) {

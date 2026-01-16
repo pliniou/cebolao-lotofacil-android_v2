@@ -145,15 +145,15 @@ class CheckerViewModel @Inject constructor(
 
         _selectedNumbers.value = next
         _isGameComplete.value = next.size == GameConstants.GAME_SIZE
-        recomputeScoreAndHeatmap()
+        resetAnalysis()
+        _uiState.value = CheckerUiState.Idle
     }
 
     private fun clearNumbers() {
         _selectedNumbers.value = emptySet()
         _isGameComplete.value = false
-        _gameScore.value = null
-        _heatmapEnabled.value = false
-        _heatmapIntensities.value = emptyMap()
+        resetAnalysis()
+        _uiState.value = CheckerUiState.Idle
     }
 
     private fun saveGame() {
@@ -194,6 +194,7 @@ class CheckerViewModel @Inject constructor(
             sendMessage(R.string.checker_incomplete_selection)
             return
         }
+        resetAnalysis()
         viewModelScope.launch {
             _uiState.value = CheckerUiState.Loading
             checkGameUseCase(numbers.toSet()).collect { result ->
@@ -205,6 +206,7 @@ class CheckerViewModel @Inject constructor(
                             LotofacilGame.fromNumbers(numbers),
                             lastDraw?.numbers
                         )
+                        computeAnalysis(numbers)
                         _uiState.value = CheckerUiState.Success(report, metrics)
 
                         externalScope.launch {
@@ -249,15 +251,20 @@ class CheckerViewModel @Inject constructor(
     private fun replaceNumbers(newNumbers: Set<Int>) {
         _selectedNumbers.value = newNumbers.coerceToMax(GameConstants.GAME_SIZE)
         _isGameComplete.value = _selectedNumbers.value.size == GameConstants.GAME_SIZE
-        recomputeScoreAndHeatmap()
+        resetAnalysis()
+        _uiState.value = CheckerUiState.Idle
     }
 
-    private fun recomputeScoreAndHeatmap() {
-        val numbers = _selectedNumbers.value
-        if (numbers.isEmpty()) {
-            _gameScore.value = null
-            _heatmapEnabled.value = false
-            _heatmapIntensities.value = emptyMap()
+    private fun resetAnalysis() {
+        recomputeJob?.cancel()
+        _gameScore.value = null
+        _heatmapEnabled.value = false
+        _heatmapIntensities.value = emptyMap()
+    }
+
+    private fun computeAnalysis(numbers: Set<Int>) {
+        if (numbers.size != GameConstants.GAME_SIZE) {
+            resetAnalysis()
             return
         }
 
@@ -267,28 +274,15 @@ class CheckerViewModel @Inject constructor(
                 val history = historyRepository.getHistory()
                 val lastDraw = history.firstOrNull()
 
-                val computedScore = if (numbers.size == GameConstants.GAME_SIZE) {
-                    metricsCalculator.analyze(
-                        LotofacilGame.fromNumbers(numbers),
-                        lastDraw?.numbers
-                    )
-                } else {
-                    null
-                }
+                val computedScore = metricsCalculator.analyze(
+                    LotofacilGame.fromNumbers(numbers),
+                    lastDraw?.numbers
+                )
 
                 val computedIntensities = if (history.isNotEmpty()) {
                     val totalDraws = history.size
-                    val counts = mutableMapOf<Int, Int>()
-                    history.forEach { draw ->
-                        draw.numbers.forEach { n ->
-                            if (numbers.contains(n)) {
-                                counts[n] = (counts[n] ?: 0) + 1
-                            }
-                        }
-                    }
-
                     numbers.associateWith { n ->
-                        val count = counts[n] ?: 0
+                        val count = history.count { draw -> n in draw.numbers }
                         (count.toFloat() / totalDraws).coerceIn(0f, 1f)
                     }
                 } else {

@@ -14,11 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.NextDrawInfo
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.CardVariant
-import com.cebolao.lotofacil.ui.theme.Alpha
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
@@ -30,13 +30,13 @@ fun NextContestHeroCard(
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        variant = CardVariant.Outlined,
-        contentPadding = Dimen.CardContentPadding
+        variant = CardVariant.Solid,
+        contentPadding = Dimen.Spacing12
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
+            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
         ) {
             // Header with Contest Number
             Surface(
@@ -65,10 +65,12 @@ fun NextContestHeroCard(
                 )
                 Text(
                     text = info.formattedPrize,
-                    style = MaterialTheme.typography.displayMedium,
+                    style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 

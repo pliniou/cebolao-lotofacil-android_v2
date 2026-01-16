@@ -253,6 +253,8 @@
 
     <!-- Checker -->
     <string name="checker_recent_hits_chart_title">Acertos Recentes</string>
+    <string name="checker_recent_hits_toggle_table">Ver tabela</string>
+    <string name="checker_recent_hits_limited">Mostrando ultimos %1$d concursos</string>
     <string name="checker_results_header_wins">Prêmios</string>
     <string name="checker_results_header_no_wins">Sem prêmios</string>
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analisado em %1$d concursos</string>

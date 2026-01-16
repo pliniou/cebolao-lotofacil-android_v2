@@ -54,13 +54,12 @@ fun LastDrawCard(
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        outlined = true
+        outlined = true,
+        contentPadding = Dimen.Spacing12
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimen.CardContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium),
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
@@ -192,8 +191,8 @@ private fun DrawDateSubtitle(draw: UiDraw) {
 private fun ModernNumberGrid(numbers: Set<Int>) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8, Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4, Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
         maxItemsInEachRow = 5
     ) {
         numbers.sorted().forEach { number ->

@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,9 +15,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -64,20 +67,49 @@ fun CheckResultCard(
                 val chartData = remember(result.recentHits) {
                     result.recentHits.map { it.first.toString() to it.second }.toImmutableList()
                 }
+                val condensedData = remember(chartData) { chartData.takeLast(12).toImmutableList() }
+                var showTable by rememberSaveable { mutableStateOf(false) }
 
                 Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
-                    Text(
-                        stringResource(R.string.checker_recent_hits_chart_title),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    BarChart(
-                        data = chartData,
-                        maxValue = GameConstants.GAME_SIZE,
-                        modifier = Modifier.fillMaxWidth().height(100.dp),
-                        chartHeight = 100.dp,
-                        highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.checker_recent_hits_chart_title),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        TextButton(onClick = { showTable = !showTable }) {
+                            Text(
+                                text = if (showTable) stringResource(R.string.general_close) else stringResource(R.string.checker_recent_hits_toggle_table),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                    if (showTable) {
+                        HitsTable(condensedData)
+                    } else {
+                        BarChart(
+                            data = condensedData,
+                            maxValue = GameConstants.GAME_SIZE,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(140.dp),
+                            chartHeight = 140.dp,
+                            chartType = ChartType.BAR,
+                            highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
+                        )
+                        if (chartData.size > condensedData.size) {
+                            Text(
+                                text = stringResource(R.string.checker_recent_hits_limited, condensedData.size),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
 
                 HorizontalDivider(
@@ -173,6 +205,31 @@ private fun ScoreRow(score: Int, count: Int) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+private fun HitsTable(data: List<Pair<String, Int>>) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)) {
+        data.forEach { (contest, hits) ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Concurso $contest",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "$hits acertos",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

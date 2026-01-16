@@ -41,21 +41,27 @@ class CheckGameUseCase @Inject constructor(
                 return@flow
             }
 
-            // 2. Fetch History
+            // 2. Garantir histÇürico atualizado antes de calcular
+            val syncResult = historyRepository.syncHistoryIfNeeded()
+            if (syncResult.isFailure) {
+                logger.warning(TAG, "SincronizaÇõÇœo falhou ou nÇõo necessÇ­ria; usando cache local")
+            }
+
+            // 3. Fetch History
             val history = historyRepository.getHistory()
             if (history.isEmpty()) {
                 logger.warning(TAG, "History is empty during check")
                 // Ideally return a specific error or proceed with empty stats
             }
 
-            // 3. Prepare Data
+            // 4. Prepare Data
             val game = LotofacilGame.fromNumbers(gameNumbers)
             val sourceHash = calculateTicketHash(game)
             
-            // 4. Delegate to Engine
+            // 5. Delegate to Engine
             val checkResult = gameCheckEngine.checkGame(game, history)
             
-            // 5. Build Report
+            // 6. Build Report
             val drawWindow = DrawWindow(
                 firstContest = history.lastOrNull()?.contestNumber ?: 0,
                 lastContest = history.firstOrNull()?.contestNumber ?: 0,

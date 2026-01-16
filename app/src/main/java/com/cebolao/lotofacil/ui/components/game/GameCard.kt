@@ -4,9 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -14,9 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -48,12 +44,13 @@ fun GameCard(
         } else {
             Color.Unspecified
         },
-        contentPadding = Dimen.CardContentPadding
+        contentPadding = Dimen.Spacing12
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .animateContentSize()
+                .animateContentSize(),
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -78,8 +75,6 @@ fun GameCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(Dimen.Spacing8))
-
             NumberGrid(
                 selectedNumbers = game.numbers,
                 onNumberClick = {},
@@ -88,8 +83,6 @@ fun GameCard(
                 sizeVariant = NumberBallSize.Small,
                 ballVariant = if (isPinned) NumberBallVariant.Secondary else NumberBallVariant.Neutral
             )
-
-            Spacer(modifier = Modifier.height(Dimen.Spacing8))
 
             GameCardActions(
                 onAnalyze = { onAction(GameCardAction.Analyze) },
