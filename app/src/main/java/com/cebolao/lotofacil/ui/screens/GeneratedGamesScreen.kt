@@ -392,7 +392,7 @@ private fun GameList(
         contentAlignment = Alignment.TopCenter
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 340.dp),
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .widthIn(max = 900.dp)
                 .fillMaxSize(),
@@ -415,6 +415,7 @@ private fun GameList(
                     GameCard(
                         game = game,
                         index = index + 1,
+                        modifier = Modifier.aspectRatio(1f),
                         onAction = { action -> onAction(action, game) }
                     )
                 }

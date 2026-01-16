@@ -23,6 +23,7 @@ import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -45,6 +46,7 @@ import com.cebolao.lotofacil.ui.theme.FontFamilyDisplay
 import com.cebolao.lotofacil.ui.theme.filterIcon
 import kotlin.math.max
 
+@Stable
 @Composable
 fun FilterCard(
     state: FilterState,

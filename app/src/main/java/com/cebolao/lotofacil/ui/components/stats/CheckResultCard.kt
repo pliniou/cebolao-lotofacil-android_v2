@@ -59,49 +59,7 @@ fun CheckResultCard(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = Alpha.DIVIDER)
             )
 
-            if (totalWins > 0 && result.lastCheckedContest > 0) {
-                val winRate = (totalWins.toFloat() / result.lastCheckedContest.toFloat()) * 100f
-                val oneIn = if (winRate > 0) 100f / winRate else 0f
-                val winRateFormatted = if (oneIn >= 1.5f) {
-                    "1 em %.0f (%.2f%%)".format(oneIn, winRate)
-                } else {
-                    "%.2f%%".format(winRate)
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            AppIcons.Analytics,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier
-                                .size(Dimen.IconSmall)
-                                .padding(end = Dimen.Spacing4)
-                        )
-                        Text(
-                            "Frequência de Prêmios",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    Text(
-                        text = winRateFormatted,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = Dimen.Spacing8),
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = Alpha.DIVIDER)
-                )
-            }
-
+            
             if (result.recentHits.isNotEmpty()) {
                 val chartData = remember(result.recentHits) {
                     result.recentHits.map { it.first.toString() to it.second }.toImmutableList()

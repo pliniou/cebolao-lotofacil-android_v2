@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +41,9 @@ fun NumberGrid(
         Alignment.CenterHorizontally
     )
 ) {
-    val isFull = maxSelection != null && selectedNumbers.size >= maxSelection
+    val isFull = remember(maxSelection, selectedNumbers.size) {
+        derivedStateOf { maxSelection != null && selectedNumbers.size >= maxSelection }
+    }.value
 
     FlowRow(
         modifier = modifier.fillMaxWidth(),
