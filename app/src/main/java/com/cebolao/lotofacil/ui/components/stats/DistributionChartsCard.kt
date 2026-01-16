@@ -123,7 +123,11 @@ private fun PatternSelector(
         horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
         contentPadding = PaddingValues(horizontal = 0.dp)
     ) {
-        items(patterns) { pattern ->
+        items(
+            items = patterns,
+            key = { it },
+            contentType = { "pattern_chip" }
+        ) { pattern ->
             val label = patternLabel(pattern)
             CustomChip(
                 selected = pattern == selectedPattern,

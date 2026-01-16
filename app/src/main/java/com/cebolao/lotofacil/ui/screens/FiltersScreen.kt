@@ -17,6 +17,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -62,6 +65,7 @@ data class FilterCategory(
 fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
     val resources = LocalContext.current.resources
     val currentResources by rememberUpdatedState(resources)
     
@@ -94,7 +98,8 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
     FiltersScreenContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        listState = listState
     )
 }
 
@@ -103,14 +108,15 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
 fun FiltersScreenContent(
     uiState: FiltersScreenState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (FiltersUiEvent) -> Unit
+    onEvent: (FiltersUiEvent) -> Unit,
+    listState: LazyListState
 ) {
     val configuration = LocalConfiguration.current
     val useColumnLayout = configuration.screenWidthDp >= 600
 
     // Local state for quantity and preset selection
-    var quantity by remember { mutableIntStateOf(10) }
-    var selectedPreset by remember { mutableStateOf<FilterPreset?>(null) }
+    var quantity by rememberSaveable { mutableIntStateOf(10) }
+    var selectedPreset by rememberSaveable { mutableStateOf<FilterPreset?>(null) }
 
     if (uiState.showResetDialog) {
         AppConfirmationDialog(
@@ -208,7 +214,10 @@ fun FiltersScreenContent(
 
         val categoryTitles = categories.map { stringResource(it.titleRes) }
 
-        StandardPageLayout(scaffoldPadding = innerPadding) {
+        StandardPageLayout(
+            scaffoldPadding = innerPadding,
+            listState = listState
+        ) {
             item(key = "preset_selector") {
                 FilterPresetSelector(
                     selectedPreset = selectedPreset,

@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -143,7 +144,11 @@ private fun TimeWindowSelector(
             horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
-            items(GameConstants.TIME_WINDOWS) { window ->
+            items(
+                items = GameConstants.TIME_WINDOWS,
+                key = { it },
+                contentType = { "time_window" }
+            ) { window ->
                 val label = when (window) {
                     0 -> stringResource(R.string.home_all_contests)
                     else -> stringResource(R.string.home_last_contests_format, window)
@@ -172,7 +177,12 @@ private fun StatsContent(stats: UiStatisticsReport) {
     @Suppress("ConfigurationScreenWidthHeight")
     val configuration = LocalConfiguration.current
     @Suppress("ConfigurationScreenWidthHeight")
-    val useColumnLayout = configuration.screenWidthDp < PHONE_BREAKPOINT_DP
+    // Use derivedStateOf for configuration-based layout decision to optimize recompositions
+    val useColumnLayout = remember {
+        derivedStateOf {
+            configuration.screenWidthDp < PHONE_BREAKPOINT_DP
+        }
+    }.value
 
     val tertiary = MaterialTheme.colorScheme.tertiary
     val error = MaterialTheme.colorScheme.error
@@ -252,7 +262,11 @@ private fun StatRow(
                 horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny),
                 contentPadding = PaddingValues(horizontal = Dimen.SpacingShort)
             ) {
-                items(data) { (number, value) ->
+                items(
+                    items = data,
+                    key = { it.first },
+                    contentType = { "stat_item" }
+                ) { (number, value) ->
                     StatItem(
                         number = number,
                         value = value,

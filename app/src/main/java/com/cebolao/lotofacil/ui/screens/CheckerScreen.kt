@@ -37,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -86,6 +88,7 @@ fun CheckerScreen(
     val heatmapIntensities by viewModel.heatmapIntensities.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
 
@@ -108,7 +111,8 @@ fun CheckerScreen(
         heatmapIntensities = heatmapIntensities,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        listState = listState
     )
 }
 
@@ -122,7 +126,8 @@ fun CheckerScreenContent(
     heatmapIntensities: Map<Int, Float>,
     snackbarHostState: SnackbarHostState,
     onNavigateBack: (() -> Unit)?,
-    onEvent: (CheckerUiEvent) -> Unit
+    onEvent: (CheckerUiEvent) -> Unit,
+    listState: LazyListState
 ) {
     var showClearDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -184,7 +189,10 @@ fun CheckerScreenContent(
             }
         }
     ) { innerPadding ->
-        StandardPageLayout(scaffoldPadding = innerPadding) {
+        StandardPageLayout(
+            scaffoldPadding = innerPadding,
+            listState = listState
+        ) {
             item(key = "counter") {
                 Column(
                     modifier = Modifier

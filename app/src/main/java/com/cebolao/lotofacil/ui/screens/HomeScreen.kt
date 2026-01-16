@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,6 +46,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
 
     uiState.syncMessageRes?.let { msgId ->
         val msg = stringResource(msgId)
@@ -59,7 +62,8 @@ fun HomeScreen(
         onEvent = viewModel::onEvent,
         onNavigateToChecker = { numbers ->
             navController?.navigateToChecker(numbers)
-        }
+        },
+        listState = listState
     )
 }
 
@@ -69,7 +73,8 @@ fun HomeScreenContent(
     uiState: HomeUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (HomeUiEvent) -> Unit,
-    onNavigateToChecker: (Set<Int>) -> Unit
+    onNavigateToChecker: (Set<Int>) -> Unit,
+    listState: LazyListState
     ) {
     AppScreen(
         title = stringResource(R.string.app_name),
@@ -84,7 +89,10 @@ fun HomeScreenContent(
             modifier = Modifier.fillMaxSize()
         ) {
             val successState = uiState.screenState as? HomeScreenState.Success
-            StandardPageLayout(scaffoldPadding = innerPadding) {
+            StandardPageLayout(
+                scaffoldPadding = innerPadding,
+                listState = listState
+            ) {
                 item(key = "welcome") {
                     AnimateOnEntry(
                         delayMillis = staggerDelay(0).toLong(),

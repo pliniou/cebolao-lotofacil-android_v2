@@ -89,3 +89,9 @@ object ComposePerformance {
      */
     fun <T> stableState(value: T): StableState<T> = StableState(value)
 }
+
+/**
+ * Extension functions for converting standard collections to stable wrappers
+ */
+fun <T> List<T>.toStable(): StableList<T> = StableList(this)
+fun <K, V> Map<K, V>.toStable(): StableMap<K, V> = StableMap(this)

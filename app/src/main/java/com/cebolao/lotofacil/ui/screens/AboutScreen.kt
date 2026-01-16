@@ -25,6 +25,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -67,11 +69,13 @@ fun AboutScreen(
 ) {
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val accentPalette by viewModel.accentPalette.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
     
     AboutScreenContent(
         themeMode = themeMode,
         accentPalette = accentPalette,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        listState = listState
     )
 }
 
@@ -79,7 +83,8 @@ fun AboutScreen(
 fun AboutScreenContent(
     themeMode: String,
     accentPalette: AccentPalette,
-    onEvent: (MainUiEvent) -> Unit
+    onEvent: (MainUiEvent) -> Unit,
+    listState: LazyListState
 ) {
     val context = LocalContext.current
 
@@ -92,7 +97,10 @@ fun AboutScreenContent(
         title = stringResource(R.string.about_title),
         subtitle = stringResource(R.string.about_subtitle)
     ) { padding ->
-        StandardPageLayout(scaffoldPadding = padding) {
+        StandardPageLayout(
+            scaffoldPadding = padding,
+            listState = listState
+        ) {
             item(key = "hero") {
                 StudioHero()
             }

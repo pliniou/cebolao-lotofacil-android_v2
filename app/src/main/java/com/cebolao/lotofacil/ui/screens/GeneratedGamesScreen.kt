@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -377,6 +379,9 @@ private fun GameList(
     onGenerateRequest: () -> Unit,
     onAction: (GameCardAction, UiLotofacilGame) -> Unit
 ) {
+    val gridState = rememberLazyGridState()
+    val animateCards by remember(games.size) { derivedStateOf { games.size < 40 } }
+
     if (games.isEmpty()) {
         EmptyState(isNewGamesTab, onGenerateRequest)
         return
@@ -391,6 +396,7 @@ private fun GameList(
             modifier = Modifier
                 .widthIn(max = 900.dp)
                 .fillMaxSize(),
+            state = gridState,
             contentPadding = PaddingValues(
                 top = Dimen.ItemSpacing,
                 bottom = Dimen.SectionSpacing,
@@ -402,15 +408,20 @@ private fun GameList(
         ) {
             itemsIndexed(
                 items = games,
-                key = { _, game -> game.numbers.sorted().joinToString(separator = "-") },
+                key = { _, game -> game.mask },
                 contentType = { _, _ -> "game_card" }
             ) { index, game ->
-                AnimateOnEntry(delayMillis = (index * 40).toLong()) {
+                val card: @Composable () -> Unit = {
                     GameCard(
                         game = game,
                         index = index + 1,
                         onAction = { action -> onAction(action, game) }
                     )
+                }
+                if (animateCards) {
+                    AnimateOnEntry(delayMillis = (index * 40).toLong()) { card() }
+                } else {
+                    card()
                 }
             }
         }

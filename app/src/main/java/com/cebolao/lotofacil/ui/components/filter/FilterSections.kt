@@ -3,6 +3,7 @@ package com.cebolao.lotofacil.ui.components.filter
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -25,9 +26,15 @@ fun FilterGroupColumn(
     onInfoRequest: (FilterType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)) {
-        SectionHeader(title)
-        filters.forEach { filter ->
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+    ) {
+        item { SectionHeader(title) }
+        items(
+            items = filters,
+            key = { it.type }
+        ) { filter ->
             FilterCard(
                 state = filter,
                 onToggle = { onToggle(filter.type, it) },
