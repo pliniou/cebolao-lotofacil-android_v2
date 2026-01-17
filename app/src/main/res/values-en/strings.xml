@@ -31,6 +31,9 @@
 
     <!-- Home Screen -->
     <string name="home_subtitle">Overview</string>
+    <string name="results_title">All Results</string>
+    <string name="results_error_message">Unable to load results.</string>
+    <string name="results_contest_number_format">Draw %1$d</string>
     <string name="home_next_contest">Next Draw %1$d</string>
     <string name="home_statistics_center">Statistics Center</string>
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sync data</string>
@@ -307,6 +310,8 @@
     <string name="filters_title">Filters</string>
     <string name="filters_subtitle">Configure your strategy</string>
     <string name="filters_reset_button_description">Reset</string>
+    <string name="filters_quantity_decrease">Decrease quantity</string>
+    <string name="filters_quantity_increase">Increase quantity</string>
     <string name="filter_category_numeric">Numeric</string>
     <string name="filter_category_geometric">Geometric</string>
     <string name="filter_category_math">Mathematical</string>

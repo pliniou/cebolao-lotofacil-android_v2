@@ -96,15 +96,7 @@ class CheckerViewModel @Inject constructor(
             is CheckerUiEvent.CheckGame -> checkGame()
             is CheckerUiEvent.RequestSave -> requestSaveConfirmation()
             is CheckerUiEvent.ConfirmSave -> confirmSaveGame()
-            is CheckerUiEvent.RequestReplace -> requestReplaceConfirmation()
-            is CheckerUiEvent.ConfirmReplace -> confirmReplaceNumbers()
-            is CheckerUiEvent.CancelReplace -> cancelReplaceNumbers()
-            is CheckerUiEvent.ToggleHeatmap -> toggleHeatmap()
         }
-    }
-
-    private fun toggleHeatmap() {
-        _heatmapEnabled.value = !_heatmapEnabled.value
     }
 
     private fun toggleNumber(n: Int) {
@@ -191,31 +183,11 @@ class CheckerViewModel @Inject constructor(
                         }
                     }
                     is AppResult.Failure -> {
-                        // This case is now handled by the onError of launchCatching,
-                        // but keeping it here for specific AppResult.Failure handling if needed.
-                        // For now, it will be caught by the general onError.
                         _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed)
                     }
                 }
             }
         }
-    }
-
-    private fun requestReplaceConfirmation() {
-        if (_selectedNumbers.value.isNotEmpty()) {
-            viewModelScope.launch { 
-                _events.send(CheckerEffect.RequestReplaceConfirmation) 
-            }
-        }
-    }
-
-    private fun confirmReplaceNumbers() {
-        val generated = (1..25).shuffled().take(GameConstants.GAME_SIZE).toSet()
-        replaceNumbers(generated)
-    }
-
-    private fun cancelReplaceNumbers() {
-        // Intentional no-op
     }
 
     private fun confirmSaveGame() {
@@ -288,10 +260,6 @@ sealed interface CheckerUiEvent {
     data object CheckGame : CheckerUiEvent
     data object RequestSave : CheckerUiEvent
     data object ConfirmSave : CheckerUiEvent
-    data object RequestReplace : CheckerUiEvent
-    data object ConfirmReplace : CheckerUiEvent
-    data object CancelReplace : CheckerUiEvent
-    data object ToggleHeatmap : CheckerUiEvent
 }
 
 /**
@@ -301,7 +269,6 @@ sealed interface CheckerUiEvent {
 sealed interface CheckerEffect {
     data class ShowMessage(@get:StringRes val messageResId: Int) : CheckerEffect
     data object RequestSaveConfirmation : CheckerEffect
-    data object RequestReplaceConfirmation : CheckerEffect
 }
 
 sealed interface CheckerUiState {

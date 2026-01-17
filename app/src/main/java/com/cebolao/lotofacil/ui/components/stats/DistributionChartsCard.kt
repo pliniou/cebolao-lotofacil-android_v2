@@ -242,7 +242,7 @@ private fun domainFor(pattern: StatisticPattern): IntRange? = when (pattern) {
 @Composable
 private fun DistributionChartsCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             DistributionChartsCard(
                 stats = UiStatisticsReport(
                     mostFrequentNumbers = emptyList(),

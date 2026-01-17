@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Mantém as definições absolutas (se você já replica, pode remover duplicatas) -->
-    <color name="brand_primary">#0066FF</color>
+    <!-- Mantem as definicoes alinhadas a paleta principal -->
+    <color name="brand_primary">#0055FF</color>
     <color name="surface_light">#F8FAFC</color>
     <color name="surface_variant_light">#FFFFFF</color>
     <color name="on_surface_light">#0F172A</color>
@@ -16,5 +16,6 @@
     <color name="widget_background">@color/surface_variant_dark</color>
     <color name="widget_text_primary">@color/on_surface_dark</color>
     <color name="widget_text_secondary">@color/on_surface_variant_dark</color>
-    <color name="widget_icon_tint">@color/on_surface_variant_dark</color>
+    <color name="widget_icon_tint">@color/brand_primary</color>
+    <color name="widget_divider">@color/outline_dark</color>
 </resources>

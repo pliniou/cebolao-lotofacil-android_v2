@@ -137,8 +137,8 @@ fun PrimaryActionButton(
 private fun PrimaryActionButtonPreview() {
     MaterialTheme {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(Dimen.Spacing16),
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
         ) {
             PrimaryActionButton(text = "Ação Principal", onClick = {})
             PrimaryActionButton(

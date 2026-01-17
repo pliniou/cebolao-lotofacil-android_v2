@@ -306,7 +306,7 @@ private fun ProbabilityItemRow(item: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp),
+            .padding(vertical = Dimen.Spacing4),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(

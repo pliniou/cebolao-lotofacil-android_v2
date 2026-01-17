@@ -104,13 +104,13 @@ private fun QuantitySelector(
             icon = AppIcons.Remove,
             onClick = { if (quantity > 1) onQuantityChanged(quantity - 1) },
             enabled = enabled && quantity > 1,
-            contentDescription = "Decrease quantity" // Added content description
+            contentDescription = stringResource(R.string.filters_quantity_decrease)
         )
 
         Box(
             modifier = Modifier
-                .width(60.dp) // Slightly wider for double digits
-                .height(40.dp),
+                .width(Dimen.ControlWidthMedium) // Slightly wider for double digits
+                .height(Dimen.ControlHeightMedium),
             contentAlignment = Alignment.Center
         ) {
             AnimatedContent(
@@ -142,7 +142,7 @@ private fun QuantitySelector(
             icon = AppIcons.Add,
             onClick = { if (quantity < 50) onQuantityChanged(quantity + 1) }, // Limit max quantity reasonable
             enabled = enabled && quantity < 50,
-            contentDescription = "Increase quantity" // Added content description
+            contentDescription = stringResource(R.string.filters_quantity_increase)
         )
     }
 }
@@ -166,7 +166,7 @@ private fun QuantityButton(
             disabledContainerColor = scheme.surfaceContainerHighest,
             disabledContentColor = scheme.onSurfaceVariant.copy(alpha = 0.38f)
         ),
-        modifier = Modifier.size(40.dp) // Consistent touch target size
+        modifier = Modifier.size(Dimen.ControlHeightMedium) // Consistent touch target size
     ) {
         Icon(
             imageVector = icon,
@@ -180,7 +180,7 @@ private fun QuantityButton(
 @Composable
 private fun GenerationActionsPanelPreview() {
     MaterialTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(Dimen.Spacing16)) {
             GenerationActionsPanel(
                 quantity = 5,
                 onQuantityChanged = {},

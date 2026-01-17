@@ -19,7 +19,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val startDestinationState by viewModel.startDestination.collectAsStateWithLifecycle()
-    val startDestination = startDestinationState.destination // This needs to be Any, check MainViewModel
+    val startDestination = startDestinationState.destination
 
     Scaffold(
         bottomBar = { AppBottomBar(navController, navBackStackEntry?.destination) }

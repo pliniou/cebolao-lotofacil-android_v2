@@ -35,7 +35,7 @@
             android:layout_height="@dimen/widget_refresh_button_size"
             android:background="@drawable/widget_icon_button_background"
             android:contentDescription="@string/content_desc_refresh"
-            android:padding="6dp"
+            android:padding="@dimen/spacing_small_plus"
             android:scaleType="centerInside"
             android:src="@drawable/ic_refresh"
             android:tint="@color/widget_icon_tint" />
@@ -67,7 +67,7 @@
                 style="@style/Widget.Cebolao.Text.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/spacing_xsmall"
                 android:text="@string/widget_placeholder_date" />
         </LinearLayout>
 

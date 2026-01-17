@@ -34,7 +34,7 @@
             android:layout_height="@dimen/widget_refresh_button_size_small"
             android:background="@drawable/widget_icon_button_background"
             android:contentDescription="@string/content_desc_refresh"
-            android:padding="5dp"
+            android:padding="@dimen/spacing_small_plus"
             android:scaleType="centerInside"
             android:src="@drawable/ic_refresh"
             android:tint="@color/widget_icon_tint" />
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/widget_header"
-        android:layout_marginTop="6dp">
+        android:layout_marginTop="@dimen/spacing_small_plus">
 
         <LinearLayout
             android:id="@+id/widget_numbers_container"

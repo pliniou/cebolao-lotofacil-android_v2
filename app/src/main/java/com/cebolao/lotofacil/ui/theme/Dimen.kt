@@ -29,6 +29,8 @@ object Dimen {
     val ActionButtonHeight = 48.dp
     val ActionButtonHeightLarge = 56.dp
     val SmallButtonHeight = 36.dp
+    val ControlHeightMedium = 40.dp
+    val ControlWidthMedium = 60.dp
 
     // --- Indicators ---
     val IndicatorHeightSmall = 8.dp

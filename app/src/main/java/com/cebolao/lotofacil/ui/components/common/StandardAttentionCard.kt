@@ -82,7 +82,7 @@ fun StandardAttentionCard(
 @Composable
 private fun StandardAttentionCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StandardAttentionCard(
                 title = "Atenção",
                 message = "Esta é uma mensagem de aviso importante que requer sua atenção."

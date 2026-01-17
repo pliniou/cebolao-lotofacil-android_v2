@@ -71,8 +71,8 @@ fun CustomChip(
 private fun CustomChipPreview() {
     MaterialTheme {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(Dimen.Spacing16),
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
         ) {
             CustomChip(selected = true, onClick = {}, label = "Selecionado")
             CustomChip(selected = false, onClick = {}, label = "Não Selecionado")

@@ -330,7 +330,7 @@ private fun StatItem(
 @Composable
 private fun StatisticsPanelPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StatisticsPanel(
                 stats = UiStatisticsReport(
                     mostFrequentNumbers = emptyList(),

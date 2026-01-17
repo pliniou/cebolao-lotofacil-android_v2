@@ -169,7 +169,7 @@ private fun getStatusDescriptionRes(status: ScoreStatus): Int {
 @Composable
 private fun GameQualityCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             GameQualityCard(
                 score = GameScore(
                     totalScore = 85,

@@ -18,14 +18,12 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +48,8 @@ import com.cebolao.lotofacil.domain.model.toCheckResult
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
 import com.cebolao.lotofacil.ui.components.common.MessageState
+import com.cebolao.lotofacil.ui.components.common.LoadingCard
+import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
@@ -84,13 +84,17 @@ fun CheckerScreen(
     val listState = rememberLazyListState()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
+    var showSaveDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { effect ->
             when (effect) {
-                is CheckerEffect.ShowMessage -> snackbarHostState.showSnackbar(message = currentContext.getString(effect.messageResId))
-                is CheckerEffect.RequestSaveConfirmation -> { /* Handle dialog state if needed or show snackbar */ }
-                is CheckerEffect.RequestReplaceConfirmation -> { /* Handle dialog state */ }
+                is CheckerEffect.ShowMessage -> snackbarHostState.showSnackbar(
+                    message = currentContext.getString(effect.messageResId)
+                )
+                is CheckerEffect.RequestSaveConfirmation -> {
+                    showSaveDialog = true
+                }
             }
         }
     }
@@ -105,7 +109,13 @@ fun CheckerScreen(
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
         onEvent = viewModel::onEvent,
-        listState = listState
+        listState = listState,
+        showSaveDialog = showSaveDialog,
+        onConfirmSave = {
+            showSaveDialog = false
+            viewModel.onEvent(CheckerUiEvent.ConfirmSave)
+        },
+        onDismissSave = { showSaveDialog = false }
     )
 }
 
@@ -120,7 +130,10 @@ fun CheckerScreenContent(
     snackbarHostState: SnackbarHostState,
     onNavigateBack: (() -> Unit)?,
     onEvent: (CheckerUiEvent) -> Unit,
-    listState: LazyListState
+    listState: LazyListState,
+    showSaveDialog: Boolean,
+    onConfirmSave: () -> Unit,
+    onDismissSave: () -> Unit
 ) {
     var showClearDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -135,6 +148,17 @@ fun CheckerScreenContent(
             },
             onDismiss = { showClearDialog = false },
             icon = AppIcons.Delete
+        )
+    }
+
+    if (showSaveDialog) {
+        AppConfirmationDialog(
+            title = R.string.checker_save_confirmation_title,
+            message = R.string.checker_save_confirmation_message,
+            confirmText = R.string.general_save,
+            onConfirm = onConfirmSave,
+            onDismiss = onDismissSave,
+            icon = AppIcons.Save
         )
     }
 
@@ -386,32 +410,18 @@ private fun CheckerResultSection(
             }
 
             is CheckerUiState.Loading -> {
-                AppCard(
+                LoadingCard(
                     modifier = Modifier.fillMaxWidth(),
-                    outlined = true,
-                    color = MaterialTheme.colorScheme.surface,
-                    contentPadding = Dimen.CardContentPadding
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
-                        Text(
-                            text = stringResource(R.string.general_loading),
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
+                    title = stringResource(R.string.general_loading),
+                    description = stringResource(R.string.loading_details_fallback)
+                )
             }
 
             is CheckerUiState.Error -> {
-                MessageState(
-                    icon = AppIcons.Success,
+                StandardAttentionCard(
                     title = stringResource(R.string.general_error_title),
                     message = stringResource(state.messageResId),
-                    iconTint = MaterialTheme.colorScheme.error
+                    icon = AppIcons.Error
                 )
             }
 

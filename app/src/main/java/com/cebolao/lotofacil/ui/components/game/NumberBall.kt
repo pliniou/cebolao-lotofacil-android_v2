@@ -200,7 +200,7 @@ private fun resolveColors(
 @Composable
 private fun NumberBallPreview() {
     MaterialTheme {
-        Row(modifier = Modifier.padding(16.dp)) {
+        Row(modifier = Modifier.padding(Dimen.Spacing16)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Normal", style = MaterialTheme.typography.labelSmall)
                 NumberBall(number = 1)

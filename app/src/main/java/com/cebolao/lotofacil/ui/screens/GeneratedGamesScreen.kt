@@ -20,12 +20,12 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -61,7 +61,9 @@ import com.cebolao.lotofacil.presentation.viewmodel.GameScreenUiState
 import com.cebolao.lotofacil.presentation.viewmodel.GameUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.GameViewModel
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
+import com.cebolao.lotofacil.ui.components.common.LoadingCard
 import com.cebolao.lotofacil.ui.components.common.MessageState
+import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
 import com.cebolao.lotofacil.ui.components.game.GameCard
 import com.cebolao.lotofacil.ui.components.game.GameCardAction
 import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
@@ -299,12 +301,41 @@ fun GeneratedGamesScreenContent(
                 val games = if (page == 0) unpinned else pinned
                 val isNewGamesTab = page == 0
 
-                GameList(
-                    games = games,
-                    isNewGamesTab = isNewGamesTab,
-                    onGenerateRequest = onGenerateRequest,
-                    onAction = onAction
-                )
+                when {
+                    uiState.isLoading -> {
+                        LoadingCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = Dimen.ScreenPadding,
+                                    vertical = Dimen.SectionSpacing
+                                ),
+                            title = stringResource(R.string.general_loading),
+                            description = stringResource(R.string.loading_details_fallback)
+                        )
+                    }
+                    uiState.errorMessageRes != null -> {
+                        StandardAttentionCard(
+                            title = stringResource(R.string.general_error_title),
+                            message = stringResource(uiState.errorMessageRes),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = Dimen.ScreenPadding,
+                                    vertical = Dimen.SectionSpacing
+                                ),
+                            icon = AppIcons.Error
+                        )
+                    }
+                    else -> {
+                        GameList(
+                            games = games,
+                            isNewGamesTab = isNewGamesTab,
+                            onGenerateRequest = onGenerateRequest,
+                            onAction = onAction
+                        )
+                    }
+                }
             }
         }
     }

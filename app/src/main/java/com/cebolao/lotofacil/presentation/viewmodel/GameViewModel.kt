@@ -50,7 +50,9 @@ data class GameSummary(
 data class GameScreenUiState(
     val gameToDelete: UiLotofacilGame? = null,
     val summary: GameSummary = GameSummary(),
-    val analysisState: GameAnalysisUiState = GameAnalysisUiState.Idle
+    val analysisState: GameAnalysisUiState = GameAnalysisUiState.Idle,
+    val isLoading: Boolean = false,
+    @StringRes val errorMessageRes: Int? = null
 )
 
 /**
@@ -88,6 +90,8 @@ class GameViewModel @Inject constructor(
 
     private val _gameToDelete = MutableStateFlow<UiLotofacilGame?>(null)
     private val _analysisState = MutableStateFlow<GameAnalysisUiState>(GameAnalysisUiState.Idle)
+    private val _uiError = MutableStateFlow<Int?>(null)
+    private val _isLoading = MutableStateFlow(true)
 
     private var analyzeJob: Job? = null
 
@@ -109,8 +113,10 @@ class GameViewModel @Inject constructor(
     val uiState: StateFlow<GameScreenUiState> = combine(
         _gameToDelete,
         _analysisState,
-        gamesFlow
-    ) { gameToDelete, analysisState, games ->
+        gamesFlow,
+        _isLoading,
+        _uiError
+    ) { gameToDelete, analysisState, games, isLoading, errorMessageRes ->
         val pinnedCount = games.count { it.isPinned }
         val totalCost = GameConstants.GAME_COST.multiply(BigDecimal(games.size))
         
@@ -121,13 +127,25 @@ class GameViewModel @Inject constructor(
                 pinnedGames = pinnedCount,
                 totalCost = totalCost
             ),
-            analysisState = analysisState
+            analysisState = analysisState,
+            isLoading = isLoading,
+            errorMessageRes = errorMessageRes
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
-        GameScreenUiState()
+        GameScreenUiState(isLoading = true)
     )
+
+    init {
+        // Primeiro carregamento dos jogos finaliza o estado de loading e limpa erros pendentes
+        viewModelScope.launch {
+            gamesFlow.collect {
+                _isLoading.value = false
+                _uiError.value = null
+            }
+        }
+    }
 
     fun onEvent(event: GameUiEvent) {
         when (event) {
@@ -143,8 +161,12 @@ class GameViewModel @Inject constructor(
     }
 
     private fun togglePinState(game: UiLotofacilGame) {
+        _uiError.value = null
         launchCatching(
-            onError = { _events.trySend(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed)) }
+            onError = {
+                _events.trySend(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed))
+                _uiError.value = R.string.error_toggle_pin_failed
+            }
         ) {
             when (val result = toggleGamePinUseCase(game.toDomain())) {
                 is AppResult.Success -> {
@@ -157,6 +179,7 @@ class GameViewModel @Inject constructor(
                 }
                 is AppResult.Failure -> {
                     _events.send(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed))
+                    _uiError.value = R.string.error_toggle_pin_failed
                 }
             }
         }
@@ -172,8 +195,12 @@ class GameViewModel @Inject constructor(
 
     private fun confirmDeleteGame() {
         val game = _gameToDelete.value ?: return
+        _uiError.value = null
         launchCatching(
-            onError = { _events.trySend(GameEffect.ShowSnackbar(R.string.error_delete_game_failed)) }
+            onError = {
+                _events.trySend(GameEffect.ShowSnackbar(R.string.error_delete_game_failed))
+                _uiError.value = R.string.error_delete_game_failed
+            }
         ) {
             try {
                 gameRepository.deleteGame(game.toDomain())
@@ -184,8 +211,12 @@ class GameViewModel @Inject constructor(
     }
 
     private fun clearUnpinned() {
+        _uiError.value = null
         launchCatching(
-            onError = { _events.trySend(GameEffect.ShowSnackbar(R.string.error_clear_games_failed)) }
+            onError = {
+                _events.trySend(GameEffect.ShowSnackbar(R.string.error_clear_games_failed))
+                _uiError.value = R.string.error_clear_games_failed
+            }
         ) {
             gameRepository.clearUnpinnedGames()
         }
@@ -195,6 +226,7 @@ class GameViewModel @Inject constructor(
         if (_analysisState.value is GameAnalysisUiState.Loading) return
 
         analyzeJob?.cancel()
+        _uiError.value = null
         analyzeJob = launchCatching {
             _analysisState.value = GameAnalysisUiState.Loading
             val domainGame = game.toDomain()
@@ -204,6 +236,7 @@ class GameViewModel @Inject constructor(
                 }
                 is AppResult.Failure -> {
                     _analysisState.value = GameAnalysisUiState.Error(R.string.error_analysis_failed)
+                    _uiError.value = R.string.error_analysis_failed
                 }
             }
         }
@@ -215,8 +248,12 @@ class GameViewModel @Inject constructor(
     }
 
     private fun shareGame(game: UiLotofacilGame) {
+        _uiError.value = null
         launchCatching(
-            onError = { _events.trySend(GameEffect.ShowSnackbar(R.string.error_share_game_failed)) }
+            onError = {
+                _events.trySend(GameEffect.ShowSnackbar(R.string.error_share_game_failed))
+                _uiError.value = R.string.error_share_game_failed
+            }
         ) {
             val sortedNumbers = game.numbers.sorted()
             val lastDraw = historyRepository.getLastDraw()

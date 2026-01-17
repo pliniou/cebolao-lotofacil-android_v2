@@ -64,7 +64,7 @@ fun StandardInfoRow(
 @Composable
 private fun StandardInfoRowPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StandardInfoRow(
                 icon = Icons.Default.Info,
                 title = "Informação",

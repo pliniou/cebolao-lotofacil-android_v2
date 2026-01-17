@@ -292,7 +292,7 @@ private fun NoWins() {
 @Composable
 private fun CheckResultCardPreview_Wins() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16).verticalScroll(rememberScrollState())) {
             CheckResultCard(
                 result = CheckResult(
                     lastCheckedContest = 100,
@@ -310,7 +310,7 @@ private fun CheckResultCardPreview_Wins() {
 @Composable
 private fun CheckResultCardPreview_NoWins() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             CheckResultCard(
                 result = CheckResult(
                     lastCheckedContest = 20,

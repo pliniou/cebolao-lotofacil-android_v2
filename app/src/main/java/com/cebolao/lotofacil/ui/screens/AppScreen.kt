@@ -29,7 +29,8 @@ fun AppScreen(
                 title = title,
                 subtitle = subtitle,
                 navigationIcon = { navigationIcon?.invoke() },
-                actions = actions
+                actions = actions,
+                containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.96f)
             )
         },
         bottomBar = bottomBar,

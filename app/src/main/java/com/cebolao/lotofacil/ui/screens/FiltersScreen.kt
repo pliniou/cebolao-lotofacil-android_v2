@@ -123,7 +123,10 @@ fun FiltersScreenContent(
             title = R.string.filters_reset_dialog_title,
             message = R.string.filters_reset_dialog_message,
             confirmText = R.string.filters_reset_confirm,
-            onConfirm = { onEvent(FiltersUiEvent.ConfirmResetFilters) },
+            onConfirm = {
+                selectedPreset = null
+                onEvent(FiltersUiEvent.ConfirmResetFilters)
+            },
             onDismiss = { onEvent(FiltersUiEvent.DismissResetDialog) },
             icon = Icons.Default.DeleteSweep
         )
@@ -222,7 +225,8 @@ fun FiltersScreenContent(
                 FilterPresetSelector(
                     selectedPreset = selectedPreset,
                     presets = FilterPresets.all,
-                    onPresetSelected = { 
+                    onPresetSelected = {
+                        selectedPreset = it
                         onEvent(FiltersUiEvent.ApplyPreset(it))
                     },
                     modifier = Modifier

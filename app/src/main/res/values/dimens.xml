@@ -9,6 +9,8 @@
     <dimen name="spacing_xlarge">32dp</dimen>
     <dimen name="spacing_xxlarge">48dp</dimen>
     <dimen name="spacing_xxxlarge">64dp</dimen>
+    <dimen name="spacing_small_plus">6dp</dimen>
+    <dimen name="spacing_medium_compact">12dp</dimen>
 
     <!-- WIDGET SPECIFIC -->
     <!-- Content Padding -->

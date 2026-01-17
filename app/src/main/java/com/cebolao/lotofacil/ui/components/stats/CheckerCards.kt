@@ -135,7 +135,7 @@ private data class SimpleStatItem(
 @Composable
 private fun FinancialPerformanceCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             FinancialPerformanceCard(
                 report = CheckReport(
                     ticket = com.cebolao.lotofacil.domain.model.LotofacilGame.fromNumbers(emptySet()),
@@ -160,7 +160,7 @@ private fun FinancialPerformanceCardPreview() {
 @Composable
 private fun SimpleStatsCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             SimpleStatsCard(
                 gameMetrics = GameComputedMetrics(
                     sum = 180,

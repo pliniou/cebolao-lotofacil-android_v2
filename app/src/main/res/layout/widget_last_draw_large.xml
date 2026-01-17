@@ -34,7 +34,7 @@
             android:layout_height="@dimen/widget_refresh_button_size_large"
             android:background="@drawable/widget_icon_button_background"
             android:contentDescription="@string/content_desc_refresh"
-            android:padding="7dp"
+            android:padding="@dimen/spacing_small_plus"
             android:scaleType="centerInside"
             android:src="@drawable/ic_refresh"
             android:tint="@color/widget_icon_tint" />
@@ -45,8 +45,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/widget_header"
-        android:layout_marginTop="10dp"
-        android:background="@color/widget_text_secondary"
+        android:layout_marginTop="@dimen/spacing_medium_compact"
+        android:background="@color/widget_divider"
         android:alpha="0.25" />
 
     <FrameLayout
@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/widget_divider"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="@dimen/spacing_medium_compact">
 
         <LinearLayout
             android:id="@+id/widget_numbers_container"

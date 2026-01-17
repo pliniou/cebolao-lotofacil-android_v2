@@ -223,7 +223,7 @@ private fun CardContent(
 @Composable
 private fun AppCardPreview() {
     MaterialTheme {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(16.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16), modifier = Modifier.padding(Dimen.Spacing16)) {
             AppCard(title = "Solid Card") {
                 Text("This is a solid card content.")
             }

@@ -291,7 +291,7 @@ private fun RangeIndicator(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(12.dp),
+            modifier = Modifier.size(Dimen.IconSmall),
             tint = color
         )
         Spacer(modifier = Modifier.width(Dimen.Spacing4))
@@ -337,7 +337,7 @@ private fun Label(
 @Composable
 private fun FilterCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             FilterCard(
                 state = FilterState(
                     type = FilterType.PARES,

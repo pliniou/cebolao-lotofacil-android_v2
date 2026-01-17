@@ -184,7 +184,7 @@ private fun htmlToAnnotatedString(html: String): AnnotatedString {
 @Composable
 private fun TitleWithIconPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             TitleWithIcon(
                 text = "Example Title",
                 iconVector = AppIcons.Info
@@ -197,7 +197,7 @@ private fun TitleWithIconPreview() {
 @Composable
 private fun InfoPointPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             InfoPoint(
                 title = "Point Title",
                 description = "This is a description of the info point."

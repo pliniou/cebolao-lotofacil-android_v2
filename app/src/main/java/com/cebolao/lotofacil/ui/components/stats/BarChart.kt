@@ -513,7 +513,7 @@ private fun DrawScope.drawNormalLine(
 private fun BarChartPreview() {
     val mockData = (1..10).map { it.toString() to (it * 10) }.toImmutableList()
     MaterialTheme {
-        Box(modifier = Modifier.padding(16.dp).background(MaterialTheme.colorScheme.surface)) {
+        Box(modifier = Modifier.padding(Dimen.Spacing16).background(MaterialTheme.colorScheme.surface)) {
             BarChart(
                 data = mockData,
                 maxValue = 100,
@@ -529,7 +529,7 @@ private fun BarChartPreview() {
 private fun LineChartPreview() {
     val mockData = (1..10).map { it.toString() to (it * 5 + 20) }.toImmutableList()
     MaterialTheme {
-        Box(modifier = Modifier.padding(16.dp).background(MaterialTheme.colorScheme.surface)) {
+        Box(modifier = Modifier.padding(Dimen.Spacing16).background(MaterialTheme.colorScheme.surface)) {
             BarChart(
                 data = mockData,
                 maxValue = 100,

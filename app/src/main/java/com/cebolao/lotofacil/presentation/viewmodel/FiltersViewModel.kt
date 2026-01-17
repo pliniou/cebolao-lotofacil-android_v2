@@ -1,34 +1,24 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterPreset
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
-import com.cebolao.lotofacil.domain.service.FilterSuccessCalculator
 import com.cebolao.lotofacil.domain.service.GenerationFailureReason
 import com.cebolao.lotofacil.domain.service.GenerationProgressType
-import com.cebolao.lotofacil.domain.service.GenerationTelemetry
 import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
-import com.cebolao.lotofacil.domain.service.GenerationProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -89,23 +79,8 @@ data class FiltersScreenState(
     val filterStates: List<FilterState> = emptyList(),
     val generationState: GenerationUiState = GenerationUiState.Idle,
     val lastDraw: Set<Int>? = null,
-    val successProbability: Float = 1f,
     val showResetDialog: Boolean = false,
-    val filterInfoToShow: FilterType? = null,
-    val generationTelemetry: GenerationTelemetry? = null
-)
-
-private data class FiltersUiInputs(
-    val filterStates: List<FilterState>,
-    val generationState: GenerationUiState,
-    val lastDraw: Set<Int>?,
-    val successProbability: Float
-)
-
-private data class FiltersUiFlags(
-    val showResetDialog: Boolean,
-    val filterInfoToShow: FilterType?,
-    val generationTelemetry: GenerationTelemetry?
+    val filterInfoToShow: FilterType? = null
 )
 
 /**
@@ -116,7 +91,6 @@ private data class FiltersUiFlags(
 class FiltersViewModel @Inject constructor(
     private val generateGames: GenerateGamesUseCase,
     private val getLastDraw: GetLastDrawUseCase,
-    private val filterSuccessCalculator: FilterSuccessCalculator,
     private val saveGeneratedGamesUseCase: SaveGeneratedGamesUseCase
 ) : BaseViewModel() {
     private val _filterStates = MutableStateFlow(FilterType.defaults())
@@ -124,7 +98,6 @@ class FiltersViewModel @Inject constructor(
     private val _lastDraw = MutableStateFlow<Set<Int>?>(null)
     private val _showResetDialog = MutableStateFlow(false)
     private val _filterInfoToShow = MutableStateFlow<FilterType?>(null)
-    private val _generationTelemetry = MutableStateFlow<GenerationTelemetry?>(null)
     private val _events = Channel<NavigationEvent>(Channel.BUFFERED)
 
     /**
@@ -133,58 +106,29 @@ class FiltersViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     private var generationJob: Job? = null
-    private var debounceJob: Job? = null
 
-    /**
-     * Estimated success probability based on current filter configuration (0-1).
-     */
-    private val successProbability: StateFlow<Float> =
-        _filterStates
-            .map { filters -> filterSuccessCalculator(filters.filter { it.isEnabled }) }
-            .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 1f)
-
-    /**
-     * Combined UI state for the Filters screen.
-     */
-    private val uiInputs = combine(
-        _filterStates,
-        _generationState,
-        _lastDraw,
-        successProbability
-    ) { filterStates, generationState, lastDraw, successProbability ->
-        FiltersUiInputs(
-            filterStates = filterStates,
-            generationState = generationState,
-            lastDraw = lastDraw,
-            successProbability = successProbability
-        )
-    }
-
-    private val uiFlags = combine(
-        _showResetDialog,
-        _filterInfoToShow,
-        _generationTelemetry
-    ) { showResetDialog, filterInfoToShow, generationTelemetry ->
-        FiltersUiFlags(
-            showResetDialog = showResetDialog,
-            filterInfoToShow = filterInfoToShow,
-            generationTelemetry = generationTelemetry
-        )
+    init {
+        viewModelScope.launch {
+            when (val result = getLastDraw()) {
+                is AppResult.Success -> _lastDraw.value = result.value?.numbers
+                is AppResult.Failure -> _lastDraw.value = null
+            }
+        }
     }
 
     val uiState: StateFlow<FiltersScreenState> = combine(
-        uiInputs,
-        uiFlags
-    ) { inputs, flags ->
+        _filterStates,
+        _generationState,
+        _lastDraw,
+        _showResetDialog,
+        _filterInfoToShow
+    ) { filterStates, generationState, lastDraw, showResetDialog, filterInfoToShow ->
         FiltersScreenState(
-            filterStates = inputs.filterStates,
-            generationState = inputs.generationState,
-            lastDraw = inputs.lastDraw,
-            successProbability = inputs.successProbability,
-            showResetDialog = flags.showResetDialog,
-            filterInfoToShow = flags.filterInfoToShow,
-            generationTelemetry = flags.generationTelemetry
+            filterStates = filterStates,
+            generationState = generationState,
+            lastDraw = lastDraw,
+            showResetDialog = showResetDialog,
+            filterInfoToShow = filterInfoToShow
         )
     }.stateIn(
         viewModelScope,
@@ -250,11 +194,9 @@ class FiltersViewModel @Inject constructor(
         generationJob = launchCatching(
             onError = {
                 _generationState.value = GenerationUiState.Error(R.string.filters_generation_error)
-                _generationTelemetry.value = null
             }
         ) {
             _generationState.value = GenerationUiState.Loading(0, quantity)
-            _generationTelemetry.value = null
 
             val filters = _filterStates.value.filter { it.isEnabled }
             
@@ -274,7 +216,6 @@ class FiltersViewModel @Inject constructor(
                     }
                     is GenerationProgressType.Finished -> {
                         val games = type.games
-                        _generationTelemetry.value = type.telemetry
                         
                         // Save games
                         when (saveGeneratedGamesUseCase(games)) {
@@ -327,7 +268,6 @@ class FiltersViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         cancelGeneration()
-        debounceJob?.cancel()
         _events.close()
     }
 }

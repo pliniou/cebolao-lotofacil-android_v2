@@ -9,10 +9,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import com.cebolao.lotofacil.ui.theme.Dimen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,7 +23,8 @@ fun StandardScreenHeader(
     title: String,
     subtitle: String? = null,
     navigationIcon: @Composable (() -> Unit) = {},
-    actions: @Composable (RowScope.() -> Unit) = {}
+    actions: @Composable (RowScope.() -> Unit) = {},
+    containerColor: Color = MaterialTheme.colorScheme.surface
 ) {
     TopAppBar(
         modifier = modifier,
@@ -50,7 +53,7 @@ fun StandardScreenHeader(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = containerColor,
             scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,

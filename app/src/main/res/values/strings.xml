@@ -35,6 +35,8 @@
     <!-- Home Screen -->
     <string name="home_subtitle">Sua sorte, suas estatísticas</string>
     <string name="results_title">Todos os Resultados</string>
+    <string name="results_error_message">Nao foi possivel carregar os resultados.</string>
+    <string name="results_contest_number_format">Concurso %1$d</string>
     <string name="home_next_contest">Próximo Concurso %1$s</string>
     <string name="home_statistics_center">Central de Estatísticas</string>
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sincronizar dados</string>
@@ -62,7 +64,8 @@
     <string name="game_rules_title">Regras e Premiações</string>
     <string name="game_rules_how_to_play">Como Jogar</string>
     <string name="game_rules_how_to_play_p1">A Lotofácil é, como o próprio nome diz, fácil de apostar e ainda mais fácil de ganhar. Você marca entre 15 e 20 números, dentre os 25 disponíveis no volante, e fatura prêmio se acertar 11, 12, 13, 14 ou 15 números.</string>
-    <string name="game_rules_how_to_play_p2">Surpresinha: deixe que o sistema escolha os números para você.\nTeimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concursos consecutivos.</string>
+    <string name="game_rules_how_to_play_p2">Surpresinha: deixe que o sistema escolha os números para você.
+Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concursos consecutivos.</string>
     <string name="game_rules_prices_title">Valores das Apostas</string>
     <string name="game_rules_probabilities_title" tools:keep="@string/game_rules_probabilities_title">Probabilidades (1 em…)</string>
     <string name="game_rules_probabilities_and_pools" tools:keep="@string/game_rules_probabilities_and_pools">Probabilidades e Bolões</string>
@@ -296,6 +299,8 @@
     <string name="filters_title">Filtros</string>
     <string name="filters_subtitle">Configure sua estratégia</string>
     <string name="filters_reset_button_description">Resetar</string>
+    <string name="filters_quantity_decrease">Diminuir quantidade</string>
+    <string name="filters_quantity_increase">Aumentar quantidade</string>
     <string name="filters_group_numeric" tools:keep="@string/filters_group_numeric">Numéricos</string>
     <string name="filters_group_geometric" tools:keep="@string/filters_group_geometric">Geométricos</string>
     <string name="filters_group_math" tools:keep="@string/filters_group_math">Matemáticos</string>
@@ -354,7 +359,17 @@
     <string name="game_card_pinned">Fixado</string>
 
     <!-- Share -->
-    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:\n%1$s\n\n📊 Estatísticas:\nSoma: %2$d | Pares: %3$d\nPrimos: %4$d | Moldura: %5$d\nMiolo: %6$d | Fib.: %7$d\nMult. 3: %8$d | Repet.: %9$d\nSeq.: %10$d\n\nGerado com Cebolão Lotofácil</string>
+    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:
+%1$s
+
+📊 Estatísticas:
+Soma: %2$d | Pares: %3$d
+Primos: %4$d | Moldura: %5$d
+Miolo: %6$d | Fib.: %7$d
+Mult. 3: %8$d | Repet.: %9$d
+Seq.: %10$d
+
+Gerado com Cebolão Lotofácil</string>
     <string name="share_error_message">Erro ao compartilhar jogo</string>
 
     <!-- General -->
@@ -439,3 +454,4 @@
     <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
     <string name="about_version_title">Versão</string>
 </resources>
+
