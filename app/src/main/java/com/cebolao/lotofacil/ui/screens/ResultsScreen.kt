@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,8 +77,8 @@ fun ResultsScreen(
                 }
                 is ResultsUiState.Success -> {
                     items(
-                        items = state.draws.sortedByDescending { it.number },
-                        key = { it.number }
+                        items = state.draws.sortedByDescending { it.contestNumber },
+                        key = { it.contestNumber }
                     ) { draw ->
                         DrawListItem(draw = draw)
                     }
@@ -102,13 +103,13 @@ fun DrawListItem(draw: Draw) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Concurso ${draw.number}",
+                    text = "Concurso ${draw.contestNumber}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 
-                val dateText = rememberDrawDate(draw.date)
+                val dateText = rememberDrawDate(draw.date ?: 0L)
                 Text(
                     text = dateText,
                     style = MaterialTheme.typography.bodySmall,

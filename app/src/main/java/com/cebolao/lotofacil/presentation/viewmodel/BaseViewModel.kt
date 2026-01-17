@@ -30,7 +30,11 @@ abstract class BaseViewModel : ViewModel() {
         return viewModelScope.launch(
             context = CoroutineExceptionHandler { _, throwable ->
                 // Log globally if possible, or trigger onError
-                onError?.invoke(throwable)
+                if (onError != null) {
+                    onError(throwable)
+                } else {
+                    android.util.Log.e("BaseViewModel", "Uncaught exception in ViewModel", throwable)
+                }
             },
             block = block
         )

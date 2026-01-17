@@ -75,31 +75,6 @@ sealed interface GameAnalysisUiState {
  * Manages user's lottery games, including pinning, deletion, and analysis.
  */
 @HiltViewModel
-    val analysisState: GameAnalysisUiState = GameAnalysisUiState.Idle
-)
-
-/**
- * Represents the state of a game analysis operation.
- */
-sealed interface GameAnalysisUiState {
-    /** No analysis in progress. */
-    data object Idle : GameAnalysisUiState
-
-    /** Analysis is currently running. */
-    data object Loading : GameAnalysisUiState
-
-    /** Analysis completed successfully. */
-    data class Success(val result: UiGameAnalysisResult) : GameAnalysisUiState
-
-    /** Analysis failed with an error. */
-    data class Error(@param:StringRes val messageResId: Int) : GameAnalysisUiState
-}
-
-/**
- * ViewModel for the Game screen.
- * Manages user's lottery games, including pinning, deletion, and analysis.
- */
-@HiltViewModel
 class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val analyzeGameUseCase: AnalyzeGameUseCase,

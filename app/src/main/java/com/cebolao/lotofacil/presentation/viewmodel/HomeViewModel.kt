@@ -137,6 +137,7 @@ class HomeViewModel @Inject constructor(
             is Async.Success -> statsState.data to false
             is Async.Loading -> null to true
             is Async.Error -> null to false
+            Async.Uninitialized -> null to false
         }
 
         val msgFromStatus = when (status) {
@@ -180,31 +181,31 @@ class HomeViewModel @Inject constructor(
             data.lastDraw?.let { getGameSimpleStatsUseCase(it).toSimpleStats() } 
                 ?: persistentListOf()
 
-        val nextDrawInfo = data.details?.let { details ->
-            // Use val for local variables for better readability
-            val contestNumber = details.nextContestNumber
-            val contestDate = details.nextContestDate
-
-            // Check all conditions in a single if statement
-            if (contestNumber != null && contestNumber > 0 && !contestDate.isNullOrBlank()) {
-                NextDrawInfo(
-                    contestNumber = contestNumber,
-                    formattedDate = contestDate,
-                    formattedPrize = Formatters.formatCurrency(details.nextEstimatedPrize),
-                    formattedPrizeFinalFive = Formatters.formatCurrency(details.accumulatedValue05)
-                )
-            } else {
-                null
-            }
-        }
-
         return HomeScreenState.Success(
             data.lastDraw?.toUiModel(),
             simpleStats,
             data.lastDrawCheckResult,
             data.details?.toUiModel(),
-            nextDrawInfo
+            mapNextDrawInfo(data.details)
         )
+    }
+
+    private fun mapNextDrawInfo(details: com.cebolao.lotofacil.domain.model.DrawDetails?): NextDrawInfo? {
+        if (details == null) return null
+        
+        val contestNumber = details.nextContestNumber
+        val contestDate = details.nextContestDate
+
+        return if (contestNumber != null && contestNumber > 0 && !contestDate.isNullOrBlank()) {
+            NextDrawInfo(
+                contestNumber = contestNumber,
+                formattedDate = contestDate,
+                formattedPrize = Formatters.formatCurrency(details.nextEstimatedPrize),
+                formattedPrizeFinalFive = Formatters.formatCurrency(details.accumulatedValue05)
+            )
+        } else {
+            null
+        }
     }
 
     /**

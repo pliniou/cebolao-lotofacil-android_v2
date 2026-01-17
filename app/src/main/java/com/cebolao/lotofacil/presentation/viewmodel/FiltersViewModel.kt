@@ -15,6 +15,7 @@ import com.cebolao.lotofacil.domain.service.GenerationTelemetry
 import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
+import com.cebolao.lotofacil.domain.service.GenerationProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -117,7 +118,7 @@ class FiltersViewModel @Inject constructor(
     private val getLastDraw: GetLastDrawUseCase,
     private val filterSuccessCalculator: FilterSuccessCalculator,
     private val saveGeneratedGamesUseCase: SaveGeneratedGamesUseCase
-) : ViewModel() {
+) : BaseViewModel() {
     private val _filterStates = MutableStateFlow(FilterType.defaults())
     private val _generationState = MutableStateFlow<GenerationUiState>(GenerationUiState.Idle)
     private val _lastDraw = MutableStateFlow<Set<Int>?>(null)
@@ -191,153 +192,113 @@ class FiltersViewModel @Inject constructor(
         FiltersScreenState()
     )
 
-    init {
-        viewModelScope.launch {
-            when (val result = getLastDraw()) {
-                is AppResult.Success -> {
-                    _lastDraw.value = result.value?.numbers?.toSet()
-                }
-                is AppResult.Failure -> {
-                    // Ignore failure for last draw in filters (optional)
-                }
-            }
-        }
+    private fun showResetDialog() {
+        _showResetDialog.value = true
     }
 
     fun onEvent(event: FiltersUiEvent) {
         when (event) {
-            is FiltersUiEvent.ToggleFilter -> onFilterToggle(event.type, event.enabled)
-            is FiltersUiEvent.AdjustRange -> onRangeAdjust(event.type, event.range)
+            is FiltersUiEvent.ToggleFilter -> toggleFilter(event.type, event.enabled)
+            is FiltersUiEvent.AdjustRange -> adjustRange(event.type, event.range)
             is FiltersUiEvent.ApplyPreset -> applyPreset(event.preset)
             is FiltersUiEvent.GenerateGames -> generateGames(event.quantity)
-            is FiltersUiEvent.CancelGeneration -> cancelGeneration()
-            is FiltersUiEvent.RequestResetFilters -> showResetDialog()
-            is FiltersUiEvent.ConfirmResetFilters -> confirmResetFilters()
-            is FiltersUiEvent.DismissResetDialog -> dismissResetDialog()
+            FiltersUiEvent.CancelGeneration -> cancelGeneration()
+            FiltersUiEvent.RequestResetFilters -> showResetDialog()
+            FiltersUiEvent.ConfirmResetFilters -> confirmResetFilters()
+            FiltersUiEvent.DismissResetDialog -> dismissResetDialog()
             is FiltersUiEvent.ShowFilterInfo -> showFilterInfo(event.type)
-            is FiltersUiEvent.DismissFilterInfo -> dismissFilterInfo()
+            FiltersUiEvent.DismissFilterInfo -> dismissFilterInfo()
         }
     }
 
-    private fun onFilterToggle(type: FilterType, enabled: Boolean) {
+    private fun toggleFilter(type: FilterType, enabled: Boolean) {
+        _filterStates.update { current ->
+            current.map { if (it.type == type) it.copy(isEnabled = enabled) else it }
+        }
+    }
+
+    private fun adjustRange(type: FilterType, range: ClosedFloatingPointRange<Float>) {
         _filterStates.update { current ->
             current.map {
-                if (it.type == type) it.copy(isEnabled = enabled) else it
-            }
-        }
-    }
-
-    private fun onRangeAdjust(type: FilterType, range: ClosedFloatingPointRange<Float>) {
-        debounceJob?.cancel()
-
-        debounceJob = viewModelScope.launch {
-            delay(150) // Debounce for 150ms
-
-            _filterStates.update { current ->
-                current.map {
-                    if (it.type == type) {
-                        val snapped = range.snapToStep(it.type.fullRange)
-                        it.copy(selectedRange = snapped, isEnabled = true)
-                    } else it
-                }
+                if (it.type == type) it.copy(selectedRange = range.snapToStep(it.type.fullRange)) else it
             }
         }
     }
 
     private fun applyPreset(preset: FilterPreset) {
+        val rules = preset.rules
         _filterStates.update { current ->
-            current.map { state ->
-                val rule = preset.rules[state.type]
-                if (rule != null) state.copy(isEnabled = true, selectedRange = rule)
-                else state.copy(isEnabled = false, selectedRange = state.type.defaultRange)
+            current.map { filter ->
+                val newRange = rules[filter.type]
+                if (newRange != null) {
+                    filter.copy(
+                        selectedRange = newRange.snapToStep(filter.type.fullRange),
+                        isEnabled = true
+                    )
+                } else {
+                    filter
+                }
             }
         }
-
-        viewModelScope.launch {
-            _events.send(
-                NavigationEvent.ShowSnackbar(
-                    messageRes = R.string.filter_preset_applied,
-                    labelRes = preset.labelRes
-                )
-            )
-        }
+        _events.trySend(NavigationEvent.ShowSnackbar(R.string.filter_preset_applied, null))
     }
 
     private fun generateGames(quantity: Int) {
-        if (generationJob != null) return
+         if (_generationState.value is GenerationUiState.Loading) return
 
-        _generationState.value = GenerationUiState.Loading()
-        _generationTelemetry.value = GenerationTelemetry.start()
+        generationJob?.cancel()
+        generationJob = launchCatching(
+            onError = {
+                _generationState.value = GenerationUiState.Error(R.string.filters_generation_error)
+                _generationTelemetry.value = null
+            }
+        ) {
+            _generationState.value = GenerationUiState.Loading(0, quantity)
+            _generationTelemetry.value = null
 
-        generationJob = viewModelScope.launch {
-            var hasFailed = false
-            try {
-                var totalGenerated = 0
-                generateGames(
-                    quantity = quantity,
-                    filters = _filterStates.value.filter { it.isEnabled }
-                ).collect { progress ->
-                    when (val type = progress.progressType) {
-                        is GenerationProgressType.Started -> {
-                            _generationState.value = GenerationUiState.Loading(0, progress.total)
-                        }
-                        is GenerationProgressType.Step -> {
-                            _generationState.value = GenerationUiState.Loading(progress.current, progress.total)
-                        }
-                        is GenerationProgressType.Attempt -> {
-                            _generationState.value = GenerationUiState.Loading(progress.current, progress.total)
-                            totalGenerated = progress.current
-                        }
-                        is GenerationProgressType.Finished -> {
-                            totalGenerated = type.games.size
-                            _generationTelemetry.value = type.telemetry
-                            // Save generated games and navigate
-                            if (type.games.isNotEmpty()) {
-                                when (saveGeneratedGamesUseCase(type.games)) {
-                                    is AppResult.Success -> {
-                                        _events.send(NavigationEvent.NavigateToGeneratedGames)
-                                    }
-                                    is AppResult.Failure -> {
-                                        hasFailed = true
-                                        _generationState.value = GenerationUiState.Error(R.string.filters_save_error)
-                                        currentCoroutineContext().cancel()
-                                    }
-                                }
-                            }
-                        }
-                        is GenerationProgressType.Failed -> {
-                            hasFailed = true
-                            val errorMsg = when (type.reason) {
-                                GenerationFailureReason.NO_HISTORY -> R.string.game_generator_failure_no_history
-                                GenerationFailureReason.FILTERS_TOO_STRICT -> R.string.game_generator_failure_filters_strict
-                                else -> R.string.game_generator_failure_generic
-                            }
-                            _generationState.value = GenerationUiState.Error(errorMsg)
-                            currentCoroutineContext().cancel()
+            val filters = _filterStates.value.filter { it.isEnabled }
+            
+            // Debouncer for UI updates
+            var lastProgressUpdate = 0L
+
+            generateGames(quantity, filters).collect { progress ->
+                val type = progress.progressType
+                when (type) {
+                    is GenerationProgressType.Step -> {
+                        val now = System.currentTimeMillis()
+                        // Update progress roughly every 100ms or so
+                        if (now - lastProgressUpdate > 100) {
+                            _generationState.value = GenerationUiState.Loading(progress.current, quantity)
+                            lastProgressUpdate = now
                         }
                     }
+                    is GenerationProgressType.Finished -> {
+                        val games = type.games
+                        _generationTelemetry.value = type.telemetry
+                        
+                        // Save games
+                        when (saveGeneratedGamesUseCase(games)) {
+                             is AppResult.Success -> {
+                                 _generationState.value = GenerationUiState.Success(games.size)
+                                 _events.send(NavigationEvent.NavigateToGeneratedGames)
+                             }
+                             is AppResult.Failure -> {
+                                 _generationState.value = GenerationUiState.Error(R.string.filters_save_error)
+                             }
+                        }
+                    }
+                    is GenerationProgressType.Failed -> {
+                         val msg = when(type.reason) {
+                             GenerationFailureReason.FILTERS_TOO_STRICT -> R.string.game_generator_failure_filters_strict
+                             GenerationFailureReason.NO_HISTORY -> R.string.game_generator_failure_no_history
+                             else -> R.string.game_generator_failure_generic
+                         }
+                         _generationState.value = GenerationUiState.Error(msg)
+                    }
+                    else -> { /* Started, Attempt - ignore for UI state */ }
                 }
-                if (!hasFailed) {
-                    _generationState.value = GenerationUiState.Success(totalGenerated)
-                }
-            } catch (_: CancellationException) {
-                // Ignore cancellations
-            } catch (_: Throwable) {
-                _generationState.value = GenerationUiState.Error(R.string.filters_generation_error)
-            } finally {
-                generationJob = null
             }
         }
-    }
-
-    private fun cancelGeneration() {
-        generationJob?.cancel()
-        generationJob = null
-        _generationState.value = GenerationUiState.Idle
-    }
-
-    private fun showResetDialog() {
-        _showResetDialog.value = true
     }
 
     private fun confirmResetFilters() {
@@ -355,6 +316,12 @@ class FiltersViewModel @Inject constructor(
 
     private fun dismissFilterInfo() {
         _filterInfoToShow.value = null
+    }
+
+    private fun cancelGeneration() {
+        generationJob?.cancel()
+        generationJob = null
+        _generationState.value = GenerationUiState.Idle
     }
 
     override fun onCleared() {

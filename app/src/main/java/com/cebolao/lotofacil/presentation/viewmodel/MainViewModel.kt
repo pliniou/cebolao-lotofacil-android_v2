@@ -40,7 +40,7 @@ data class StartDestinationState(
 class MainViewModel @Inject constructor(
     observeAppConfigUseCase: ObserveAppConfigUseCase,
     private val updateAppConfigUseCase: UpdateAppConfigUseCase
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val paletteByName: Map<String, AccentPalette> =
         AccentPalette.entries.associateBy { it.name }
@@ -97,7 +97,7 @@ class MainViewModel @Inject constructor(
      * Single entry point for UI events.
      */
     fun onEvent(event: MainUiEvent) {
-        viewModelScope.launch {
+        launchCatching {
             when (event) {
                 is MainUiEvent.CompleteOnboarding -> {
                     updateAppConfigUseCase.completeOnboarding()
