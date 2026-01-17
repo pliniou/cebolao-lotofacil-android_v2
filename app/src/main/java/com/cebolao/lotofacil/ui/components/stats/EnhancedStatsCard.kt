@@ -1,7 +1,5 @@
 package com.cebolao.lotofacil.ui.components.stats
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -28,18 +25,15 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
-import kotlin.math.cos
-import kotlin.math.sin
 
 @Composable
 fun EnhancedStatsCard(
@@ -48,7 +42,7 @@ fun EnhancedStatsCard(
 ) {
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        title = "Análise Estatística",
+        title = stringResource(R.string.enhanced_stats_title),
         outlined = true
     ) {
         Column(
@@ -76,7 +70,7 @@ private fun EnhancedMetricsRow(
         horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
     ) {
         EnhancedMetricItem(
-            label = "Soma",
+            label = stringResource(R.string.stat_sum),
             value = metrics.sum.toString(),
             maxValue = 300, // Soma máxima possível
             currentValue = metrics.sum.toFloat(),
@@ -84,7 +78,7 @@ private fun EnhancedMetricsRow(
             modifier = Modifier.weight(1f)
         )
         EnhancedMetricItem(
-            label = "Pares",
+            label = stringResource(R.string.stat_evens),
             value = metrics.evens.toString(),
             maxValue = 15,
             currentValue = metrics.evens.toFloat(),
@@ -92,7 +86,7 @@ private fun EnhancedMetricsRow(
             modifier = Modifier.weight(1f)
         )
         EnhancedMetricItem(
-            label = "Primos",
+            label = stringResource(R.string.stat_primes),
             value = metrics.primes.toString(),
             maxValue = 15,
             currentValue = metrics.primes.toFloat(),
@@ -107,7 +101,7 @@ private fun EnhancedMetricsRow(
         horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
     ) {
         EnhancedMetricItem(
-            label = "Fibonacci",
+            label = stringResource(R.string.stat_fibonacci),
             value = metrics.fibonacci.toString(),
             maxValue = 15,
             currentValue = metrics.fibonacci.toFloat(),
@@ -115,7 +109,7 @@ private fun EnhancedMetricsRow(
             modifier = Modifier.weight(1f)
         )
         EnhancedMetricItem(
-            label = "Moldura",
+            label = stringResource(R.string.stat_frame),
             value = metrics.frame.toString(),
             maxValue = 15,
             currentValue = metrics.frame.toFloat(),
@@ -123,7 +117,7 @@ private fun EnhancedMetricsRow(
             modifier = Modifier.weight(1f)
         )
         EnhancedMetricItem(
-            label = "Centro",
+            label = stringResource(R.string.stat_center),
             value = metrics.center.toString(),
             maxValue = 15,
             currentValue = metrics.center.toFloat(),
@@ -170,15 +164,15 @@ private fun EnhancedMetricItem(
         Box(
             modifier = Modifier
                 .padding(top = Dimen.Spacing4)
-                .size(40.dp, 6.dp)
-                .clip(RoundedCornerShape(3.dp))
+                .size(Dimen.MiniBarWidth, Dimen.MiniBarHeight)
+                .clip(RoundedCornerShape(Dimen.CornerRadiusTiny))
                 .background(scheme.surfaceVariant)
         ) {
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(6.dp),
+                    .height(Dimen.MiniBarHeight),
                 color = color,
                 trackColor = scheme.surfaceVariant,
             )
@@ -191,21 +185,20 @@ private fun MetricsBarChart(
     metrics: com.cebolao.lotofacil.domain.model.GameComputedMetrics
 ) {
     val scheme = MaterialTheme.colorScheme
-    val chartData = remember(metrics) {
-        listOf(
-            ChartData("Soma", metrics.sum, 300, scheme.primary),
-            ChartData("Pares", metrics.evens, 15, scheme.secondary),
-            ChartData("Primos", metrics.primes, 15, scheme.tertiary),
-            ChartData("Fibonacci", metrics.fibonacci, 15, scheme.primary),
-            ChartData("Moldura", metrics.frame, 15, scheme.secondary),
-            ChartData("Centro", metrics.center, 15, scheme.tertiary)
-        )
-    }
+    val labelColor = scheme.onSurfaceVariant
+    val chartData = listOf(
+        ChartData(stringResource(R.string.stat_sum), metrics.sum, 300, scheme.primary, labelColor),
+        ChartData(stringResource(R.string.stat_evens), metrics.evens, 15, scheme.secondary, labelColor),
+        ChartData(stringResource(R.string.stat_primes), metrics.primes, 15, scheme.tertiary, labelColor),
+        ChartData(stringResource(R.string.stat_fibonacci), metrics.fibonacci, 15, scheme.primary, labelColor),
+        ChartData(stringResource(R.string.stat_frame), metrics.frame, 15, scheme.secondary, labelColor),
+        ChartData(stringResource(R.string.stat_center), metrics.center, 15, scheme.tertiary, labelColor)
+    )
     
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(Dimen.ChartHeightMini)
             .padding(horizontal = Dimen.Spacing4)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -218,8 +211,12 @@ private data class ChartData(
     val label: String,
     val value: Int,
     val maxValue: Int,
-    val color: Color
-)
+    val color: Color,
+    val labelColor: Color
+) {
+    val valueTextColor: Color
+        get() = if (color.luminance() < 0.5f) Color.White else Color.Black
+}
 
 private fun DrawScope.drawEnhancedBarChart(
     data: List<ChartData>,
@@ -245,7 +242,7 @@ private fun DrawScope.drawEnhancedBarChart(
         
         // Desenhar valor no topo da barra
         val textPaint = android.graphics.Paint().apply {
-            color = android.graphics.Color.WHITE
+            color = chartData.valueTextColor.toArgb()
             textSize = 24f
             textAlign = android.graphics.Paint.Align.CENTER
             isFakeBoldText = true
@@ -260,7 +257,7 @@ private fun DrawScope.drawEnhancedBarChart(
         
         // Desenhar label abaixo
         val labelPaint = android.graphics.Paint().apply {
-            color = android.graphics.Color.DKGRAY
+            color = chartData.labelColor.toArgb()
             textSize = 20f
             textAlign = android.graphics.Paint.Align.CENTER
         }

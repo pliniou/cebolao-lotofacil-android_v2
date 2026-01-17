@@ -1,12 +1,10 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.cebolao.lotofacil.domain.model.AppError
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.presentation.util.Async
+import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -34,7 +32,7 @@ class ResultsViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
             initialValue = ResultsUiState.Loading
         )
 

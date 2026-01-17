@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
 
@@ -40,7 +39,7 @@ fun StandardAttentionCard(
         AppCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .widthIn(max = 520.dp),
+                .widthIn(max = Dimen.CardMaxWidth),
             outlined = false,
             color = scheme.inverseSurface,
             contentPadding = Dimen.CardContentPadding

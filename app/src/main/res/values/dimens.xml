@@ -28,6 +28,8 @@
     <dimen name="widget_refresh_button_size_small">34dp</dimen>
     <dimen name="widget_refresh_button_size_large">46dp</dimen>
 
+    <dimen name="widget_border_width">1dp</dimen>
+
     <dimen name="widget_ball_size">36dp</dimen>
     <dimen name="widget_ball_size_small">30dp</dimen>
     <dimen name="widget_ball_size_large">42dp</dimen>

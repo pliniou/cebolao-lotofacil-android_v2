@@ -44,7 +44,7 @@
     <View
         android:id="@+id/widget_divider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/widget_border_width"
         android:layout_below="@id/widget_header"
         android:layout_marginTop="@dimen/spacing_medium_compact"
         android:background="@color/widget_divider"

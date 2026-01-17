@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 /**
@@ -50,7 +49,7 @@ fun StandardPageLayout(
     ) {
         LazyColumn(
             modifier = Modifier
-                .widthIn(max = 900.dp) // Aumentado para better use em tablets
+                .widthIn(max = Dimen.LayoutMaxWidth)
                 .fillMaxWidth()
                 .imePadding(),
             state = listState,

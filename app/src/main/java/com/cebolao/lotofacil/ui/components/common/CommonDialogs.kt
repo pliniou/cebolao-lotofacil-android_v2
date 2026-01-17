@@ -85,7 +85,7 @@ fun AppConfirmationDialog(
 @Composable
 private fun AppConfirmationDialogPreview() {
     MaterialTheme {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)) {
             // Note: Alerts are tricky to preview inline, but we can check compilation
             // and structure. In a real preview environment, this might need a surface.
              Text("Dialog Preview Placeholder")

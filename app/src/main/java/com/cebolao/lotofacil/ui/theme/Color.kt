@@ -24,7 +24,6 @@ val VividAmber = Color(0xFFFBBF24)
 val VividGreen = Color(0xFF10B981)
 
 // Corporate Identity
-// Corporate Identity
 val BrandAzulCaixa = Color(0xFF005CA9) // Legacy
 val BrandLaranjaCaixa = Color(0xFFF8971D)
 

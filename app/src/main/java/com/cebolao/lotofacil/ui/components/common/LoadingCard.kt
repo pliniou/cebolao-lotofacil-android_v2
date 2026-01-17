@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -27,7 +26,7 @@ fun LoadingCard(
     modifier: Modifier = Modifier,
     title: String = stringResource(R.string.home_updating_data),
     description: String = stringResource(R.string.home_pull_to_refresh_hint),
-    height: androidx.compose.ui.unit.Dp = 120.dp
+    height: androidx.compose.ui.unit.Dp = Dimen.LoadingCardHeight
 ) {
     AppCard(
         modifier = modifier

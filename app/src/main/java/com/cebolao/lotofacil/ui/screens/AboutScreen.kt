@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -52,6 +51,8 @@ import com.cebolao.lotofacil.ui.theme.AccentPalette
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
+import com.cebolao.lotofacil.ui.theme.TextPrimaryDark
+import com.cebolao.lotofacil.ui.theme.TextPrimaryLight
 import com.cebolao.lotofacil.presentation.viewmodel.MainViewModel
 
 import com.cebolao.lotofacil.ui.components.common.AppDivider
@@ -369,7 +370,7 @@ private fun AccentColorButton(
     }
 
     // Contraste automático para seeds muito claras (ex.: amarelo)
-    val onSeed = if (palette.seed.luminance() > 0.62f) Color(0xFF101114) else Color.White
+    val onSeed = if (palette.seed.luminance() > 0.62f) TextPrimaryLight else TextPrimaryDark
 
     val scale by animateFloatAsState(
         targetValue = if (isSelected) Motion.Offset.SELECTSCALE else 1f,
@@ -385,7 +386,7 @@ private fun AccentColorButton(
         color = palette.seed,
         shape = MaterialTheme.shapes.large,
         border = if (isSelected) {
-            BorderStroke(2.dp, scheme.primary)
+            BorderStroke(Dimen.Border.Thick, scheme.primary)
         } else {
             BorderStroke(Dimen.Border.Hairline, scheme.onSurface.copy(alpha = 0.10f))
         }

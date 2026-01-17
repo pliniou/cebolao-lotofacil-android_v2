@@ -2,21 +2,16 @@ package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.domain.util.Logger
+import android.util.Log
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Base ViewModel class providing common functionality for error handling and coroutine launching.
  */
 abstract class BaseViewModel : ViewModel() {
-
-    // Ideally injected, but for Base class we might need to handle it differently
-    // or rely on subclasses to log. For now, we'll keep it simple.
     
     /**
      * Launches a coroutine with a default error handler that logs the exception.
@@ -33,7 +28,7 @@ abstract class BaseViewModel : ViewModel() {
                 if (onError != null) {
                     onError(throwable)
                 } else {
-                    android.util.Log.e("BaseViewModel", "Uncaught exception in ViewModel", throwable)
+                    Log.e("BaseViewModel", "Uncaught exception in ViewModel", throwable)
                 }
             },
             block = block

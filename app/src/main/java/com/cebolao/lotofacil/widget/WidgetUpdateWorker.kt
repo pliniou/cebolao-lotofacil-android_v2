@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import androidx.annotation.DimenRes
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -16,7 +17,6 @@ import com.cebolao.lotofacil.domain.repository.GameRepository
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.repository.SyncStatus
 import com.cebolao.lotofacil.util.DEFAULT_NUMBER_FORMAT
-import com.cebolao.lotofacil.util.DEFAULT_PLACEHOLDER
 import com.cebolao.lotofacil.util.Formatters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -114,7 +114,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
 
             if (details != null && details.nextContestNumber != null) {
                 val title = "${context.getString(R.string.widget_next_contest_title_generic)} ${details.nextContestNumber}"
-                val date = details.nextContestDate ?: DEFAULT_PLACEHOLDER
+                val date = details.nextContestDate ?: context.getString(R.string.widget_placeholder_date)
                 val prize = Formatters.formatCurrency(details.nextEstimatedPrize)
                 
                 applyNextContestContent(small, title, date, prize)
@@ -233,32 +233,38 @@ class WidgetUpdateWorker @AssistedInject constructor(
         val h = max(0, opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0))
 
         val paddingDp = when (variant) {
-            WidgetSizeVariant.SMALL -> 12
-            WidgetSizeVariant.MEDIUM -> 16
-            WidgetSizeVariant.LARGE -> 20
+            WidgetSizeVariant.SMALL -> dimenDp(R.dimen.widget_content_padding_small)
+            WidgetSizeVariant.MEDIUM -> dimenDp(R.dimen.widget_content_padding)
+            WidgetSizeVariant.LARGE -> dimenDp(R.dimen.widget_content_padding_large)
         }
 
         val ballDp = when (variant) {
-            WidgetSizeVariant.SMALL -> 30
-            WidgetSizeVariant.MEDIUM -> 36
-            WidgetSizeVariant.LARGE -> 42
+            WidgetSizeVariant.SMALL -> dimenDp(R.dimen.widget_ball_size_small)
+            WidgetSizeVariant.MEDIUM -> dimenDp(R.dimen.widget_ball_size)
+            WidgetSizeVariant.LARGE -> dimenDp(R.dimen.widget_ball_size_large)
         }
 
         val marginDp = when (variant) {
-            WidgetSizeVariant.SMALL -> 1
-            WidgetSizeVariant.MEDIUM -> 2
-            WidgetSizeVariant.LARGE -> 3
+            WidgetSizeVariant.SMALL -> dimenDp(R.dimen.widget_ball_margin_small)
+            WidgetSizeVariant.MEDIUM -> dimenDp(R.dimen.widget_ball_margin)
+            WidgetSizeVariant.LARGE -> dimenDp(R.dimen.widget_ball_margin_large)
         }
 
-        val effectiveW = (w - (paddingDp * 2)).coerceAtLeast(120)
-        val cellDp = ballDp + (marginDp * 2)
+        val effectiveW = (w.toFloat() - (paddingDp * 2f)).coerceAtLeast(120f)
+        val cellDp = (ballDp + (marginDp * 2f)).coerceAtLeast(1f)
 
-        var cols = floor(effectiveW.toDouble() / cellDp.toDouble()).toInt().coerceIn(4, 6)
+        var cols = floor((effectiveW / cellDp).toDouble()).toInt().coerceIn(4, 6)
 
         // Altura curta: aumenta colunas para reduzir linhas
         if (h in 1..110) cols = (cols + 1).coerceAtMost(6)
 
         return cols
+    }
+
+    private fun dimenDp(@DimenRes dimenRes: Int): Float {
+        val px = context.resources.getDimension(dimenRes)
+        val density = context.resources.displayMetrics.density.coerceAtLeast(1f)
+        return px / density
     }
 
     private fun getWidgetIds(cls: Class<out AppWidgetProvider>): IntArray {

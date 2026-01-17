@@ -23,7 +23,6 @@ fun Throwable.toAppError(): AppError {
         is HttpException -> {
             when (code()) {
                 429 -> {
-                    response()?.headers()?.get("Retry-After")?.toLongOrNull()
                     AppError.RateLimited(
                         message = this.message,
                         cause = this

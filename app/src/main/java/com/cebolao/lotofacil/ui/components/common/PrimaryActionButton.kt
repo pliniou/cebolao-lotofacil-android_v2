@@ -31,11 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
 
@@ -71,6 +72,7 @@ fun PrimaryActionButton(
     )
 
     val widthModifier = if (isFullWidth) Modifier.fillMaxWidth() else Modifier
+    val loadingDescription = stringResource(R.string.general_loading)
 
     Button(
         onClick = onClick,
@@ -79,7 +81,7 @@ fun PrimaryActionButton(
             .scale(scale)
             .then(widthModifier)
             .semantics {
-                if (isLoading) stateDescription = "Carregando"
+                if (isLoading) stateDescription = loadingDescription
             },
         enabled = enabled && !isLoading,
         shape = MaterialTheme.shapes.medium,
@@ -91,10 +93,10 @@ fun PrimaryActionButton(
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 0.dp,
-            pressedElevation = 0.dp,
-            focusedElevation = 0.dp,
-            hoveredElevation = 0.dp
+            defaultElevation = Dimen.Elevation.None,
+            pressedElevation = Dimen.Elevation.None,
+            focusedElevation = Dimen.Elevation.None,
+            hoveredElevation = Dimen.Elevation.None
         )
     ) {
         AnimatedContent(

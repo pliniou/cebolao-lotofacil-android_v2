@@ -1,7 +1,6 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
@@ -18,7 +17,6 @@ import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.model.toDomain
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -175,10 +173,10 @@ class GameViewModel @Inject constructor(
                     } else {
                         R.string.game_card_pinned
                     }
-                    _events.send(GameEffect.ShowSnackbar(msg))
+                    _events.trySend(GameEffect.ShowSnackbar(msg))
                 }
                 is AppResult.Failure -> {
-                    _events.send(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed))
+                    _events.trySend(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed))
                     _uiError.value = R.string.error_toggle_pin_failed
                 }
             }
@@ -259,7 +257,7 @@ class GameViewModel @Inject constructor(
             val lastDraw = historyRepository.getLastDraw()
             val metrics = metricsCalculator.calculate(game.toDomain(), lastDraw?.numbers)
 
-            _events.send(GameEffect.ShareGame(numbers = sortedNumbers, metrics = metrics))
+            _events.trySend(GameEffect.ShareGame(numbers = sortedNumbers, metrics = metrics))
         }
     }
 

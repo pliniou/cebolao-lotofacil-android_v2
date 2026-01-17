@@ -42,15 +42,23 @@ data class FinancialProjection(
 }
 
 object FinancialCalculator {
-    
+
     /**
-     * Calcula projeção financeira com custo real do jogo e dados históricos opcionais
-     * 
-     * @param checkResult Resultado da conferência
-     * @param totalDraws Total de concursos analisados
-     * @param gameCost Custo real do jogo (não usar constante fixa)
-     * @param historicalData Dados históricos opcionais para cálculos mais precisos
-     * @return FinancialProjection com flag isApproximate se não houver dados históricos
+     * Calculates a financial projection for a given set of lottery check results.
+     *
+     * This method no longer relies on a fixed game cost nor assumes the absence of
+     * historical data.  Callers must provide the real cost per ticket, and may
+     * supply the full history of draws to produce an exact projection.  When the
+     * historical draw list is null or empty the projection is flagged as
+     * approximate and a disclaimer is provided.
+     *
+     * @param checkResult    aggregated scoring results from evaluating a ticket
+     * @param totalDraws     number of draws considered while generating the report
+     * @param gameCost       actual cost of a single game; do not pass a constant
+     * @param historicalData optional list of historic draws; when null or empty the
+     *                       returned [FinancialProjection] is marked approximate
+     * @return a [FinancialProjection] containing investment, revenue, profit, ROI,
+     *         and approximation metadata
      */
     fun calculate(
         checkResult: CheckResult,
@@ -58,8 +66,10 @@ object FinancialCalculator {
         gameCost: BigDecimal,
         historicalData: List<Draw>? = null
     ): FinancialProjection {
+        // Compute total investment by multiplying the cost per game by the number of draws
         val cost = gameCost.multiply(BigDecimal(totalDraws))
 
+        // Aggregate revenue by summing prize amounts per hit score
         val revenue = checkResult.scoreCounts.entries.sumOf { (score, count) ->
             val prize = when (score) {
                 11 -> GameConstants.FinancialPrizes.PRIZE_11
@@ -72,15 +82,23 @@ object FinancialCalculator {
             prize.multiply(BigDecimal(count))
         }
 
+        // Derive profit as the difference between revenue and cost
         val profit = revenue.subtract(cost)
+
+        // Avoid division by zero when computing return on investment (ROI)
         val roi = if (cost > BigDecimal.ZERO) {
             profit.divide(cost, 4, RoundingMode.HALF_UP).toFloat() * 100
-        } else 0f
+        } else {
+            0f
+        }
 
+        // Flag the projection as approximate when historical data was not provided
         val isApproximate = historicalData.isNullOrEmpty()
         val disclaimer = if (isApproximate) {
             "Projeção aproximada baseada em valores médios estimados. Valores reais podem variar."
-        } else null
+        } else {
+            null
+        }
 
         return FinancialProjection.fromBigDecimal(
             investment = cost,
@@ -90,20 +108,6 @@ object FinancialCalculator {
             breakEven = profit >= BigDecimal.ZERO,
             isApproximate = isApproximate,
             disclaimer = disclaimer
-        )
-    }
-
-    /**
-     * Método de compatibilidade mantido para código legado
-     * @deprecated Use calculate com gameCost e historicalData
-     */
-    @Deprecated("Use calculate with gameCost and historicalData parameters")
-    fun calculate(checkResult: CheckResult, totalDraws: Int): FinancialProjection {
-        return calculate(
-            checkResult = checkResult,
-            totalDraws = totalDraws,
-            gameCost = GameConstants.GAME_COST,
-            historicalData = null
         )
     }
 }

@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.domain.model.GameScore
 import com.cebolao.lotofacil.domain.model.MetricEvaluation
 import com.cebolao.lotofacil.domain.model.ScoreStatus
@@ -90,7 +89,7 @@ private fun ScoreBadge(score: Int, status: ScoreStatus) {
 
     Box(
         modifier = Modifier
-            .background(color.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.1f), RoundedCornerShape(Dimen.CornerRadiusSmall))
             .padding(horizontal = Dimen.Spacing12, vertical = Dimen.Spacing8),
         contentAlignment = Alignment.Center
     ) {
@@ -112,7 +111,7 @@ private fun MetricRow(metric: MetricEvaluation) {
         // Dot indicator
         Box(
             modifier = Modifier
-                .size(8.dp)
+                .size(Dimen.IndicatorHeightSmall)
                 .clip(CircleShape)
                 .background(getStatusColor(metric.status))
         )

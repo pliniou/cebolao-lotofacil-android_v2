@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.StatisticPattern
@@ -74,7 +73,7 @@ fun DistributionChartsCard(
         headerActions = {
             // Legenda do destaque (último concurso)
             if (highlightValue != null) {
-                Canvas(modifier = Modifier.size(8.dp)) {
+                Canvas(modifier = Modifier.size(Dimen.IndicatorHeightSmall)) {
                     drawCircle(color = scheme.error)
                 }
                 Text(

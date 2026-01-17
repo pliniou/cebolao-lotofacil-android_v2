@@ -40,7 +40,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.common.AppDivider
 import com.cebolao.lotofacil.ui.components.common.AppTable
@@ -82,6 +81,8 @@ private fun GameRulesHeader(
     onToggle: () -> Unit
 ) {
     val scheme = MaterialTheme.colorScheme
+    val expandedState = stringResource(R.string.state_expanded)
+    val collapsedState = stringResource(R.string.state_collapsed)
 
     Row(
         modifier = Modifier
@@ -90,9 +91,9 @@ private fun GameRulesHeader(
                 Modifier.semantics {
                     role = Role.Button
                     stateDescription = if (expanded)
-                        "Contrair regras"
+                        expandedState
                     else
-                        "Expandir regras"
+                        collapsedState
                 }
             )
             .clickable { onToggle() },
@@ -121,7 +122,7 @@ private fun GameRulesHeader(
                 verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
             ) {
                 Text(
-                    text = "Probabilidades e Bolões",
+                    text = stringResource(R.string.game_rules_probabilities_and_pools),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = scheme.onSurface,
@@ -205,7 +206,7 @@ private fun PricesSection() {
                     listOf("17", "R$ 476,00"),
                     listOf("18", "R$ 2.856,00"),
                     listOf("19", "R$ 13.566,00"),
-                    listOf("20", "R$ 54,264,00")
+                    listOf("20", "R$ 54.264,00")
                 ),
                 weights = listOf(1f, 1f),
                 textAligns = listOf(TextAlign.Center, TextAlign.End)
@@ -218,7 +219,7 @@ private fun PricesSection() {
 @Composable
 private fun ProbabilitiesSection() {
     RulesSection(
-        title = "Probabilidades (1 em...)",
+        title = stringResource(R.string.game_rules_probabilities_title),
         icon = Icons.Outlined.Casino
     ) {
         ProbabilitiesTable()
@@ -326,7 +327,7 @@ private fun ProbabilityItemRow(item: String) {
 @Composable
 private fun BolaoSection() {
     RulesSection(
-        title = "Bolão Caixa",
+        title = stringResource(R.string.game_rules_pool_caixa_title),
         icon = Icons.Outlined.Groups
     ) {
         ScrollableBolaoTable()
@@ -380,6 +381,17 @@ private fun RulesSection(
 private fun ScrollableBolaoTable() {
     val scheme = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
+    val columns = listOf(
+        stringResource(R.string.game_rules_pool_col_numbers) to Dimen.ControlWidthMedium,
+        stringResource(R.string.game_rules_pool_col_bets) to Dimen.ControlWidthMedium,
+        stringResource(R.string.game_rules_pool_col_min_quotas) to Dimen.TableColumnWidthMedium,
+        stringResource(R.string.game_rules_pool_col_max_quotas) to Dimen.TableColumnWidthMedium,
+        stringResource(R.string.game_rules_pool_col_min_quota) to Dimen.TableColumnWidthLarge,
+        stringResource(R.string.game_rules_pool_col_min_pool) to Dimen.TableColumnWidthLarge,
+        stringResource(R.string.game_rules_pool_col_max_pool) to Dimen.TableColumnWidthXLarge,
+        stringResource(R.string.game_rules_pool_col_max_games) to Dimen.TableColumnWidthMedium
+    )
+    val columnWidths = columns.map { it.second }
 
     Column(
         modifier = Modifier
@@ -390,16 +402,7 @@ private fun ScrollableBolaoTable() {
     ) {
         // Header
         Row(Modifier.padding(bottom = Dimen.Spacing8)) {
-            listOf(
-                "Números" to 60.dp,
-                "Apostas" to 60.dp,
-                "Min Cotas" to 70.dp,
-                "Max Cotas" to 70.dp,
-                "Min Cota" to 80.dp,
-                "Min Bolão" to 80.dp,
-                "Max Bolão" to 100.dp,
-                "Max Jogos" to 70.dp
-            ).forEach { (text, width) ->
+            columns.forEach { (text, width) ->
                 Text(
                     text = text,
                     modifier = Modifier.width(width),
@@ -410,7 +413,7 @@ private fun ScrollableBolaoTable() {
             }
         }
 
-        HorizontalDivider(thickness = 0.5.dp, color = scheme.outlineVariant)
+        HorizontalDivider(thickness = Dimen.Border.Hairline, color = scheme.outlineVariant)
 
         // Data
         val data = listOf(
@@ -424,17 +427,16 @@ private fun ScrollableBolaoTable() {
 
         data.forEach { row ->
             Row(Modifier.padding(vertical = Dimen.Spacing8)) {
-                val widths = listOf(60.dp, 60.dp, 70.dp, 70.dp, 80.dp, 80.dp, 100.dp, 70.dp)
                 row.forEachIndexed { index, cell ->
                     Text(
                         text = cell,
-                        modifier = Modifier.width(widths[index]),
+                        modifier = Modifier.width(columnWidths[index]),
                         style = MaterialTheme.typography.bodySmall,
                         color = scheme.onSurfaceVariant
                     )
                 }
             }
-            HorizontalDivider(thickness = 0.5.dp, color = scheme.outlineVariant.copy(alpha = 0.3f))
+            HorizontalDivider(thickness = Dimen.Border.Hairline, color = scheme.outlineVariant.copy(alpha = 0.3f))
         }
     }
 }

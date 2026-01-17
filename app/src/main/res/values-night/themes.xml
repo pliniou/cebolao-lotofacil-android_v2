@@ -3,7 +3,7 @@
     <style name="Theme.CebolaoLotofacil" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowBackground">@color/surface_dark</item>
+        <item name="android:windowBackground">@color/app_background</item>
 
         <!-- false = ícones claros -->
         <item name="android:windowLightStatusBar">false</item>
@@ -12,7 +12,7 @@
     <style name="Theme" parent="android:Theme.Material.NoActionBar" />
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/surface_dark</item>
+        <item name="windowSplashScreenBackground">@color/app_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
         <item name="windowSplashScreenAnimationDuration">750</item>
         <item name="postSplashScreenTheme">@style/Theme.CebolaoLotofacil</item>

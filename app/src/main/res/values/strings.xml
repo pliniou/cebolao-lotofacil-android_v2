@@ -69,10 +69,22 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="game_rules_prices_title">Valores das Apostas</string>
     <string name="game_rules_probabilities_title" tools:keep="@string/game_rules_probabilities_title">Probabilidades (1 em…)</string>
     <string name="game_rules_probabilities_and_pools" tools:keep="@string/game_rules_probabilities_and_pools">Probabilidades e Bolões</string>
+    <string name="game_rules_pool_caixa_title">Bolão Caixa</string>
+    <string name="game_rules_pool_col_numbers">Números</string>
+    <string name="game_rules_pool_col_bets">Apostas</string>
+    <string name="game_rules_pool_col_min_quotas">Min Cotas</string>
+    <string name="game_rules_pool_col_max_quotas">Max Cotas</string>
+    <string name="game_rules_pool_col_min_quota">Min Cota</string>
+    <string name="game_rules_pool_col_min_pool">Min Bolão</string>
+    <string name="game_rules_pool_col_max_pool">Max Bolão</string>
+    <string name="game_rules_pool_col_max_games">Max Jogos</string>
     <string name="table_header_numbers">Números</string>
     <string name="table_header_value">Valor</string>
     <string name="next_contest_final_five_label">Acumulado final 0/5</string>
     <string name="distribution_last_label">Último: %1$s</string>
+    <string name="enhanced_stats_title">Análise Estatística</string>
+    <string name="state_expanded">Expandido</string>
+    <string name="state_collapsed">Recolhido</string>
 
     <!-- Labels curtos usados em cards de estatística -->
     <string name="widget_label_prize_estimate">Prêmio estimado</string>

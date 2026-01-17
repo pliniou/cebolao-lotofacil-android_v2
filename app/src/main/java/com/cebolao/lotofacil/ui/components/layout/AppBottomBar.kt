@@ -22,7 +22,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -33,6 +32,7 @@ import com.cebolao.lotofacil.ui.theme.Motion
 import com.cebolao.lotofacil.ui.theme.FontFamilyBody
 import com.cebolao.lotofacil.ui.theme.GlassSurfaceDark
 import com.cebolao.lotofacil.ui.theme.GlassSurfaceLight
+import com.cebolao.lotofacil.ui.theme.Dimen
 
 /**
  * Barra de navegação inferior com animações elegantes.
@@ -62,13 +62,13 @@ fun AppBottomBar(navController: NavHostController, currentDestination: NavDestin
     ) {
         NavigationBar(
             containerColor = if (isDark) GlassSurfaceDark else GlassSurfaceLight,
-            tonalElevation = 0.dp,
+            tonalElevation = Dimen.Elevation.None,
             modifier = Modifier.drawBehind {
                 drawLine(
                     color = scheme.outlineVariant.copy(alpha = 0.2f),
                     start = Offset(0f, 0f),
                     end = Offset(size.width, 0f),
-                    strokeWidth = 1.dp.toPx()
+                    strokeWidth = Dimen.Border.Thin.toPx()
                 )
             }
         ) {
@@ -94,7 +94,7 @@ fun AppBottomBar(navController: NavHostController, currentDestination: NavDestin
                         }
                     },
                     icon = {
-                        val iconModifier = Modifier.size(24.dp)
+                        val iconModifier = Modifier.size(Dimen.IconMedium)
                         (if (selected) screen.selectedIcon else screen.unselectedIcon)?.let {
                             Icon(
                                 imageVector = it,

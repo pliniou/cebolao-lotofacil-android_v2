@@ -19,17 +19,19 @@ import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
 import com.cebolao.lotofacil.domain.usecase.CheckGameUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
+import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.navigation.CheckerRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
@@ -41,9 +43,9 @@ class CheckerViewModel @Inject constructor(
     private val metricsCalculator: GameMetricsCalculator,
     private val historyRepository: HistoryRepository,
     private val checkRunRepository: CheckRunRepository,
-    private val logger: com.cebolao.lotofacil.domain.util.Logger,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val externalScope: CoroutineScope,
+    private val logger: Logger,
+    @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope private val externalScope: CoroutineScope,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -128,12 +130,12 @@ class CheckerViewModel @Inject constructor(
             val game = LotofacilGame.fromNumbers(numbers)
             when (val result = saveGameUseCase(game)) {
                 is AppResult.Success -> {
-                    _events.send(CheckerEffect.ShowMessage(R.string.checker_game_saved))
+                    _events.trySend(CheckerEffect.ShowMessage(R.string.checker_game_saved))
                 }
                 is AppResult.Failure -> {
                     val error = result.error
                     logger.error(TAG, "Failed to save game: $error", null)
-                    _events.send(CheckerEffect.ShowMessage(R.string.checker_save_fail_message))
+                    _events.trySend(CheckerEffect.ShowMessage(R.string.checker_save_fail_message))
                 }
             }
         }
@@ -144,9 +146,7 @@ class CheckerViewModel @Inject constructor(
             sendMessage(R.string.checker_incomplete_selection)
             return
         }
-        viewModelScope.launch {
-            _events.send(CheckerEffect.RequestSaveConfirmation)
-        }
+        _events.trySend(CheckerEffect.RequestSaveConfirmation)
     }
 
     private fun checkGame() {
@@ -160,31 +160,29 @@ class CheckerViewModel @Inject constructor(
              onError = { _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed) }
         ) {
             _uiState.value = CheckerUiState.Loading
-            checkGameUseCase(numbers.toSet()).collect { result ->
-                when (result) {
-                    is AppResult.Success -> {
-                        val report = result.value
-                        val lastDraw = historyRepository.getLastDraw()
-                        val metrics = metricsCalculator.calculate(
-                            LotofacilGame.fromNumbers(numbers),
-                            lastDraw?.numbers
-                        )
-                        computeAnalysis(numbers)
-                        _uiState.value = CheckerUiState.Success(report, metrics)
+            when (val result = checkGameUseCase(numbers.toSet()).first()) {
+                is AppResult.Success -> {
+                    val report = result.value
+                    val lastDraw = historyRepository.getLastDraw()
+                    val metrics = metricsCalculator.calculate(
+                        LotofacilGame.fromNumbers(numbers),
+                        lastDraw?.numbers
+                    )
+                    computeAnalysis(numbers)
+                    _uiState.value = CheckerUiState.Success(report, metrics)
 
-                        externalScope.launch {
-                            try {
-                                checkRunRepository.saveCheckRun(report)
-                            } catch (e: IOException) {
-                                logger.warning(TAG, "Network error saving check run telemetry: ${e.message}")
-                            } catch (e: SQLiteException) {
-                                logger.warning(TAG, "Database error saving check run telemetry: ${e.message}")
-                            }
+                    externalScope.launch {
+                        try {
+                            checkRunRepository.saveCheckRun(report)
+                        } catch (e: IOException) {
+                            logger.warning(TAG, "Network error saving check run telemetry: ${e.message}")
+                        } catch (e: SQLiteException) {
+                            logger.warning(TAG, "Database error saving check run telemetry: ${e.message}")
                         }
                     }
-                    is AppResult.Failure -> {
-                        _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed)
-                    }
+                }
+                is AppResult.Failure -> {
+                    _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed)
                 }
             }
         }
@@ -244,13 +242,17 @@ class CheckerViewModel @Inject constructor(
         }
     }
     private fun sendMessage(@StringRes messageResId: Int) {
-        viewModelScope.launch {
-            _events.send(CheckerEffect.ShowMessage(messageResId))
-        }
+        _events.trySend(CheckerEffect.ShowMessage(messageResId))
     }
 
     private fun Set<Int>.coerceToMax(max: Int): Set<Int> {
         return if (size > max) this.take(max).toSet() else this
+    }
+
+    override fun onCleared() {
+        recomputeJob?.cancel()
+        _events.close()
+        super.onCleared()
     }
 }
 

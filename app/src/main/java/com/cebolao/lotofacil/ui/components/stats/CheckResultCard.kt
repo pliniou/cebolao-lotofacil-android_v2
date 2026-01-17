@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.CheckResult
@@ -97,8 +96,8 @@ fun CheckResultCard(
                             maxValue = GameConstants.GAME_SIZE,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(140.dp),
-                            chartHeight = 140.dp,
+                                .height(Dimen.ChartHeightSmall),
+                            chartHeight = Dimen.ChartHeightSmall,
                             chartType = ChartType.BAR,
                             highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
                         )

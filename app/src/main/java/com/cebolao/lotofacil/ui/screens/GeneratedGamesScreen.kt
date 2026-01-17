@@ -426,7 +426,7 @@ private fun GameList(
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
-                .widthIn(max = 900.dp)
+                .widthIn(max = Dimen.LayoutMaxWidth)
                 .fillMaxSize(),
             state = gridState,
             contentPadding = PaddingValues(
@@ -562,7 +562,7 @@ private fun GameAnalysisSheetContent(
                         .padding(vertical = Dimen.SectionSpacing),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.size(36.dp))
+                    CircularProgressIndicator(modifier = Modifier.size(Dimen.LoadingIndicatorSize))
                 }
             }
             is GameAnalysisUiState.Error -> {

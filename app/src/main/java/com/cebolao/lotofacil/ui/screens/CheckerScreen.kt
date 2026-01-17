@@ -37,6 +37,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -163,10 +165,22 @@ fun CheckerScreenContent(
     }
 
     val shouldShowHeatmap = isHeatmapEnabled && uiState is CheckerUiState.Success
-    val heatmapColors = remember(shouldShowHeatmap, heatmapIntensities) {
+    val scheme = MaterialTheme.colorScheme
+    val heatmapColors = remember(
+        shouldShowHeatmap,
+        heatmapIntensities,
+        scheme.primary,
+        scheme.tertiary,
+        scheme.error
+    ) {
         if (shouldShowHeatmap) {
             heatmapIntensities.mapValues { (_, intensity) ->
-                getHeatmapColor(intensity)
+                getHeatmapColor(
+                    intensity = intensity,
+                    cold = scheme.primary,
+                    mid = scheme.tertiary,
+                    hot = scheme.error
+                )
             }
         } else {
             null
@@ -296,16 +310,16 @@ fun CheckerScreenContent(
 }
 
 // Helper for Color Lerp
-private fun getHeatmapColor(intensity: Float): androidx.compose.ui.graphics.Color {
-    // 0.0 (Cold/Blue) -> 0.5 (Yellow) -> 1.0 (Hot/Red)
-    val cold = androidx.compose.ui.graphics.Color(0xFF2196F3) // Blue
-    val mid = androidx.compose.ui.graphics.Color(0xFFFFEB3B) // Yellow
-    val hot = androidx.compose.ui.graphics.Color(0xFFF44336) // Red
-    
+private fun getHeatmapColor(
+    intensity: Float,
+    cold: Color,
+    mid: Color,
+    hot: Color
+): Color {
     return if (intensity < 0.5f) {
-        androidx.compose.ui.graphics.lerp(cold, mid, intensity * 2f)
+        lerp(cold, mid, intensity * 2f)
     } else {
-        androidx.compose.ui.graphics.lerp(mid, hot, (intensity - 0.5f) * 2f)
+        lerp(mid, hot, (intensity - 0.5f) * 2f)
     }
 }
 

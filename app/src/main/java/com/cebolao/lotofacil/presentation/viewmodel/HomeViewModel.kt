@@ -1,7 +1,6 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.AppResult
@@ -21,6 +20,7 @@ import com.cebolao.lotofacil.ui.model.UiDrawDetails
 import com.cebolao.lotofacil.ui.model.UiStatisticsReport
 import com.cebolao.lotofacil.ui.model.toUiModel
 import com.cebolao.lotofacil.util.Formatters
+import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import com.cebolao.lotofacil.util.toAppError
 import com.cebolao.lotofacil.util.toUserMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,8 +30,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -91,10 +93,10 @@ class HomeViewModel @Inject constructor(
     private val _syncMessageEvent = MutableStateFlow<Int?>(null)
 
     val syncStatus: StateFlow<SyncStatus> = observeSyncStatusUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SyncStatus.Idle)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), SyncStatus.Idle)
 
     private val homeDataFlow: StateFlow<AppResult<HomeScreenData>?> = getHomeScreenDataUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), null)
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     private val statsFlow = _selectedTimeWindow.flatMapLatest { window ->
@@ -109,7 +111,7 @@ class HomeViewModel @Inject constructor(
                 }
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Async.Loading)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), Async.Loading)
 
     // Combine first 3 flows
     private val combinedData = combine(
@@ -118,6 +120,21 @@ class HomeViewModel @Inject constructor(
         statsFlow
     ) { homeResult, status, statsState ->
         Triple(homeResult, status, statsState)
+    }
+
+    init {
+        viewModelScope.launch {
+            syncStatus
+                .map { status ->
+                    when (status) {
+                        is SyncStatus.Success -> R.string.home_sync_success_message
+                        is SyncStatus.Failed -> status.error.toUserMessageRes()
+                        else -> null
+                    }
+                }
+                .distinctUntilChanged()
+                .collect { _syncMessageEvent.value = it }
+        }
     }
 
     val uiState: StateFlow<HomeUiState> = combine(
@@ -140,12 +157,6 @@ class HomeViewModel @Inject constructor(
             Async.Uninitialized -> null to false
         }
 
-        val msgFromStatus = when (status) {
-            is SyncStatus.Success -> R.string.home_sync_success_message
-            is SyncStatus.Failed -> status.error.toUserMessageRes()
-            else -> null
-        }
-
         HomeUiState(
             screenState = screenState,
             statistics = statistics,
@@ -153,11 +164,11 @@ class HomeViewModel @Inject constructor(
             isSyncing = status is SyncStatus.Syncing,
             selectedPattern = pattern,
             selectedTimeWindow = window,
-            syncMessageRes = syncMsg ?: msgFromStatus
+            syncMessageRes = syncMsg
         )
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
+        SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
         HomeUiState()
     )
 

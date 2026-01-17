@@ -12,6 +12,7 @@ import com.cebolao.lotofacil.domain.service.GenerationProgressType
 import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
+import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -89,8 +90,8 @@ data class FiltersScreenState(
  */
 @HiltViewModel
 class FiltersViewModel @Inject constructor(
-    private val generateGames: GenerateGamesUseCase,
-    private val getLastDraw: GetLastDrawUseCase,
+    private val generateGamesUseCase: GenerateGamesUseCase,
+    private val getLastDrawUseCase: GetLastDrawUseCase,
     private val saveGeneratedGamesUseCase: SaveGeneratedGamesUseCase
 ) : BaseViewModel() {
     private val _filterStates = MutableStateFlow(FilterType.defaults())
@@ -109,7 +110,7 @@ class FiltersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            when (val result = getLastDraw()) {
+            when (val result = getLastDrawUseCase()) {
                 is AppResult.Success -> _lastDraw.value = result.value?.numbers
                 is AppResult.Failure -> _lastDraw.value = null
             }
@@ -132,7 +133,7 @@ class FiltersViewModel @Inject constructor(
         )
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
+        SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
         FiltersScreenState()
     )
 
@@ -203,7 +204,7 @@ class FiltersViewModel @Inject constructor(
             // Debouncer for UI updates
             var lastProgressUpdate = 0L
 
-            generateGames(quantity, filters).collect { progress ->
+            generateGamesUseCase(quantity, filters).collect { progress ->
                 val type = progress.progressType
                 when (type) {
                     is GenerationProgressType.Step -> {
@@ -221,7 +222,7 @@ class FiltersViewModel @Inject constructor(
                         when (saveGeneratedGamesUseCase(games)) {
                              is AppResult.Success -> {
                                  _generationState.value = GenerationUiState.Success(games.size)
-                                 _events.send(NavigationEvent.NavigateToGeneratedGames)
+                                 _events.trySend(NavigationEvent.NavigateToGeneratedGames)
                              }
                              is AppResult.Failure -> {
                                  _generationState.value = GenerationUiState.Error(R.string.filters_save_error)

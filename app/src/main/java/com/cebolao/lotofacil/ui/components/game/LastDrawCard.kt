@@ -86,7 +86,7 @@ fun LastDrawCard(
                 color = scheme.surfaceVariant.copy(alpha = 0.5f),
                 contentColor = scheme.onSurfaceVariant,
                 shape = MaterialTheme.shapes.medium,
-                border = BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.2f))
+                border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant.copy(alpha = 0.2f))
             ) {
                 Column(
                     modifier = Modifier
@@ -154,7 +154,7 @@ fun LastDrawCard(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp,
+                        strokeWidth = Dimen.Border.Thick,
                         color = scheme.primary
                     )
                     Text(
@@ -269,7 +269,7 @@ private fun StatItem(
                 .fillMaxWidth()
                 .padding(horizontal = Dimen.Spacing8, vertical = Dimen.Spacing8),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny)
         ) {
             Text(
                 text = label,
@@ -336,7 +336,7 @@ private fun LocationInfoSection(details: UiDrawDetails) {
                 .fillMaxWidth()
                 .padding(Dimen.Spacing16),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             Text(
                 text = stringResource(R.string.draw_location_label),

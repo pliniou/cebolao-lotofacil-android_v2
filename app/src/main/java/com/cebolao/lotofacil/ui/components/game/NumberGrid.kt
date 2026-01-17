@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.ui.unit.dp
 
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -46,9 +45,9 @@ fun NumberGrid(
     }.value
     val minSize = remember(sizeVariant) {
         when (sizeVariant) {
-            NumberBallSize.Large -> 44.dp
-            NumberBallSize.Medium -> 32.dp
-            NumberBallSize.Small -> 26.dp
+            NumberBallSize.Large -> Dimen.BallTouchSizeLarge
+            NumberBallSize.Medium -> Dimen.BallTouchSizeMedium
+            NumberBallSize.Small -> Dimen.BallTouchSizeSmall
         }
     }
 
