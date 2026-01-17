@@ -65,10 +65,22 @@
     <string name="game_rules_prices_title">Bet Values</string>
     <string name="game_rules_probabilities_title">Odds (1 in…)</string>
     <string name="game_rules_probabilities_and_pools">Odds and Pools</string>
+    <string name="game_rules_pool_caixa_title">Caixa Pool</string>
+    <string name="game_rules_pool_col_numbers">Numbers</string>
+    <string name="game_rules_pool_col_bets">Bets</string>
+    <string name="game_rules_pool_col_min_quotas">Min shares</string>
+    <string name="game_rules_pool_col_max_quotas">Max shares</string>
+    <string name="game_rules_pool_col_min_quota">Min share</string>
+    <string name="game_rules_pool_col_min_pool">Min pool</string>
+    <string name="game_rules_pool_col_max_pool">Max pool</string>
+    <string name="game_rules_pool_col_max_games">Max games</string>
     <string name="table_header_numbers">Numbers</string>
     <string name="table_header_value">Value</string>
     <string name="next_contest_final_five_label">Final 0/5 Accumulated</string>
     <string name="distribution_last_label">Last: %1$s</string>
+    <string name="enhanced_stats_title">Statistical Analysis</string>
+    <string name="state_expanded">Expanded</string>
+    <string name="state_collapsed">Collapsed</string>
 
     <!-- Short labels used in stat cards -->
     <string name="widget_label_prize_estimate">Est. Prize</string>

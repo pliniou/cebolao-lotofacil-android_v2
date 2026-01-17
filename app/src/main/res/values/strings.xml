@@ -37,7 +37,7 @@
     <string name="results_title">Todos os Resultados</string>
     <string name="results_error_message">Nao foi possivel carregar os resultados.</string>
     <string name="results_contest_number_format">Concurso %1$d</string>
-    <string name="home_next_contest">Próximo Concurso %1$s</string>
+    <string name="home_next_contest">Próximo Concurso %1$d</string>
     <string name="home_statistics_center">Central de Estatísticas</string>
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sincronizar dados</string>
     <string name="home_sync_success_message">Base de dados atualizada. Agora a culpa não é da defasagem.</string>
