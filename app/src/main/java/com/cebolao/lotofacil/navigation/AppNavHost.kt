@@ -17,6 +17,7 @@ import com.cebolao.lotofacil.ui.screens.FiltersScreen
 import com.cebolao.lotofacil.ui.screens.GeneratedGamesScreen
 import com.cebolao.lotofacil.ui.screens.HomeScreen
 import com.cebolao.lotofacil.ui.screens.OnboardingScreen
+import com.cebolao.lotofacil.ui.screens.ResultsScreen
 import com.cebolao.lotofacil.ui.theme.Motion
 
 @Composable
@@ -65,6 +66,11 @@ fun AppNavHost(
             }
         }
         composable<HomeRoute> { HomeScreen(navController) }
+        composable<ResultsRoute> {
+            ResultsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
         composable<FiltersRoute> { FiltersScreen(navController) }
         composable<GeneratedGamesRoute> {
             val canPop = navController.previousBackStackEntry != null

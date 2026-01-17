@@ -27,7 +27,7 @@ private class ColorSchemeBuilder(
     private val secondary: Color
         get() = when (palette) {
             AccentPalette.ROSA -> BrandAzul
-            AccentPalette.AZUL -> BrandRosa
+            AccentPalette.AZUL -> BrandRoxo // Matches brand_secondary in colors.xml
             else -> BrandRosa
         }
     

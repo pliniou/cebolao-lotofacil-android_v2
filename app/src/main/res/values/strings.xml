@@ -33,8 +33,9 @@
     <string name="onboarding_desc_4">Simule seus jogos contra resultados passados. Descubra se você já teria ficado rico (ou não).</string>
 
     <!-- Home Screen -->
-    <string name="home_subtitle">Visão Geral</string>
-    <string name="home_next_contest">Próximo concurso %1$d</string>
+    <string name="home_subtitle">Sua sorte, suas estatísticas</string>
+    <string name="results_title">Todos os Resultados</string>
+    <string name="home_next_contest">Próximo Concurso %1$s</string>
     <string name="home_statistics_center">Central de Estatísticas</string>
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sincronizar dados</string>
     <string name="home_sync_success_message">Base de dados atualizada. Agora a culpa não é da defasagem.</string>

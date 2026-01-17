@@ -24,10 +24,13 @@ val VividAmber = Color(0xFFFBBF24)
 val VividGreen = Color(0xFF10B981)
 
 // Corporate Identity
-val BrandAzulCaixa = Color(0xFF005CA9)
+// Corporate Identity
+val BrandAzulCaixa = Color(0xFF005CA9) // Legacy
 val BrandLaranjaCaixa = Color(0xFFF8971D)
-val BrandAzul = BrandAzulCaixa
-val BrandRoxo = VividPurple
+
+// NEW DESIGN SYSTEM MAPPING
+val BrandAzul = Color(0xFF0055FF) // matches colors.xml brand_primary
+val BrandRoxo = Color(0xFF651FFF) // matches colors.xml brand_secondary
 val BrandVerde = VividGreen
 val BrandAmarelo = VividAmber
 val BrandRosa = VividPink

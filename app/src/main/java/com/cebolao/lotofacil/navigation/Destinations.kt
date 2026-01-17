@@ -15,6 +15,9 @@ object FiltersRoute
 object GeneratedGamesRoute
 
 @Serializable
+object ResultsRoute
+
+@Serializable
 object AboutRoute
 
 @Serializable

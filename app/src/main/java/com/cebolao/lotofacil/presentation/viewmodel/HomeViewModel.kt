@@ -35,15 +35,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-/**
- * Internal helper for simple async state management.
- */
-private sealed interface Async<out T> {
-    data object Loading : Async<Nothing>
-    data class Success<T>(val data: T) : Async<T>
-    data class Error(val messageRes: Int) : Async<Nothing>
-}
+import com.cebolao.lotofacil.presentation.util.Async
 
 /**
  * Represents the different states of the home screen.
@@ -92,7 +84,7 @@ class HomeViewModel @Inject constructor(
     getHomeScreenDataUseCase: GetHomeScreenDataUseCase,
     private val getAnalyzedStatsUseCase: GetAnalyzedStatsUseCase,
     private val getGameSimpleStatsUseCase: GetGameSimpleStatsUseCase
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _selectedTimeWindow = MutableStateFlow(0)
     private val _selectedPattern = MutableStateFlow(StatisticPattern.SUM)

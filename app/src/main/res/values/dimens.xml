@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Espaçamentos globais (Material Design) -->
+    <!-- GLOBAL SPACING (Material Design 4dp grid) -->
+    <dimen name="spacing_xxsmall">2dp</dimen>
     <dimen name="spacing_xsmall">4dp</dimen>
     <dimen name="spacing_small">8dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>
     <dimen name="spacing_large">24dp</dimen>
     <dimen name="spacing_xlarge">32dp</dimen>
+    <dimen name="spacing_xxlarge">48dp</dimen>
+    <dimen name="spacing_xxxlarge">64dp</dimen>
 
-    <!-- Padding padrão para widgets e telas -->
+    <!-- WIDGET SPECIFIC -->
+    <!-- Content Padding -->
     <dimen name="widget_content_padding">16dp</dimen>
     <dimen name="widget_content_padding_small">12dp</dimen>
     <dimen name="widget_content_padding_large">20dp</dimen>
 
-    <!-- Tamanhos de ícones -->
+    <!-- Icon Sizes -->
     <dimen name="icon_size_small">20dp</dimen>
     <dimen name="icon_size_medium">24dp</dimen>
     <dimen name="icon_size_large">28dp</dimen>
 
-    <!-- Botão de refresh do widget -->
+    <!-- Widget Components -->
     <dimen name="widget_refresh_button_size">40dp</dimen>
     <dimen name="widget_refresh_button_size_small">34dp</dimen>
     <dimen name="widget_refresh_button_size_large">46dp</dimen>
 
-    <!-- Bola da Lotofácil (Widget) -->
     <dimen name="widget_ball_size">36dp</dimen>
     <dimen name="widget_ball_size_small">30dp</dimen>
     <dimen name="widget_ball_size_large">42dp</dimen>
@@ -35,7 +38,7 @@
     <dimen name="widget_ball_margin_small">1dp</dimen>
     <dimen name="widget_ball_margin_large">3dp</dimen>
 
-    <!-- Tipografia Widget -->
+    <!-- Typography -->
     <dimen name="widget_title_size">16sp</dimen>
     <dimen name="widget_title_size_small">14sp</dimen>
     <dimen name="widget_title_size_large">18sp</dimen>
@@ -48,6 +51,6 @@
     <dimen name="widget_prize_size_small">18sp</dimen>
     <dimen name="widget_prize_size_large">26sp</dimen>
 
-    <!-- Design -->
+    <!-- Styles -->
     <dimen name="widget_corner_radius" tools:keep="@dimen/widget_corner_radius">16dp</dimen>
 </resources>

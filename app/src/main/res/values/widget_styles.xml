@@ -50,7 +50,7 @@
     <style name="Widget.Cebolao.BallText" parent="Widget.Cebolao">
         <item name="android:textSize">@dimen/widget_ball_text_size</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/ball_text_selected</item>
         <item name="android:gravity">center</item>
         <item name="android:fontFamily">sans-serif-condensed-medium</item>
     </style>

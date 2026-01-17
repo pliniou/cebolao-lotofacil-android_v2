@@ -63,6 +63,9 @@ fun HomeScreen(
         onNavigateToChecker = { numbers ->
             navController?.navigateToChecker(numbers)
         },
+        onNavigateToResults = {
+            navController?.navigate(com.cebolao.lotofacil.navigation.ResultsRoute)
+        },
         listState = listState
     )
 }
@@ -74,6 +77,7 @@ fun HomeScreenContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (HomeUiEvent) -> Unit,
     onNavigateToChecker: (Set<Int>) -> Unit,
+    onNavigateToResults: () -> Unit,
     listState: LazyListState
     ) {
     AppScreen(
@@ -136,14 +140,22 @@ fun HomeScreenContent(
                             delayMillis = staggerDelay(3).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
-                            LastDrawCard(
-                                draw = draw,
-                                details = successState.details,
-                                onCheckGame = { numbers ->
-                                    onNavigateToChecker(numbers.toSet())
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                            androidx.compose.foundation.layout.Column {
+                                LastDrawCard(
+                                    draw = draw,
+                                    details = successState.details,
+                                    onCheckGame = { numbers ->
+                                        onNavigateToChecker(numbers.toSet())
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                androidx.compose.material3.TextButton(
+                                    onClick = onNavigateToResults,
+                                    modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally)
+                                ) {
+                                    androidx.compose.material3.Text(stringResource(R.string.results_title))
+                                }
+                            }
                         }
                     }
                 }

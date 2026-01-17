@@ -1,29 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- PALETA PRINCIPAL (Material Design) -->
-    <color name="brand_primary">#0066FF</color>
-    <color name="brand_secondary">#0052CC</color>
-    <color name="brand_accent">#00B8D9</color>
+    <!-- BRAND / PRIMARY -->
+    <!-- Azul Intenso Profissional -->
+    <color name="brand_primary">#0055FF</color>
+    <color name="brand_on_primary">#FFFFFF</color>
+    <color name="brand_primary_container">#D6E4FF</color>
+    <color name="brand_on_primary_container">#001B3D</color>
 
-    <!-- Superfícies e textos (Material 3) -->
-    <color name="surface_light">#F8FAFC</color>
-    <color name="surface_variant_light">#FFFFFF</color>
-    <color name="on_surface_light">#0F172A</color>
-    <color name="on_surface_variant_light">#475569</color>
+    <!-- SECONDARY / ACCENT -->
+    <!-- Roxo Profundo para ações secundárias ou destaques -->
+    <color name="brand_secondary">#651FFF</color>
+    <color name="brand_on_secondary">#FFFFFF</color>
+    <color name="brand_secondary_container">#EADDFF</color>
+    <color name="brand_on_secondary_container">#21005D</color>
 
-    <color name="surface_dark">#0F172A</color>
-    <color name="surface_variant_dark">#1E293B</color>
-    <color name="on_surface_dark">#F8FAFC</color>
-    <color name="on_surface_variant_dark">#94A3B8</color>
+    <!-- STATUS COLORS (Success, Error, Warning) -->
+    <color name="status_success">#22C55E</color> <!-- Green 500 -->
+    <color name="status_error">#EF4444</color>   <!-- Red 500 -->
+    <color name="status_warning">#F59E0B</color> <!-- Amber 500 -->
+    <color name="status_on_color">#FFFFFF</color>
 
-    <!-- Backgrounds -->
-    <color name="app_background">@color/surface_light</color>
+    <!-- LOTTERY BALL COLORS (Lotofácil Specific) -->
+    <color name="ball_color_01">#DDDDDD</color>
+    <color name="ball_text_01">#333333</color>
+    <color name="ball_color_selected">@color/brand_primary</color>
+    <color name="ball_text_selected">@color/brand_on_primary</color>
 
-    <!-- Widget tokens -->
-    <color name="widget_background">@color/surface_variant_light</color>
+    <!-- NEUTRALS & SURFACES (Light Theme) -->
+    <color name="surface_light">#F8FAFC</color>       <!-- Slate 50 -->
+    <color name="surface_container_light">#FFFFFF</color>
+    <color name="on_surface_light">#0F172A</color>    <!-- Slate 900 -->
+    <color name="on_surface_variant_light">#64748B</color> <!-- Slate 500 -->
+    <color name="outline_light">#CBD5E1</color>       <!-- Slate 300 -->
+
+    <!-- NEUTRALS & SURFACES (Dark Theme) -->
+    <color name="surface_dark">#0F172A</color>        <!-- Slate 900 -->
+    <color name="surface_container_dark">#1E293B</color> <!-- Slate 800 -->
+    <color name="on_surface_dark">#F8FAFC</color>     <!-- Slate 50 -->
+    <color name="on_surface_variant_dark">#94A3B8</color> <!-- Slate 400 -->
+    <color name="outline_dark">#334155</color>        <!-- Slate 700 -->
+
+    <!-- WIDGET SPECIFIC TOKENS -->
+    <!-- Mapped to semantic colors for consistency -->
+    <color name="widget_background">@color/surface_container_light</color>
     <color name="widget_text_primary">@color/on_surface_light</color>
     <color name="widget_text_secondary">@color/on_surface_variant_light</color>
-    <color name="widget_icon_tint">@color/on_surface_variant_light</color>
+    <color name="widget_divider">@color/outline_light</color>
+    <color name="widget_icon_tint">@color/brand_primary</color>
 
-    <!-- Removidas cores não utilizadas e duplicadas -->
+    <color name="app_background">@color/surface_light</color>
 </resources>

@@ -57,13 +57,72 @@ data class CheckerViewModelCoroutineDependencies(
 
 /**
  * Events emitted by the Checker screen.
+package com.cebolao.lotofacil.presentation.viewmodel
+
+import android.database.sqlite.SQLiteException
+import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.di.ApplicationScope
+import com.cebolao.lotofacil.di.DefaultDispatcher
+import com.cebolao.lotofacil.domain.GameConstants
+import com.cebolao.lotofacil.domain.model.AppResult
+import com.cebolao.lotofacil.domain.model.CheckReport
+import com.cebolao.lotofacil.domain.model.GameComputedMetrics
+import com.cebolao.lotofacil.domain.model.GameScore
+import com.cebolao.lotofacil.domain.model.LotofacilGame
+import com.cebolao.lotofacil.domain.repository.CheckRunRepository
+import com.cebolao.lotofacil.domain.repository.HistoryRepository
+import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
+import com.cebolao.lotofacil.domain.usecase.CheckGameUseCase
+import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
+import com.cebolao.lotofacil.navigation.CheckerRoute
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import javax.inject.Inject
+
+/**
+ * Dependencies for CheckerViewModel grouped to reduce constructor parameter count
+ */
+data class CheckerViewModelDependencies(
+    val checkGameUseCase: CheckGameUseCase,
+    val saveGameUseCase: SaveGameUseCase,
+    val metricsCalculator: GameMetricsCalculator,
+    val historyRepository: HistoryRepository,
+    val checkRunRepository: CheckRunRepository,
+    val logger: com.cebolao.lotofacil.domain.util.Logger
+)
+
+/**
+ * Coroutine dependencies for CheckerViewModel
+ */
+data class CheckerViewModelCoroutineDependencies(
+    @param:DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope val externalScope: CoroutineScope
+)
+
+/**
+ * Events emitted by the Checker screen.
  */
 @HiltViewModel
 class CheckerViewModel @Inject constructor(
     dependencies: CheckerViewModelDependencies,
     coroutineDependencies: CheckerViewModelCoroutineDependencies,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val checkGameUseCase = dependencies.checkGameUseCase
     private val saveGameUseCase = dependencies.saveGameUseCase
@@ -195,7 +254,9 @@ class CheckerViewModel @Inject constructor(
             return
         }
         resetAnalysis()
-        viewModelScope.launch {
+        launchCatching(
+             onError = { _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed) }
+        ) {
             _uiState.value = CheckerUiState.Loading
             checkGameUseCase(numbers.toSet()).collect { result ->
                 when (result) {
@@ -220,6 +281,9 @@ class CheckerViewModel @Inject constructor(
                         }
                     }
                     is AppResult.Failure -> {
+                        // This case is now handled by the onError of launchCatching,
+                        // but keeping it here for specific AppResult.Failure handling if needed.
+                        // For now, it will be caught by the general onError.
                         _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed)
                     }
                 }
@@ -269,7 +333,7 @@ class CheckerViewModel @Inject constructor(
         }
 
         recomputeJob?.cancel()
-        recomputeJob = viewModelScope.launch {
+        recomputeJob = launchCatching {
             val (score, intensities) = withContext(defaultDispatcher) {
                 val history = historyRepository.getHistory()
                 val lastDraw = history.firstOrNull()
@@ -297,28 +361,6 @@ class CheckerViewModel @Inject constructor(
             _heatmapEnabled.value = true
         }
     }
-
-    private fun Set<Int>.coerceToMax(max: Int): Set<Int> {
-        return if (size <= max) this else take(max).toSet()
-    }
-
-    private fun sendMessage(@StringRes messageResId: Int) {
-        viewModelScope.launch {
-            _events.send(CheckerEffect.ShowMessage(messageResId))
-        }
-    }
-
-    override fun onCleared() {
-        recomputeJob?.cancel()
-        _events.close()
-        super.onCleared()
-    }
-}
-
-sealed interface CheckerUiEvent {
-    data class ToggleNumber(val number: Int) : CheckerUiEvent
-    data object ClearNumbers : CheckerUiEvent
-    data object CheckGame : CheckerUiEvent
     data object RequestSave : CheckerUiEvent
     data object ConfirmSave : CheckerUiEvent
     data object RequestReplace : CheckerUiEvent
