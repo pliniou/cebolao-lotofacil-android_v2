@@ -35,6 +35,7 @@ import com.cebolao.lotofacil.ui.model.toUiModel as toUiModelGame
 /**
  * Summary of all games (pinned and unpinned).
  */
+@androidx.compose.runtime.Immutable
 data class GameSummary(
     val totalGames: Int = 0,
     val pinnedGames: Int = 0,
@@ -169,9 +170,9 @@ class GameViewModel @Inject constructor(
             when (val result = toggleGamePinUseCase(game.toDomain())) {
                 is AppResult.Success -> {
                     val msg = if (game.isPinned) {
-                        R.string.game_card_unpinned
+                        R.string.games_unpin_success
                     } else {
-                        R.string.game_card_pinned
+                        R.string.games_pin_success
                     }
                     _events.trySend(GameEffect.ShowSnackbar(msg))
                 }
@@ -202,6 +203,7 @@ class GameViewModel @Inject constructor(
         ) {
             try {
                 gameRepository.deleteGame(game.toDomain())
+                _events.trySend(GameEffect.ShowSnackbar(R.string.games_delete_success))
             } finally {
                 _gameToDelete.value = null
             }
@@ -217,6 +219,7 @@ class GameViewModel @Inject constructor(
             }
         ) {
             gameRepository.clearUnpinnedGames()
+            _events.trySend(GameEffect.ShowSnackbar(R.string.games_clear_success))
         }
     }
 

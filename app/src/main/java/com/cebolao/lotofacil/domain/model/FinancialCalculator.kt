@@ -110,4 +110,30 @@ object FinancialCalculator {
             disclaimer = disclaimer
         )
     }
+
+    /**
+     * Calculates the number of combinations (n choose k).
+     */
+    fun combinations(n: Int, k: Int): Long {
+        if (k < 0 || k > n) return 0
+        if (k == 0 || k == n) return 1
+        var newK = k
+        if (newK > n / 2) newK = n - newK
+        var result: Long = 1
+        for (i in 1..newK) {
+            result = result * (n - i + 1) / i
+        }
+        return result
+    }
+
+    /**
+     * Calculates the cost of a bet based on the number of selected numbers.
+     * Lotofácil rules: minimum 15, maximum 20.
+     * The cost is equivalent to the number of 15-number combinations possible.
+     */
+    fun getGameCost(numbersSelected: Int): BigDecimal {
+        if (numbersSelected < 15) return BigDecimal.ZERO
+        val numCombinations = combinations(numbersSelected, 15)
+        return GameConstants.GAME_COST.multiply(BigDecimal(numCombinations))
+    }
 }

@@ -27,41 +27,41 @@ private class ColorSchemeBuilder(
     private val secondary: Color
         get() = when (palette) {
             AccentPalette.ROSA -> BrandAzul
-            AccentPalette.AZUL -> BrandRoxo // Matches brand_secondary in colors.xml
+            AccentPalette.AZUL -> BrandRoxo
             else -> BrandRosa
         }
     
-    private fun backgroundLayer(depth: Int = 0): Color = when {
-        isDark -> when (depth) {
+    private fun backgroundLayer(level: Int = 0): Color = when {
+        isDark -> when (level) {
             0 -> DarkBackground
-            1 -> DarkSurface
-            2 -> DarkSurfaceElevated
-            else -> DarkSurfaceHighlight
+            1 -> DarkSurface1
+            2 -> DarkSurface2
+            else -> DarkSurface3
         }
-        else -> when (depth) {
+        else -> when (level) {
             0 -> LightBackground
-            1 -> LightSurface
-            2 -> LightSurfaceElevated
-            else -> LightSurfaceHighlight
+            1 -> LightSurface1
+            2 -> LightSurface2
+            else -> LightSurface3
         }
     }
     
     private fun contentColor(emphasis: Int = 0): Color = when {
         isDark -> when (emphasis) {
-            0 -> TextPrimaryDark
-            1 -> TextSecondaryDark
-            else -> TextTertiaryDark
+            0 -> DarkTextPrimary
+            1 -> DarkTextSecondary
+            else -> DarkTextTertiary
         }
         else -> when (emphasis) {
-            0 -> TextPrimaryLight
-            1 -> TextSecondaryLight
-            else -> TextTertiaryLight
+            0 -> LightTextPrimary
+            1 -> LightTextSecondary
+            else -> LightTextTertiary
         }
     }
     
     private fun outlineColor(variant: Boolean = false): Color = when {
-        isDark -> if (variant) Slate700.copy(alpha = 0.4f) else Slate700
-        else -> if (variant) Slate300 else Slate400
+        isDark -> if (variant) DarkOutlineVariant else DarkOutline
+        else -> if (variant) LightOutlineVariant else LightOutline
     }
     
     fun build(): ColorScheme = if (isDark) buildDark() else buildLight()
@@ -69,17 +69,17 @@ private class ColorSchemeBuilder(
     private fun buildDark() = darkColorScheme(
         primary = primary,
         onPrimary = onPrimary,
-        primaryContainer = primary.copy(alpha = Alpha.DIVIDER),
+        primaryContainer = primary.copy(alpha = 0.15f),
         onPrimaryContainer = primary,
 
         secondary = secondary,
         onSecondary = Color.White,
-        secondaryContainer = secondary.copy(alpha = Alpha.DIVIDER),
+        secondaryContainer = secondary.copy(alpha = 0.15f),
         onSecondaryContainer = secondary,
 
         tertiary = BrandAmarelo,
         onTertiary = Color.Black,
-        tertiaryContainer = BrandAmarelo.copy(alpha = Alpha.DIVIDER),
+        tertiaryContainer = BrandAmarelo.copy(alpha = 0.15f),
         onTertiaryContainer = BrandAmarelo,
 
         background = backgroundLayer(0),
@@ -90,26 +90,26 @@ private class ColorSchemeBuilder(
         surfaceVariant = backgroundLayer(2),
         onSurfaceVariant = contentColor(1),
 
-        surfaceContainerLowest = backgroundLayer(0),
-        surfaceContainerLow = backgroundLayer(0),
-        surfaceContainer = backgroundLayer(1),
-        surfaceContainerHigh = backgroundLayer(2),
+        surfaceContainerLowest = backgroundLayer(1),
+        surfaceContainerLow = backgroundLayer(1),
+        surfaceContainer = backgroundLayer(2),
+        surfaceContainerHigh = backgroundLayer(3),
         surfaceContainerHighest = backgroundLayer(3),
         
         surfaceBright = Slate800,
-        surfaceDim = Slate950,
+        surfaceDim = DarkBackground,
 
         outline = outlineColor(false),
         outlineVariant = outlineColor(true),
 
-        error = ErrorColor,
+        error = ErrorBase,
         onError = Color.White,
-        errorContainer = ErrorColor.copy(alpha = Alpha.DIVIDER),
-        onErrorContainer = ErrorColor,
+        errorContainer = ErrorBase.copy(alpha = 0.15f),
+        onErrorContainer = ErrorBase,
 
         surfaceTint = primary,
-        inverseSurface = contentColor(0),
-        inverseOnSurface = backgroundLayer(0),
+        inverseSurface = LightTextPrimary,
+        inverseOnSurface = LightBackground,
         inversePrimary = primary,
         scrim = Color.Black.copy(alpha = Alpha.SCRIM)
     )
@@ -117,17 +117,17 @@ private class ColorSchemeBuilder(
     private fun buildLight() = lightColorScheme(
         primary = primary,
         onPrimary = onPrimary,
-        primaryContainer = primary.copy(alpha = 0.2f),
+        primaryContainer = primary.copy(alpha = 0.08f),
         onPrimaryContainer = primary,
 
         secondary = secondary,
         onSecondary = Color.White,
-        secondaryContainer = secondary.copy(alpha = 0.2f),
+        secondaryContainer = secondary.copy(alpha = 0.08f),
         onSecondaryContainer = secondary,
 
         tertiary = BrandAmarelo,
         onTertiary = Color.Black,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.2f),
+        tertiaryContainer = BrandAmarelo.copy(alpha = 0.08f),
         onTertiaryContainer = Color.Black,
 
         background = backgroundLayer(0),
@@ -138,11 +138,11 @@ private class ColorSchemeBuilder(
         surfaceVariant = backgroundLayer(2),
         onSurfaceVariant = contentColor(1),
 
-        surfaceContainerLowest = backgroundLayer(1),
-        surfaceContainerLow = backgroundLayer(2),
-        surfaceContainer = backgroundLayer(1),
-        surfaceContainerHigh = backgroundLayer(2),
-        surfaceContainerHighest = backgroundLayer(3),
+        surfaceContainerLowest = Color.White,
+        surfaceContainerLow = LightSurface2,
+        surfaceContainer = LightSurface1,
+        surfaceContainerHigh = LightSurface2,
+        surfaceContainerHighest = LightSurface3,
         
         surfaceBright = Color.White,
         surfaceDim = Slate100,
@@ -150,10 +150,10 @@ private class ColorSchemeBuilder(
         outline = outlineColor(false),
         outlineVariant = outlineColor(true),
 
-        error = ErrorColor,
+        error = ErrorBase,
         onError = Color.White,
-        errorContainer = ErrorColor.copy(alpha = 0.2f),
-        onErrorContainer = ErrorColor,
+        errorContainer = ErrorBase.copy(alpha = 0.12f),
+        onErrorContainer = ErrorBase,
 
         surfaceTint = primary,
         inverseSurface = Slate900,

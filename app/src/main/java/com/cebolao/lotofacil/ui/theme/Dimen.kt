@@ -19,6 +19,7 @@ object Dimen {
     val SectionSpacing = Spacing16
     val ItemSpacing = Spacing8
     val TrackingWidest = 2.sp
+    val ElevationMedium = 6.dp
 
     // --- Layout (Compactado) ---
     val ScreenPadding = Spacing12

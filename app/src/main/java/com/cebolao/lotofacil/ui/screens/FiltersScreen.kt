@@ -23,12 +23,19 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.rememberNavController
+import com.cebolao.lotofacil.ui.components.layout.StandardScreenHeader
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
@@ -62,29 +69,29 @@ data class FilterCategory(
 )
 
 @Composable
-fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
+fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
-    val resources = LocalContext.current.resources
+    val resources = LocalResources.current
     val currentResources by rememberUpdatedState(resources)
     
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is NavigationEvent.NavigateToGeneratedGames -> {
-                    navController.navigate(GeneratedGamesRoute) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                    navCtrl.navigate(GeneratedGamesRoute) {
+                        popUpTo(navCtrl.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 }
 
                 is NavigationEvent.ShowSnackbar -> {
-                    val message = if (event.labelRes != null) {
+                    val message = if (event.formatArgs.isNotEmpty()) {
                         currentResources.getString(
                             event.messageRes,
-                            currentResources.getString(event.labelRes)
+                            *event.formatArgs.toTypedArray()
                         )
                     } else {
                         currentResources.getString(event.messageRes)
@@ -99,7 +106,8 @@ fun FiltersScreen(navController: NavController, viewModel: FiltersViewModel = hi
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
-        listState = listState
+        listState = listState,
+        navCtrl = navCtrl
     )
 }
 
@@ -109,10 +117,12 @@ fun FiltersScreenContent(
     uiState: FiltersScreenState,
     snackbarHostState: SnackbarHostState,
     onEvent: (FiltersUiEvent) -> Unit,
-    listState: LazyListState
+    listState: LazyListState,
+    navCtrl: NavController
 ) {
     val configuration = LocalConfiguration.current
     val useColumnLayout = configuration.screenWidthDp >= 600
+    val haptics = com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback()
 
     // Local state for quantity and preset selection
     var quantity by rememberSaveable { mutableIntStateOf(10) }
@@ -126,9 +136,24 @@ fun FiltersScreenContent(
             onConfirm = {
                 selectedPreset = null
                 onEvent(FiltersUiEvent.ConfirmResetFilters)
+                haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.MEDIUM)
             },
             onDismiss = { onEvent(FiltersUiEvent.DismissResetDialog) },
             icon = Icons.Default.DeleteSweep
+        )
+    }
+
+    if (uiState.showStrictConfirmation) {
+        AppConfirmationDialog(
+            title = R.string.filters_generation_strict_title,
+            message = R.string.filters_generation_strict_message,
+            confirmText = R.string.filters_generation_strict_confirm,
+            onConfirm = { 
+                onEvent(FiltersUiEvent.ConfirmStrictGeneration)
+                haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.MEDIUM)
+            },
+            onDismiss = { onEvent(FiltersUiEvent.DismissStrictConfirmation) },
+            icon = AppIcons.Warning
         )
     }
 
@@ -141,7 +166,9 @@ fun FiltersScreenContent(
             icon = type.filterIcon,
             onDismissRequest = { onEvent(FiltersUiEvent.DismissFilterInfo) }
         ) {
-            AppCard {
+            androidx.compose.material3.Card(
+                colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainer)
+            ) {
                 InfoPoint(
                     title = stringResource(R.string.filters_info_button_description),
                     description = stringResource(type.descriptionRes)
@@ -189,22 +216,41 @@ fun FiltersScreenContent(
         }
     }
 
-    AppScreen(
-        title = stringResource(R.string.filters_title),
-        subtitle = stringResource(R.string.filters_subtitle),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        actions = {
-            TextButton(onClick = { onEvent(FiltersUiEvent.RequestResetFilters) }) {
-                Text(stringResource(R.string.filters_reset_button_description))
-            }
+    val nav = navCtrl
+    // Using direct Scaffold to ensure correct hierarchy and z-index for Snackbar
+    androidx.compose.material3.Scaffold(
+        topBar = {
+            StandardScreenHeader(
+                title = stringResource(R.string.filters_title),
+                subtitle = stringResource(R.string.filters_subtitle),
+                navigationIcon = {
+                     IconButton(onClick = { nav.popBackStack() }) {
+                         Icon(
+                             imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                             contentDescription = stringResource(R.string.common_back)
+                         )
+                     }
+                },
+                actions = {
+                    TextButton(onClick = { 
+                        onEvent(FiltersUiEvent.RequestResetFilters)
+                        haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.LIGHT)
+                    }) {
+                        Text(stringResource(R.string.filters_reset_button_description))
+                    }
+                }
+            )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             GenerationActionsPanel(
                 quantity = quantity,
                 onQuantityChanged = { quantity = it.coerceIn(1, 50) },
                 onGenerate = { onEvent(FiltersUiEvent.GenerateGames(quantity)) },
                 isGenerating = uiState.generationState is GenerationUiState.Loading,
-                modifier = Modifier.padding(bottom = Dimen.ItemSpacing)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimen.SpacingShort)
             )
         }
     ) { innerPadding ->

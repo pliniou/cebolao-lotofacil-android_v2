@@ -273,6 +273,7 @@ sealed interface CheckerEffect {
     data object RequestSaveConfirmation : CheckerEffect
 }
 
+@androidx.compose.runtime.Immutable
 sealed interface CheckerUiState {
     data object Idle : CheckerUiState
     data object Loading : CheckerUiState

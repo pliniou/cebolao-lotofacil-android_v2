@@ -16,10 +16,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
+import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
@@ -31,11 +33,13 @@ fun PagerIndicator(
     indicatorHeight: Dp = Dimen.IndicatorHeightSmall,
     indicatorSpacing: Dp = Dimen.Spacing16
 ) {
+    val current = (currentPage + 1).coerceIn(1, pageCount.coerceAtLeast(1))
+    val description = stringResource(R.string.page_indicator_description, current, pageCount)
+
     Row(
         modifier = modifier.semantics {
-            val current = (currentPage + 1).coerceIn(1, pageCount.coerceAtLeast(1))
-            contentDescription = "Página $current de $pageCount"
-            stateDescription = "Página $current de $pageCount"
+            contentDescription = description
+            stateDescription = description
         },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically

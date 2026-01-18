@@ -52,6 +52,7 @@ sealed interface HomeScreenState {
     /**
      * Success state containing all home screen data.
      */
+    @androidx.compose.runtime.Immutable
     data class Success(
         val lastDraw: UiDraw?,
         val lastDrawSimpleStats: ImmutableList<Pair<String, String>>,

@@ -52,9 +52,9 @@ import kotlin.math.max
 import kotlin.math.round
 import kotlin.math.sqrt
 
-private const val Y_AXIS_WIDTH_PX = 60f
-private const val X_AXIS_HEIGHT_PX = 60f
-private const val TOP_PADDING_PX = 30f
+private const val Y_AXIS_WIDTH_PX = 80f
+private const val X_AXIS_HEIGHT_PX = 80f // Increased for rotated labels
+private const val TOP_PADDING_PX = 40f
 private const val GRID_LINES = 4
 
 enum class ChartType { BAR, LINE }
@@ -84,13 +84,13 @@ fun BarChart(
 
     val colors = ChartColors(
         primary = MaterialTheme.colorScheme.primary,
-        secondary = MaterialTheme.colorScheme.tertiary,
+        secondary = MaterialTheme.colorScheme.secondary, // Better harmony for selection
         highlight = MaterialTheme.colorScheme.error,
         text = MaterialTheme.colorScheme.onSurfaceVariant,
         line = MaterialTheme.colorScheme.outlineVariant,
         tooltipBg = MaterialTheme.colorScheme.surfaceContainerHighest,
         tooltipText = MaterialTheme.colorScheme.onSurface,
-        normalLine = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+        normalLine = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
     )
 
     // Fallback seguro se a fonte não carregar no preview
@@ -341,7 +341,7 @@ private fun DrawScope.drawBars(
         if (data.size <= 15 || index % skipInterval == 0 || index == data.size - 1) {
             drawContext.canvas.nativeCanvas.withSave {
                 val centerX = x + barWidth / 2
-                val baseY = size.height - 20f
+                val baseY = size.height - 10f // Moved up slightly from the bottom edge
                 if (data.size > 15) {
                     rotate(-45f, centerX, baseY)
                     drawText(label, centerX, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })
@@ -394,7 +394,7 @@ private fun DrawScope.drawLineChart(
 
         if (data.size <= 10 || index % skipInterval == 0 || index == data.size - 1) {
             drawContext.canvas.nativeCanvas.withSave {
-                val baseY = size.height - 20f
+                val baseY = size.height - 10f // Moved up slightly
                 if (data.size > 10) {
                     rotate(-45f, x, baseY)
                     drawText(label, x, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })

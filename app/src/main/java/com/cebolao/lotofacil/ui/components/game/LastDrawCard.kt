@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.ui.components.game
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -12,11 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +37,7 @@ import com.cebolao.lotofacil.domain.model.WinnerLocation
 import com.cebolao.lotofacil.ui.components.common.AppTable
 import com.cebolao.lotofacil.ui.components.common.AppTableData
 import com.cebolao.lotofacil.ui.components.common.AppTableStyle
+import com.cebolao.lotofacil.ui.components.common.ExpandableTable
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.model.UiDraw
 import com.cebolao.lotofacil.ui.model.UiDrawDetails
@@ -48,7 +53,8 @@ fun LastDrawCard(
     draw: UiDraw,
     details: UiDrawDetails?,
     modifier: Modifier = Modifier,
-    onCheckGame: (Set<Int>) -> Unit = {}
+    onCheckGame: (Set<Int>) -> Unit = {},
+    onRefresh: () -> Unit = {}
 ) {
     val scheme = MaterialTheme.colorScheme
 
@@ -80,13 +86,13 @@ fun LastDrawCard(
             // Numbers
             ModernNumberGrid(draw.numbers)
 
-            // Stats (tonal surface, flat)
+            // Stats (semantic surface)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = scheme.surfaceVariant.copy(alpha = 0.5f),
+                color = scheme.surfaceContainerHigh,
                 contentColor = scheme.onSurfaceVariant,
                 shape = MaterialTheme.shapes.medium,
-                border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant.copy(alpha = 0.2f))
+                border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant)
             ) {
                 Column(
                     modifier = Modifier
@@ -104,7 +110,7 @@ fun LastDrawCard(
                 }
             }
 
-            // Primary action (flat, modern)
+            // Primary action
             FilledTonalButton(
                 onClick = { onCheckGame(draw.numbers) },
                 modifier = Modifier
@@ -112,8 +118,8 @@ fun LastDrawCard(
                     .fillMaxWidth(0.8f),
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = scheme.secondaryContainer,
-                    contentColor = scheme.onSecondaryContainer
+                    containerColor = scheme.primary, // Using primary for more emphasis on results action
+                    contentColor = scheme.onPrimary
                 ),
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
@@ -131,24 +137,29 @@ fun LastDrawCard(
             }
 
             // Details
-            HorizontalDivider(color = scheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = scheme.outlineVariant)
 
             if (details != null) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
-                    PrizeTableSection(details)
+                    PrizeTableSection(
+                        details = details,
+                        onRefresh = onRefresh
+                    )
                     LocationInfoSection(details)
-                    if (details.winnersByState.isNotEmpty()) {
-                        WinnersByStateSection(details.winnersByState)
-                    }
+                    WinnersByStateSection(
+                        winners = details.winnersByState,
+                        onRefresh = onRefresh
+                    )
                 }
             } else {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = Dimen.Spacing8),
+                        .padding(vertical = Dimen.Spacing8)
+                        .clickable { onRefresh() },
                     horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -288,7 +299,7 @@ private fun StatItem(
 }
 
 @Composable
-private fun PrizeTableSection(details: UiDrawDetails) {
+private fun PrizeTableSection(details: UiDrawDetails, onRefresh: () -> Unit) {
     Text(
         text = stringResource(R.string.prize_table_title),
         style = MaterialTheme.typography.titleSmall,
@@ -296,29 +307,33 @@ private fun PrizeTableSection(details: UiDrawDetails) {
         modifier = Modifier.padding(bottom = Dimen.Spacing4)
     )
 
-    val headers = listOf(
-        stringResource(R.string.prize_table_header_prize),
-        stringResource(R.string.prize_table_header_winners),
-        stringResource(R.string.prize_table_header_amount)
-    )
+    if (details.prizeRates.isEmpty()) {
+        EmptyDataState(onRefresh)
+    } else {
+        val headers = listOf(
+            stringResource(R.string.prize_table_header_prize),
+            stringResource(R.string.prize_table_header_winners),
+            stringResource(R.string.prize_table_header_amount)
+        )
 
-    val rows = details.prizeRates.map { rate ->
-        listOf(
-            rate.description,
-            rate.winnerCount.toString(),
-            Formatters.formatCurrency(rate.prizeValue)
+        val rows = details.prizeRates.map { rate ->
+            listOf(
+                rate.description,
+                rate.winnerCount.toString(),
+                Formatters.formatCurrency(rate.prizeValue)
+            )
+        }
+
+        AppTable(
+            data = AppTableData(
+                headers = headers,
+                rows = rows,
+                weights = listOf(1f, 0.55f, 1f),
+                textAligns = listOf(TextAlign.Start, TextAlign.Center, TextAlign.End)
+            ),
+            style = AppTableStyle(showDividers = false)
         )
     }
-
-    AppTable(
-        data = AppTableData(
-            headers = headers,
-            rows = rows,
-            weights = listOf(1f, 0.55f, 1f),
-            textAligns = listOf(TextAlign.Start, TextAlign.Center, TextAlign.End)
-        ),
-        style = AppTableStyle(showDividers = false)
-    )
 }
 
 @Composable
@@ -355,7 +370,7 @@ private fun LocationInfoSection(details: UiDrawDetails) {
 }
 
 @Composable
-private fun WinnersByStateSection(winners: List<WinnerLocation>) {
+private fun WinnersByStateSection(winners: List<WinnerLocation>, onRefresh: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.winners_by_state),
@@ -364,36 +379,67 @@ private fun WinnersByStateSection(winners: List<WinnerLocation>) {
             modifier = Modifier.padding(bottom = Dimen.Spacing4)
         )
 
-        val headers = listOf(
-            stringResource(R.string.uf),
-            stringResource(R.string.city),
-            stringResource(R.string.count_short)
-        )
-
-        val displayWinners = winners.take(5)
-        val rows = displayWinners.map { winner ->
-            listOf(winner.state, winner.city, winner.count.toString())
-        }
-
-        AppTable(
-            data = AppTableData(
-                headers = headers,
-                rows = rows,
-                weights = listOf(0.18f, 0.64f, 0.18f),
-                textAligns = listOf(TextAlign.Start, TextAlign.Start, TextAlign.End)
-            ),
-            style = AppTableStyle(showDividers = false)
-        )
-
-        if (winners.size > 5) {
-            Text(
-                text = stringResource(R.string.and_more_count, winners.size - 5),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = Dimen.Spacing8)
+        if (winners.isEmpty()) {
+            EmptyDataState(onRefresh)
+        } else {
+            val headers = listOf(
+                stringResource(R.string.uf),
+                stringResource(R.string.city),
+                stringResource(R.string.count_short)
             )
+
+            val rows = winners.map { winner ->
+                listOf(winner.state, winner.city, winner.count.toString())
+            }
+
+            ExpandableTable(
+                data = AppTableData(
+                    headers = headers,
+                    rows = rows,
+                    weights = listOf(0.18f, 0.64f, 0.18f),
+                    textAligns = listOf(TextAlign.Start, TextAlign.Start, TextAlign.End)
+                ),
+                style = AppTableStyle(
+                    showDividers = false,
+                    zebraRows = true
+                ),
+                initialVisibleRows = 5
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyDataState(onRefresh: () -> Unit) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Dimen.Spacing8),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(R.string.filters_unavailable_data),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(Dimen.Spacing8))
+             IconButton(
+                onClick = onRefresh,
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = stringResource(R.string.action_retry),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

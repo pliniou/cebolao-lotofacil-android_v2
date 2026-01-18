@@ -32,6 +32,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +72,7 @@ fun StatisticsPanel(
     isStatsLoading: Boolean
 ) {
     val scheme = MaterialTheme.colorScheme
+    val context = LocalContext.current
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
@@ -100,6 +102,11 @@ fun StatisticsPanel(
             TimeWindowSelector(
                 selectedWindow = selectedWindow,
                 onTimeWindowSelected = onTimeWindowSelected,
+                onShowMessage = { message ->
+                    android.widget.Toast
+                        .makeText(context, message, android.widget.Toast.LENGTH_SHORT)
+                        .show()
+                },
                 enabled = !isStatsLoading
             )
 
@@ -128,6 +135,7 @@ fun StatisticsPanel(
 private fun TimeWindowSelector(
     selectedWindow: Int,
     onTimeWindowSelected: (Int) -> Unit,
+    onShowMessage: (String) -> Unit,
     enabled: Boolean
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -150,13 +158,21 @@ private fun TimeWindowSelector(
                 contentType = { "time_window" }
             ) { window ->
                 val label = when (window) {
-                    0 -> stringResource(R.string.home_all_contests)
-                    else -> stringResource(R.string.home_last_contests_format, window)
+                    0 -> stringResource(R.string.stats_time_window_all)
+                    else -> stringResource(R.string.stats_time_window_last, window)
+                }
+                val selectionMessage = if (window == 0) {
+                    stringResource(R.string.stats_period_all_selected)
+                } else {
+                    stringResource(R.string.stats_period_selected, window)
                 }
 
                 CustomChip(
                     selected = window == selectedWindow,
-                    onClick = { onTimeWindowSelected(window) },
+                    onClick = {
+                        onTimeWindowSelected(window)
+                        onShowMessage(selectionMessage)
+                    },
                     label = label,
                     enabled = enabled
                 )
@@ -184,7 +200,7 @@ private fun StatsContent(stats: UiStatisticsReport) {
         }
     }.value
 
-    val tertiary = MaterialTheme.colorScheme.tertiary
+    val primary = MaterialTheme.colorScheme.primary
     val error = MaterialTheme.colorScheme.error
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny)) {
@@ -192,13 +208,15 @@ private fun StatsContent(stats: UiStatisticsReport) {
             StatRow(
                 title = stringResource(R.string.home_hot_numbers),
                 data = preparedData.hotNumbers,
-                highlightColor = tertiary
+                highlightColor = primary,
+                unit = stringResource(R.string.stats_unit_times)
             )
             StatRow(
                 title = stringResource(R.string.home_overdue_numbers),
                 data = preparedData.overdueNumbers,
                 highlightColor = error,
-                isOverdue = true
+                isOverdue = true,
+                unit = stringResource(R.string.stats_unit_contests)
             )
         } else {
             Row(
@@ -212,7 +230,8 @@ private fun StatsContent(stats: UiStatisticsReport) {
                     StatRow(
                         title = stringResource(R.string.home_hot_numbers),
                         data = preparedData.hotNumbers,
-                        highlightColor = tertiary
+                        highlightColor = primary,
+                        unit = stringResource(R.string.stats_unit_times)
                     )
                 }
 
@@ -224,7 +243,8 @@ private fun StatsContent(stats: UiStatisticsReport) {
                         title = stringResource(R.string.home_overdue_numbers),
                         data = preparedData.overdueNumbers,
                         highlightColor = error,
-                        isOverdue = true
+                        isOverdue = true,
+                        unit = stringResource(R.string.stats_unit_contests)
                     )
                 }
             }
@@ -237,16 +257,15 @@ private fun StatRow(
     title: String,
     data: ImmutableList<Pair<Int, Int>>,
     highlightColor: androidx.compose.ui.graphics.Color,
+    unit: String,
     isOverdue: Boolean = false
 ) {
-    if (data.isEmpty()) return
-
     val scheme = MaterialTheme.colorScheme
 
     AppCard(
         modifier = Modifier.fillMaxWidth(),
         outlined = false,
-        color = scheme.surfaceVariant,
+        color = scheme.surfaceContainerLow,
         contentPadding = Dimen.CardContentPadding
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
@@ -257,23 +276,53 @@ private fun StatRow(
                 color = scheme.onSurface
             )
 
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny),
-                contentPadding = PaddingValues(horizontal = Dimen.SpacingShort)
-            ) {
-                items(
-                    items = data,
-                    key = { it.first },
-                    contentType = { "stat_item" }
-                ) { (number, value) ->
-                    StatItem(
-                        number = number,
-                        value = value,
-                        highlightColor = highlightColor,
-                        isOverdue = isOverdue,
-                        modifier = Modifier.widthIn(min = 80.dp)
-                    )
+            if (data.isEmpty()) {
+                AppCard(
+                    modifier = Modifier.fillMaxWidth().padding(Dimen.SpacingTiny),
+                    outlined = true,
+                    color = scheme.surface,
+                    contentPadding = Dimen.SpacingShort
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = Dimen.SpacingShort)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.stats_no_data_title),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = scheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = stringResource(R.string.stats_no_data_message),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontSize = 10.sp,
+                            color = scheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny),
+                    contentPadding = PaddingValues(horizontal = Dimen.SpacingShort)
+                ) {
+                    items(
+                        items = data,
+                        key = { it.first },
+                        contentType = { "stat_item" }
+                    ) { (number, value) ->
+                        StatItem(
+                            number = number,
+                            value = value,
+                            highlightColor = highlightColor,
+                            isOverdue = isOverdue,
+                            unit = unit,
+                            modifier = Modifier.widthIn(min = 80.dp)
+                        )
+                    }
                 }
             }
         }
@@ -286,6 +335,7 @@ private fun StatItem(
     value: Int,
     highlightColor: androidx.compose.ui.graphics.Color,
     isOverdue: Boolean,
+    unit: String,
     modifier: Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -293,7 +343,7 @@ private fun StatItem(
     AppCard(
         modifier = modifier,
         outlined = false,
-        color = scheme.surface,
+        color = scheme.surfaceContainerHigh,
         contentPadding = Dimen.SpacingShort
     ) {
         Column(
@@ -316,7 +366,7 @@ private fun StatItem(
             )
 
             Text(
-                text = if (isOverdue) "dias" else "vezes",
+                text = unit,
                 style = MaterialTheme.typography.labelSmall,
                 color = scheme.onSurfaceVariant.copy(alpha = 0.7f),
                 fontSize = 10.sp,

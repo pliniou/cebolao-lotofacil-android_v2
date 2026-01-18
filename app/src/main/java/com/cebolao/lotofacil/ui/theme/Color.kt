@@ -2,9 +2,7 @@ package com.cebolao.lotofacil.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val FlatWhite = Color(0xFFFFFFFF)
-
-// --- NEUTRAL GRAYS (Slate System) ---
+// --- NEUTRAL PALETTE (Slate System) ---
 val Slate50 = Color(0xFFF8FAFC)
 val Slate100 = Color(0xFFF1F5F9)
 val Slate200 = Color(0xFFE2E8F0)
@@ -17,54 +15,53 @@ val Slate800 = Color(0xFF1E293B)
 val Slate900 = Color(0xFF0F172A)
 val Slate950 = Color(0xFF020617)
 
-// --- ACCENT COLORS (Vibrant & Modern) ---
-val VividPurple = Color(0xFF8B5CF6)
-val VividPink = Color(0xFFEC4899)
-val VividAmber = Color(0xFFFBBF24)
-val VividGreen = Color(0xFF10B981)
+// --- BRAND ACCENTS ---
+val BrandAzul = Color(0xFF0055FF)
+val BrandRoxo = Color(0xFF651FFF)
+val BrandVerde = Color(0xFF10B981)
+val BrandAmarelo = Color(0xFFFBBF24)
+val BrandRosa = Color(0xFFEC4899)
+val BrandLaranja = Color(0xFFF8971D)
 
-// Corporate Identity
-val BrandAzulCaixa = Color(0xFF005CA9) // Legacy
-val BrandLaranjaCaixa = Color(0xFFF8971D)
-
-// NEW DESIGN SYSTEM MAPPING
-val BrandAzul = Color(0xFF0055FF) // matches colors.xml brand_primary
-val BrandRoxo = Color(0xFF651FFF) // matches colors.xml brand_secondary
-val BrandVerde = VividGreen
-val BrandAmarelo = VividAmber
-val BrandRosa = VividPink
-val BrandLaranja = BrandLaranjaCaixa
-
-// --- SEMANTIC COLORS ---
-val SemanticSuccess = Color(0xFF22C55E)
-val SemanticError = Color(0xFFEF4444)
-val ErrorColor = SemanticError
-val SuccessColor = SemanticSuccess
-
-// --- BACKGROUND LAYERS ---
-val DarkBackground = Slate950
-val DarkSurface = Slate900
-val DarkSurfaceElevated = Slate800
-val DarkSurfaceHighlight = Slate700
+// --- SEMANTIC ROLES: LIGHT MODE ---
 val LightBackground = Slate50
-val LightSurface = FlatWhite
-val LightSurfaceElevated = Slate100
-val LightSurfaceHighlight = Slate200
+val LightSurface1 = Color.White
+val LightSurface2 = Slate50
+val LightSurface3 = Slate100
+val LightOutline = Slate200
+val LightOutlineVariant = Slate100
+val LightTextPrimary = Slate900
+val LightTextSecondary = Slate600
+val LightTextTertiary = Slate400
 
-// --- TEXT COLORS ---
-val TextPrimaryDark = FlatWhite
-val TextSecondaryDark = Slate400
-val TextTertiaryDark = Slate500
-val TextPrimaryLight = Slate900
-val TextSecondaryLight = Slate600
-val TextTertiaryLight = Slate500
+// --- SEMANTIC ROLES: DARK MODE ---
+val DarkBackground = Slate950
+val DarkSurface1 = Slate900
+val DarkSurface2 = Slate800
+val DarkSurface3 = Slate700
+val DarkOutline = Slate800
+val DarkOutlineVariant = Slate700.copy(alpha = 0.5f)
+val DarkTextPrimary = Color.White
+val DarkTextSecondary = Slate400
+val DarkTextTertiary = Slate500
+
+// --- STATUS COLORS ---
+val SuccessBase = Color(0xFF22C55E)
+val WarningBase = Color(0xFFF59E0B)
+val ErrorBase = Color(0xFFEF4444)
+
+val SuccessColor = SuccessBase
+val WarningColor = WarningBase
+val ErrorColor = ErrorBase
 
 // --- GLASSMORPHISM TOKENS ---
-val GlassSurfaceLight = FlatWhite.copy(alpha = 0.72f)
+val GlassSurfaceLight = Color.White.copy(alpha = 0.72f)
 val GlassSurfaceDark = Slate900.copy(alpha = 0.65f)
 
 object Alpha {
+    const val DIVIDER = 0.75f
+    const val DIVIDER_SUBTLE = 0.5f
     const val DISABLED = 0.38f
-    const val DIVIDER = 0.12f
+    const val OVERLAY = 0.12f
     const val SCRIM = 0.32f
 }

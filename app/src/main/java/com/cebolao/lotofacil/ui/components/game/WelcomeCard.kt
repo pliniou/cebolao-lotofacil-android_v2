@@ -139,7 +139,7 @@ fun WelcomeCard(
             if (randomQuote.isNotEmpty()) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = scheme.surfaceVariant,
+                    color = scheme.surfaceContainerHigh,
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(

@@ -66,10 +66,21 @@ fun CheckResultCard(
                 val chartData = remember(result.recentHits) {
                     result.recentHits.map { it.first.toString() to it.second }.toImmutableList()
                 }
+                // Strict limit of last 12 for UI
                 val condensedData = remember(chartData) { chartData.takeLast(12).toImmutableList() }
-                var showTable by rememberSaveable { mutableStateOf(false) }
+                
+                // Chart specific data: format labels to last 3 digits for readability
+                val barChartData = remember(condensedData) {
+                    condensedData.map { (label, value) -> 
+                        val shortLabel = if (label.length > 3) label.takeLast(3) else label
+                        shortLabel to value
+                    }.toImmutableList()
+                }
+
+                var isChartMode by rememberSaveable { mutableStateOf(true) }
 
                 Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
+                    // Header + Toggle
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -80,19 +91,40 @@ fun CheckResultCard(
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.secondary
                         )
-                        TextButton(onClick = { showTable = !showTable }) {
-                            Text(
-                                text = if (showTable) stringResource(R.string.general_close) else stringResource(R.string.checker_recent_hits_toggle_table),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+                        ) {
+                             TextButton(
+                                onClick = { isChartMode = true },
+                                colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                                    contentColor = if (isChartMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.checker_view_chart),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = if (isChartMode) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                            TextButton(
+                                onClick = { isChartMode = false },
+                                colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                                    contentColor = if (!isChartMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.checker_view_table),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = if (!isChartMode) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
                         }
                     }
-                    if (showTable) {
-                        HitsTable(condensedData)
-                    } else {
+                    
+                    if (isChartMode) {
                         BarChart(
-                            data = condensedData,
+                            data = barChartData,
                             maxValue = GameConstants.GAME_SIZE,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -101,14 +133,37 @@ fun CheckResultCard(
                             chartType = ChartType.BAR,
                             highlightPredicate = { it >= GameConstants.MIN_PRIZE_SCORE }
                         )
-                        if (chartData.size > condensedData.size) {
-                            Text(
-                                text = stringResource(R.string.checker_recent_hits_limited, condensedData.size),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                    } else {
+                         // Table View (Newest first)
+                        val tableRows = remember(condensedData) {
+                            condensedData.reversed().map { (contest, hits) ->
+                                listOf(contest, hits.toString())
+                            }
                         }
+                        
+                        com.cebolao.lotofacil.ui.components.common.AppTable(
+                            data = com.cebolao.lotofacil.ui.components.common.AppTableData(
+                                headers = listOf(
+                                    stringResource(R.string.results_contest_number_format, 0).split(" ")[0], // "Concurso" generic
+                                    stringResource(R.string.checker_score_breakdown_hits_format, 0).split(" ")[1].replaceFirstChar { it.uppercase() } // "Pontos/Acertos"
+                                ),
+                                rows = tableRows,
+                                weights = listOf(1f, 1f),
+                                textAligns = listOf(TextAlign.Start, TextAlign.End)
+                            ),
+                            style = com.cebolao.lotofacil.ui.components.common.AppTableStyle(
+                                showDividers = true
+                            )
+                        )
                     }
+
+                    // Footnote
+                    Text(
+                        text = stringResource(R.string.checker_showing_last_12),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.align(Alignment.End)
+                    )
                 }
 
                 HorizontalDivider(
@@ -208,30 +263,7 @@ private fun ScoreRow(score: Int, count: Int) {
     }
 }
 
-@Composable
-private fun HitsTable(data: List<Pair<String, Int>>) {
-    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)) {
-        data.forEach { (contest, hits) ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Concurso $contest",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "$hits acertos",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun LastHit(res: CheckResult) {

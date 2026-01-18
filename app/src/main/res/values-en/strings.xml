@@ -16,11 +16,23 @@
     <string name="general_cancel">Cancel</string>
     <string name="general_save">Save</string>
     <string name="general_error_title">Something went wrong</string>
+
+    <string name="location_not_informed">Not informed</string>
+    <string name="winners_by_state">Winners by State</string>
+    <string name="uf">State</string>
+    <string name="city">City</string>
+    <string name="count_short">Qty</string>
+    <string name="and_more_count" tools:ignore="PluralsCandidate">and %1$d more…</string>
+    <string name="prize_is_accumulated">Accumulated!</string>
+    <string name="action_retry">Try again</string>
     <string name="general_loading">Loading…</string>
     <string name="open_external_link">Open external link</string>
 
     <!-- Onboarding -->
     <string name="onboarding_title_1">Welcome</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_start">Start</string>
+    <string name="onboarding_next">Next</string>
     <string name="onboarding_desc_1">Generate balanced games, without losing your sense of humor.</string>
     <string name="onboarding_title_2">Smart Filters</string>
     <string name="onboarding_desc_2">Visualize trends, frequencies, and delays. Turn random guesses into qualified shots.</string>
@@ -154,6 +166,15 @@
 
     <string name="edu_hot_cold_title">Frequency and Delay</string>
     <string name="edu_hot_cold_desc">"Hot" numbers appeared more in the period; "Overdue" numbers have not appeared for the longest time. This doesn\'t change the chance of the next draw (independent events), but helps balance strategies.</string>
+    <string name="stats_no_data_title">Not enough data</string>
+    <string name="stats_no_data_message">Insufficient history to calculate this statistic.</string>
+    <string name="stats_time_window_all">All draws</string>
+    <string name="stats_time_window_last">Last %d</string>
+    <string name="stats_unit_times">times</string>
+    <string name="stats_unit_contests">draws</string>
+    <string name="stats_period_selected">Period changed to the last %d draws</string>
+    <string name="stats_period_all_selected">Period changed to all draws</string>
+    <string name="common_back">Back</string>
 
     <!-- Affordance helpers -->
     <string name="tap_to_expand">Tap to expand</string>
@@ -208,6 +229,23 @@
     <string name="about_caixa_title">Caixa Website</string>
     <string name="about_caixa_desc">Official rules, results, and contest details.</string>
     <string name="about_disclaimer">This app is not affiliated with Caixa Econômica Federal.</string>
+    <string name="about_external_link_title">Open External Link?</string>
+    <string name="about_external_link_message">You will be redirected to the official browser to view this external information.</string>
+    <string name="about_external_link_confirm">Open</string>
+    <string name="about_theme_mode">Theme Mode</string>
+    <string name="about_theme_light">Light</string>
+    <string name="about_theme_dark">Dark</string>
+    <string name="about_accent_color">Accent Color</string>
+    <string name="about_accent_blue">Blue</string>
+    <string name="about_accent_purple">Purple</string>
+    <string name="about_accent_green">Green</string>
+    <string name="about_accent_yellow">Yellow</string>
+    <string name="about_accent_pink">Pink</string>
+    <string name="about_accent_orange">Orange</string>
+    <string name="about_accessibility_select_theme">Select %1$s mode</string>
+    <string name="about_accessibility_select_accent">Select %1$s accent color</string>
+    <string name="about_prob_hits_format">%1$d hits</string>
+    <string name="about_prob_n_numbers">%1$d Numbers</string>
 
     <!-- Studio -->
     <string name="studio_name">Cebola Studios</string>
@@ -270,6 +308,9 @@
 
     <!-- Checker -->
     <string name="checker_recent_hits_chart_title">Recent Hits</string>
+    <string name="checker_view_chart">Chart</string>
+    <string name="checker_view_table">Table</string>
+    <string name="checker_showing_last_12">Showing last 12 draws</string>
     <string name="checker_recent_hits_toggle_table">View table</string>
     <string name="checker_recent_hits_limited">Showing last %1$d draws</string>
     <string name="checker_results_header_wins">Prizes</string>
@@ -314,6 +355,9 @@
     <string name="filters_button_generate">Generate Games</string>
     <string name="filters_button_generating_progress">Generating…</string>
     <string name="filter_preset_applied">Strategy applied: %1$s</string>
+    <string name="filters_generation_strict_title">Filters too restrictive</string>
+    <string name="filters_generation_strict_message">The current filter combination is too strict and may take a long time or find no games. Continue anyway?</string>
+    <string name="filters_generation_strict_confirm">Continue</string>
     <string name="filters_reset_dialog_title">Reset Filters</string>
     <string name="filters_reset_dialog_message">Want to return to default settings?</string>
     <string name="filters_reset_confirm">Reset</string>
@@ -390,18 +434,6 @@
     <string name="prize_table_header_winners">Winners</string>
     <string name="prize_table_header_amount">Prize</string>
     <string name="draw_location_label">Location</string>
-    <string name="location_not_informed">Not informed</string>
-    <string name="winners_by_state">Winners by State</string>
-    <string name="uf">State</string>
-    <string name="city">City</string>
-    <string name="count_short">Qty</string>
-    <string name="and_more_count" tools:ignore="PluralsCandidate">and %1$d more…</string>
-
-    <!-- Onboarding -->
-    <string name="onboarding_skip">Skip</string>
-    <string name="onboarding_start">Start</string>
-    <string name="onboarding_next">Next</string>
-
     <!-- Errors -->
     <string name="error_load_data_failed">Error loading data.</string>
     <string name="error_analysis_failed">Error in analysis.</string>
@@ -446,4 +478,31 @@
     <!-- Home Loading States -->
     <string name="home_updating_data">Updating data…</string>
     <string name="home_pull_to_refresh_hint">Pull down to sync again.</string>
+
+    <!-- Confirmations (New) -->
+    <string name="filters_reset_confirmation_message">All filters will be restored to default. Do you want to continue?</string>
+    <string name="games_clear_confirmation_title">Clear Unpinned Games?</string>
+    <string name="games_clear_confirmation_message">All unpinned games will be permanently removed. Are you sure?</string>
+    <string name="checker_clear_confirmation_title">Clear Selection?</string>
+    <string name="checker_clear_confirmation_message">All selected numbers will be removed. Do you want to continue?</string>
+    <string name="checker_clear_confirm">Clear</string>
+
+    <!-- Success Messages (New) -->
+    <string name="filters_reset_success">Filters restored to default</string>
+    <string name="games_delete_success">Game deleted successfully</string>
+    <string name="games_clear_success">Unpinned games removed</string>
+    <string name="checker_numbers_cleared">Selection cleared</string>
+    <string name="games_pin_success">Game pinned</string>
+    <string name="games_unpin_success">Game unpinned</string>
+
+    <!-- Accessibility - Page Indicator (New) -->
+    <string name="page_indicator_description">Page %1$d of %2$d</string>
+
+    <!-- Accessibility - Filter Info Button (New) -->
+    <string name="filter_info_button_description">Information about %1$s filter</string>
+    
+    <!-- Table Components (New) -->
+    <string name="table_empty_state">No data available</string>
+    <string name="table_see_more">See more</string>
+    <string name="table_see_less">See less</string>
 </resources>

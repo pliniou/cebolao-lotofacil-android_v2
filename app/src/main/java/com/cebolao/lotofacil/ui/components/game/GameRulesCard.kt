@@ -48,6 +48,8 @@ import com.cebolao.lotofacil.ui.components.common.AppTableStyle
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
+import com.cebolao.lotofacil.domain.model.FinancialCalculator
+import com.cebolao.lotofacil.util.Formatters
 
 @Composable
 fun GameRulesCard(
@@ -174,17 +176,19 @@ private fun HowToPlaySection() {
         title = stringResource(R.string.game_rules_how_to_play),
         icon = Icons.Outlined.Casino
     ) {
-        Text(
-            text = stringResource(R.string.game_rules_how_to_play_p1),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
+            Text(
+                text = stringResource(R.string.game_rules_how_to_play_p1),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        Text(
-            text = stringResource(R.string.game_rules_how_to_play_p2),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            Text(
+                text = stringResource(R.string.game_rules_how_to_play_p2),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -194,24 +198,24 @@ private fun PricesSection() {
         title = stringResource(R.string.game_rules_prices_title),
         icon = Icons.Outlined.MonetizationOn
     ) {
+        val formatter = Formatters
+        // Generate prices for 15 to 20 numbers
+        val priceRows = (15..20).map { n ->
+            val cost = FinancialCalculator.getGameCost(n)
+            listOf(n.toString(), formatter.formatCurrency(cost))
+        }
+
         AppTable(
             data = AppTableData(
                 headers = listOf(
                     stringResource(R.string.table_header_numbers),
                     stringResource(R.string.table_header_value)
                 ),
-                rows = listOf(
-                    listOf("15", "R$ 3,50"),
-                    listOf("16", "R$ 56,00"),
-                    listOf("17", "R$ 476,00"),
-                    listOf("18", "R$ 2.856,00"),
-                    listOf("19", "R$ 13.566,00"),
-                    listOf("20", "R$ 54.264,00")
-                ),
+                rows = priceRows,
                 weights = listOf(1f, 1f),
                 textAligns = listOf(TextAlign.Center, TextAlign.End)
             ),
-            style = AppTableStyle(showDividers = true)
+            style = AppTableStyle(showDividers = true, rowStyle = MaterialTheme.typography.bodyMedium)
         )
     }
 }
@@ -231,97 +235,81 @@ private fun ProbabilitiesTable() {
     val scheme = MaterialTheme.colorScheme
     val probabilities = getProbabilitiesData()
 
-    probabilities.forEachIndexed { index, (title, items) ->
-        Column(Modifier.fillMaxWidth()) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = scheme.primary
-            )
-            items.forEach { item ->
-                ProbabilityItemRow(item = item)
+    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)) {
+        probabilities.forEachIndexed { index, data ->
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
+                Text(
+                    text = stringResource(R.string.about_prob_n_numbers, data.numbers),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = scheme.primary
+                )
+                
+                AppTable(
+                    data = AppTableData(
+                        headers = emptyList(), // No headers for nested tables
+                        rows = data.items.map { listOf(stringResource(R.string.about_prob_hits_format, it.hits), it.probability) },
+                        weights = listOf(1f, 1.2f),
+                        textAligns = listOf(TextAlign.Start, TextAlign.End)
+                    ),
+                    style = AppTableStyle(showDividers = false, rowStyle = MaterialTheme.typography.bodySmall)
+                )
+            }
+            if (index < probabilities.lastIndex) {
+                AppDivider()
             }
         }
-        if (index < probabilities.lastIndex) {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = Dimen.Spacing8),
-                color = scheme.outlineVariant.copy(alpha = 0.5f)
-            )
-        }
     }
 }
 
-private fun getProbabilitiesData(): List<Pair<String, List<String>>> {
+private data class ProbData(val numbers: Int, val items: List<HitProb>)
+private data class HitProb(val hits: Int, val probability: String)
+
+private fun getProbabilitiesData(): List<ProbData> {
     return listOf(
-        "15 Números" to listOf(
-            "15 acertos: 3.268.760",
-            "14 acertos: 21.792",
-            "13 acertos: 692",
-            "12 acertos: 60",
-            "11 acertos: 11"
-        ),
-        "16 Números" to listOf(
-            "15 acertos: 204.298",
-            "14 acertos: 3.027",
-            "13 acertos: 162",
-            "12 acertos: 21",
-            "11 acertos: 6"
-        ),
-        "17 Números" to listOf(
-            "15 acertos: 24.035",
-            "14 acertos: 601",
-            "13 acertos: 49",
-            "12 acertos: 9",
-            "11 acertos: 4"
-        ),
-        "18 Números" to listOf(
-            "15 acertos: 4.006",
-            "14 acertos: 153",
-            "13 acertos: 18",
-            "12 acertos: 5",
-            "11 acertos: 3"
-        ),
-        "19 Números" to listOf(
-            "15 acertos: 843",
-            "14 acertos: 47",
-            "13 acertos: 8",
-            "12 acertos: 3,2",
-            "11 acertos: 2,9"
-        ),
-        "20 Números" to listOf(
-            "15 acertos: 211",
-            "14 acertos: 17",
-            "13 acertos: 4,2",
-            "12 acertos: 2,6",
-            "11 acertos: 0,9"
-        )
+        ProbData(15, listOf(
+            HitProb(15, "3.268.760"),
+            HitProb(14, "21.792"),
+            HitProb(13, "692"),
+            HitProb(12, "60"),
+            HitProb(11, "11")
+        )),
+        ProbData(16, listOf(
+            HitProb(15, "204.298"),
+            HitProb(14, "3.027"),
+            HitProb(13, "162"),
+            HitProb(12, "21"),
+            HitProb(11, "6")
+        )),
+        ProbData(17, listOf(
+            HitProb(15, "24.035"),
+            HitProb(14, "601"),
+            HitProb(13, "49"),
+            HitProb(12, "9"),
+            HitProb(11, "4")
+        )),
+        ProbData(18, listOf(
+            HitProb(15, "4.006"),
+            HitProb(14, "153"),
+            HitProb(13, "18"),
+            HitProb(12, "5"),
+            HitProb(11, "3")
+        )),
+        ProbData(19, listOf(
+            HitProb(15, "843"),
+            HitProb(14, "47"),
+            HitProb(13, "8"),
+            HitProb(12, "3,2"),
+            HitProb(11, "2,9")
+        )),
+        ProbData(20, listOf(
+            HitProb(15, "211"),
+            HitProb(14, "17"),
+            HitProb(13, "4,2"),
+            HitProb(12, "2,6"),
+            HitProb(11, "0,9")
+        ))
     )
-}
-
-@Composable
-private fun ProbabilityItemRow(item: String) {
-    val scheme = MaterialTheme.colorScheme
-    val parts = item.split(":")
-    
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Dimen.Spacing4),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = parts[0],
-            style = MaterialTheme.typography.bodySmall,
-            color = scheme.onSurfaceVariant
-        )
-        Text(
-            text = parts.getOrElse(1) { "" }.trim(),
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = scheme.onSurface
-        )
-    }
 }
 
 @Composable

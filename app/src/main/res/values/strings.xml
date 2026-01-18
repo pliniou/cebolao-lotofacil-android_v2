@@ -18,11 +18,23 @@
     <string name="general_selected">Selecionado</string>
     <string name="general_cancel">Cancelar</string>
     <string name="general_save">Salvar</string>
+
+    <string name="location_not_informed">Não informado</string>
+    <string name="winners_by_state">Ganhadores por Estado</string>
+    <string name="uf">UF</string>
+    <string name="city">Cidade</string>
+    <string name="count_short">Qtd</string>
+    <string name="and_more_count">e mais %1$d…</string>
+    <string name="prize_is_accumulated">Acumulou!</string>
+    <string name="action_retry">Tentar novamente</string>
     <string name="general_error_title">Algo deu errado</string>
     <string name="general_loading">Carregando…</string>
     <string name="open_external_link">Abrir link externo</string>
 
     <!-- Onboarding -->
+    <string name="onboarding_skip">Pular</string>
+    <string name="onboarding_start">Começar</string>
+    <string name="onboarding_next">Próximo</string>
     <string name="onboarding_title_1">Bem-vindo</string>
     <string name="onboarding_desc_1">Gere jogos mais equilibrados, sem perder o bom humor.</string>
     <string name="onboarding_title_2">Filtros Inteligentes</string>
@@ -212,6 +224,23 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="about_caixa_title">Site da Caixa</string>
     <string name="about_caixa_desc">Regras oficiais, resultados e detalhes do concurso.</string>
     <string name="about_disclaimer">Este app não possui vínculo com a Caixa Econômica Federal.</string>
+    <string name="about_external_link_title">Abrir Link Externo?</string>
+    <string name="about_external_link_message">Você será redirecionado para o navegador oficial para visualizar esta informação externa.</string>
+    <string name="about_external_link_confirm">Abrir</string>
+    <string name="about_theme_mode">Modo de Tema</string>
+    <string name="about_theme_light">Claro</string>
+    <string name="about_theme_dark">Escuro</string>
+    <string name="about_accent_color">Cor de Destaque</string>
+    <string name="about_accent_blue">Azul</string>
+    <string name="about_accent_purple">Roxo</string>
+    <string name="about_accent_green">Verde</string>
+    <string name="about_accent_yellow">Amarelo</string>
+    <string name="about_accent_pink">Rosa</string>
+    <string name="about_accent_orange">Laranja</string>
+    <string name="about_accessibility_select_theme">Selecionar modo %1$s</string>
+    <string name="about_accessibility_select_accent">Selecionar cor de destaque %1$s</string>
+    <string name="about_prob_hits_format">%1$d acertos</string>
+    <string name="about_prob_n_numbers">%1$d Números</string>
 
     <!-- Studio -->
     <string name="studio_name">Cebola Studios</string>
@@ -269,6 +298,9 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
 
     <!-- Checker -->
     <string name="checker_recent_hits_chart_title">Acertos Recentes</string>
+    <string name="checker_view_chart">Gráfico</string>
+    <string name="checker_view_table">Tabela</string>
+    <string name="checker_showing_last_12">Mostrando últimos 12 concursos</string>
     <string name="checker_recent_hits_toggle_table">Ver tabela</string>
     <string name="checker_recent_hits_limited">Mostrando ultimos %1$d concursos</string>
     <string name="checker_results_header_wins">Prêmios</string>
@@ -303,6 +335,20 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="filters_button_generate">Gerar Jogos</string>
     <string name="filters_button_generating_progress" tools:keep="@string/filters_button_generating_progress">Gerando…</string>
     <string name="filter_preset_applied">Estratégia aplicada: %1$s</string>
+    <string name="filters_generation_strict_title">Filtros muito restritivos</string>
+    <string name="filters_generation_strict_message">A combinação atual de filtros é muito restrita e pode demorar ou não encontrar jogos. Deseja continuar mesmo assim?</string>
+    <string name="filters_generation_strict_confirm">Continuar</string>
+
+    <!-- Statistics -->
+    <string name="stats_no_data_title">Sem dados suficientes</string>
+    <string name="stats_no_data_message">Histórico insuficiente para calcular esta estatística.</string>
+    <string name="stats_time_window_all">Todos os concursos</string>
+    <string name="stats_time_window_last">Últimos %d</string>
+    <string name="stats_unit_times">vezes</string>
+    <string name="stats_unit_contests">concursos</string>
+    <string name="stats_period_selected">Período alterado para os últimos %d concursos</string>
+    <string name="stats_period_all_selected">Período alterado para todos os concursos</string>
+    <string name="common_back">Voltar</string>
     <string name="filters_reset_dialog_title">Resetar Filtros</string>
     <string name="filters_reset_dialog_message">Deseja voltar para a configuração padrão?</string>
     <string name="filters_reset_confirm">Resetar</string>
@@ -407,18 +453,6 @@ Gerado com Cebolão Lotofácil</string>
     <string name="prize_table_header_winners">Ganhadores</string>
     <string name="prize_table_header_amount">Prêmio</string>
     <string name="draw_location_label">Local</string>
-    <string name="location_not_informed">Não informado</string>
-    <string name="winners_by_state">Ganhadores por Estado</string>
-    <string name="uf">UF</string>
-    <string name="city">Cidade</string>
-    <string name="count_short">Qtd</string>
-    <string name="and_more_count">e mais %1$d…</string>
-
-    <!-- Onboarding -->
-    <string name="onboarding_skip">Pular</string>
-    <string name="onboarding_start">Começar</string>
-    <string name="onboarding_next">Próximo</string>
-
     <!-- Errors -->
     <string name="error_load_data_failed">Erro ao carregar dados.</string>
     <string name="error_analysis_failed">Erro na análise.</string>
@@ -465,5 +499,33 @@ Gerado com Cebolão Lotofácil</string>
     <string name="about_privacy_title">Privacidade</string>
     <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
     <string name="about_version_title">Versão</string>
+
+    <!-- Confirmations (New) -->
+    <string name="filters_reset_confirmation_message">Todos os filtros serão restaurados ao padrão. Deseja continuar?</string>
+    <string name="games_clear_confirmation_title">Limpar Jogos Não Fixados?</string>
+    <string name="games_clear_confirmation_message">Todos os jogos não fixados serão removidos permanentemente. Tem certeza?</string>
+    <string name="checker_clear_confirmation_title">Limpar Seleção?</string>
+    <string name="checker_clear_confirmation_message">Todas as dezenas selecionadas serão removidas. Deseja continuar?</string>
+    <string name="checker_clear_confirm">Limpar</string>
+
+    <!-- Success Messages (New) -->
+    <string name="filters_reset_success">Filtros restaurados ao padrão</string>
+    <string name="games_delete_success">Jogo excluído com sucesso</string>
+    <string name="games_clear_success">Jogos não fixados removidos</string>
+    <string name="checker_numbers_cleared">Seleção limpa</string>
+    <string name="games_pin_success">Jogo fixado</string>
+    <string name="games_unpin_success">Jogo desfixado</string>
+
+    <!-- Accessibility - Page Indicator (New) -->
+    <string name="page_indicator_description">Página %1$d de %2$d</string>
+
+    <!-- Accessibility - Filter Info Button (New) -->
+    <string name="filter_info_button_description">Informações sobre o filtro %1$s</string>
+    
+    <!-- Table Components (New) -->
+    <string name="table_empty_state">Nenhum dado disponível</string>
+    <string name="table_see_more">Ver mais</string>
+    <string name="table_see_less">Ver menos</string>
 </resources>
+
 

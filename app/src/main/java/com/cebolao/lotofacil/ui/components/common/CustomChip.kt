@@ -52,16 +52,16 @@ fun CustomChip(
         colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = colorScheme.primary,
             selectedLabelColor = colorScheme.onPrimary,
-            containerColor = colorScheme.surfaceContainerHigh,
-            labelColor = colorScheme.onSurfaceVariant,
+            containerColor = colorScheme.secondaryContainer.copy(alpha = 0.5f), // Even more subtle accent
+            labelColor = colorScheme.onSecondaryContainer,
             disabledContainerColor = colorScheme.surfaceContainerHigh.copy(alpha = Alpha.DISABLED),
             disabledLabelColor = colorScheme.onSurfaceVariant.copy(alpha = Alpha.DISABLED)
         ),
         border = FilterChipDefaults.filterChipBorder(
             enabled = enabled,
             selected = selected,
-            borderColor = colorScheme.outlineVariant.copy(alpha = 0f),
-            selectedBorderColor = colorScheme.outlineVariant.copy(alpha = 0f)
+            borderColor = colorScheme.outlineVariant,
+            selectedBorderColor = colorScheme.primary.copy(alpha = 0.1f)
         )
     )
 }

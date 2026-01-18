@@ -167,10 +167,9 @@ private fun EduSectionCard(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = scheme.surfaceVariant,
+        color = scheme.surfaceContainerLow,
         contentColor = scheme.onSurfaceVariant,
         shape = MaterialTheme.shapes.large
-        // Flat design: removed shadows if any were implicit
     ) {
         Column(
             modifier = Modifier
@@ -239,7 +238,7 @@ private fun FilterExplainerList() {
         filters.forEach { filter ->
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = scheme.surface,
+                color = scheme.surfaceContainerHigh,
                 contentColor = scheme.onSurface,
                 shape = MaterialTheme.shapes.medium
             ) {

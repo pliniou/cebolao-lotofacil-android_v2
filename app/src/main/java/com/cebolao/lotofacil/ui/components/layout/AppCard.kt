@@ -38,37 +38,19 @@ import com.cebolao.lotofacil.ui.theme.Motion
 import com.cebolao.lotofacil.ui.theme.GlassSurfaceDark
 import com.cebolao.lotofacil.ui.theme.GlassSurfaceLight
 
-/**
- * Variantes visuais para AppCard seguindo princípios de flat design moderno.
- */
 enum class CardVariant {
-    /** Card sólido com background levemente translúcido */
     Solid,
-    /** Card com glassmorphism (transparência e blur) */
     Glass,
-    /** Card apenas com borda */
-    Outlined
+    Outlined,
+    Elevated // Added back to avoid breaking potential usages, mapped to Solid
 }
 
-/**
- * Scope para conteúdo do AppCard com acesso ao nesting level.
- */
 interface CardScope : ColumnScope {
     val nestingLevel: Int
 }
 
-/** Card nesting level tracker for recursive styling. */
 val LocalCardNesting = compositionLocalOf { 0 }
 
-/**
- * AppCard Modernizado e Otimizado - Material Design Flat.
- *
- * Base para todos os cards do app com:
- * - Aninhamento automático com variantes recursivas
- * - Design flat sem elevações desnecessárias
- * - Feedback tátil sutil
- * - Suporte a glassmorphism
- */
 @Stable
 @Composable
 fun AppCard(
@@ -88,17 +70,16 @@ fun AppCard(
     val scheme = MaterialTheme.colorScheme
     val isDark = scheme.background.luminance() < 0.5f
     val nestingLevel = LocalCardNesting.current
-    // Usamos cantos mais contidos para compactar a UI
-    val shape = MaterialTheme.shapes.medium
+    val shape = MaterialTheme.shapes.medium // Keeping consistent shape
 
-    // Retro-compatibility and variant logic
+    // Variant logic
     val effectiveVariant = if (outlined) CardVariant.Outlined else when (nestingLevel) {
-        0 -> variant
+        0 -> if (variant == CardVariant.Elevated) CardVariant.Solid else variant
         1 -> CardVariant.Outlined
         else -> CardVariant.Solid
     }
 
-    // Interaction states with tactile feedback
+    // Interaction
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -107,27 +88,27 @@ fun AppCard(
         label = "cardScale"
     )
 
-    // Background selection com glassmorphism - sempre flat
+    // Background
     val effectiveBackground = when {
         color != Color.Unspecified -> color
         effectiveVariant == CardVariant.Glass -> if (isDark) GlassSurfaceDark else GlassSurfaceLight
         effectiveVariant == CardVariant.Outlined -> Color.Transparent
+        nestingLevel == 0 -> scheme.surface
         else -> scheme.surfaceContainer
     }
 
-    // Border flat para design moderno
+    // Border
     val border = if (hasBorder || effectiveVariant == CardVariant.Outlined) {
         BorderStroke(
             width = Dimen.Border.Thin,
             color = if (effectiveVariant == CardVariant.Glass) {
                 scheme.outlineVariant.copy(alpha = 0.2f)
             } else {
-                scheme.outlineVariant.copy(alpha = 0.08f)
+                scheme.outlineVariant // Using the new semantic outline variant
             }
         )
     } else null
 
-    // Sem elevação - flat design consistente
     val cardElevation = CardDefaults.cardElevation(defaultElevation = Dimen.Elevation.None)
     val colors = CardDefaults.cardColors(containerColor = effectiveBackground)
 
@@ -139,7 +120,47 @@ fun AppCard(
 
     CompositionLocalProvider(LocalCardNesting provides nestingLevel + 1) {
         val cardContent: @Composable ColumnScope.() -> Unit = {
-            CardContent(contentPadding, nestingLevel + 1, title, headerActions, header, footer, content)
+            val scope = remember(nestingLevel, this) {
+                object : CardScope, ColumnScope by this {
+                    override val nestingLevel: Int = nestingLevel
+                }
+            }
+            
+            Column(
+                modifier = Modifier.padding(contentPadding),
+                verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+            ) {
+                 if (title != null || headerActions != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = if (contentPadding > 0.dp) Dimen.Spacing8 else 0.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        if (title != null) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        if (headerActions != null) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                headerActions()
+                            }
+                        }
+                    }
+                }
+                
+                header?.let { it(scope) }
+                content(scope)
+                footer?.let { it(scope) }
+            }
         }
 
         if (onClick != null) {
@@ -162,83 +183,6 @@ fun AppCard(
                 border = border,
                 content = cardContent
             )
-        }
-    }
-}
-
-@Composable
-private fun CardContent(
-    contentPadding: Dp,
-    nestingLevel: Int,
-    title: String?,
-    headerActions: (@Composable RowScope.() -> Unit)?,
-    header: (@Composable CardScope.() -> Unit)?,
-    footer: (@Composable CardScope.() -> Unit)?,
-    content: @Composable CardScope.() -> Unit
-) {
-    Column(
-        modifier = Modifier.padding(contentPadding),
-        verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
-    ) {
-        val scope = remember(nestingLevel, this) {
-            object : CardScope, ColumnScope by this {
-                override val nestingLevel: Int = nestingLevel
-            }
-        }
-
-        if (title != null || headerActions != null) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = if (contentPadding > 0.dp) Dimen.Spacing8 else 0.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                if (title != null) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                if (headerActions != null) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        headerActions()
-                    }
-                }
-            }
-        }
-
-        header?.let { it(scope) }
-        content(scope)
-        footer?.let { it(scope) }
-    }
-}
-
-@Preview
-@Composable
-private fun AppCardPreview() {
-    MaterialTheme {
-        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16), modifier = Modifier.padding(Dimen.Spacing16)) {
-            AppCard(title = "Solid Card") {
-                Text("This is a solid card content.")
-            }
-            AppCard(title = "Outlined Card", variant = CardVariant.Outlined) {
-                Text("This is an outlined card content.")
-            }
-            AppCard(title = "Clickable Card", onClick = {}) {
-                Text("Click me!")
-            }
-            AppCard(title = "Nested Card") {
-                Text("Parent content")
-                AppCard(title = "Child Card") {
-                    Text("Child content automatically becomes outlined")
-                }
-            }
         }
     }
 }

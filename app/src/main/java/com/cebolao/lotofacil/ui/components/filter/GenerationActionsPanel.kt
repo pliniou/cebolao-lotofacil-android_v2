@@ -1,5 +1,8 @@
 package com.cebolao.lotofacil.ui.components.filter
 
+import com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback
+import com.cebolao.lotofacil.ui.haptics.HapticFeedbackType
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -49,15 +52,17 @@ fun GenerationActionsPanel(
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
+    val haptics = com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback()
 
-    AppCard(
+    androidx.compose.material3.Card(
         modifier = modifier.fillMaxWidth(),
-        variant = CardVariant.Solid,
-        contentPadding = Dimen.SpacingShort
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = scheme.surfaceContainerHigh), // Consistent with bottom sheet style
+        border = androidx.compose.foundation.BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.12f))
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
+            modifier = Modifier.padding(Dimen.Spacing12)
         ) {
             Text(
                 text = stringResource(R.string.count_short),
@@ -68,7 +73,10 @@ fun GenerationActionsPanel(
 
             QuantitySelector(
                 quantity = quantity,
-                onQuantityChanged = onQuantityChanged,
+                onQuantityChanged = { 
+                    onQuantityChanged(it)
+                    haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.LIGHT)
+                },
                 enabled = !isGenerating
             )
 
@@ -76,7 +84,10 @@ fun GenerationActionsPanel(
 
             PrimaryActionButton(
                 text = stringResource(R.string.filters_button_generate),
-                onClick = onGenerate,
+                onClick = {
+                    onGenerate()
+                    haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.MEDIUM)
+                },
                 isLoading = isGenerating,
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Filled.AutoFixHigh

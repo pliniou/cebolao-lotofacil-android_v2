@@ -30,8 +30,8 @@ import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.ErrorColor
 import com.cebolao.lotofacil.ui.theme.SuccessColor
-import com.cebolao.lotofacil.ui.theme.VividAmber
-import com.cebolao.lotofacil.ui.theme.VividGreen
+import com.cebolao.lotofacil.ui.theme.WarningBase
+import com.cebolao.lotofacil.ui.theme.SuccessBase
 
 @Composable
 fun GameQualityCard(
@@ -149,8 +149,8 @@ private fun MetricRow(metric: MetricEvaluation) {
 private fun getStatusColor(status: ScoreStatus): Color {
     return when (status) {
         ScoreStatus.EXCELLENT -> SuccessColor
-        ScoreStatus.GOOD -> VividGreen
-        ScoreStatus.WARNING -> VividAmber
+        ScoreStatus.GOOD -> SuccessBase
+        ScoreStatus.WARNING -> WarningBase
         ScoreStatus.BAD -> ErrorColor
     }
 }

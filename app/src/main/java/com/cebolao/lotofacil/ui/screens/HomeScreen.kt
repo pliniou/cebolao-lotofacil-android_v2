@@ -145,9 +145,12 @@ fun HomeScreenContent(
                                     draw = draw,
                                     details = successState.details,
                                     onCheckGame = { numbers ->
-                                        onNavigateToChecker(numbers.toSet())
+                                        onNavigateToChecker(numbers)
                                     },
-                                    modifier = Modifier.fillMaxWidth()
+                                    onRefresh = {
+                                        onEvent(HomeUiEvent.ForceSync)
+                                    },
+                                    modifier = Modifier.padding(horizontal = Dimen.ScreenPadding)
                                 )
                                 androidx.compose.material3.TextButton(
                                     onClick = onNavigateToResults,

@@ -1,14 +1,8 @@
 package com.cebolao.lotofacil.ui.components.filter
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,21 +10,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,175 +36,134 @@ import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
-import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.layout.CardVariant
-import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.FontFamilyDisplay
 import com.cebolao.lotofacil.ui.theme.filterIcon
-import kotlin.math.max
 
-@Stable
 @Composable
 fun FilterCard(
     state: FilterState,
     onToggle: (Boolean) -> Unit,
     onRange: (ClosedFloatingPointRange<Float>) -> Unit,
     onInfo: () -> Unit,
-    lastDraw: Set<Int>?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lastDraw: Set<Int>? = null
 ) {
-    val missingData by remember(state.type, lastDraw) {
-        derivedStateOf {
-            state.type == FilterType.REPETIDAS_CONCURSO_ANTERIOR && lastDraw == null
-        }
-    }
-
-    val active = state.isEnabled && !missingData
+    val steps = (state.type.fullRange.endInclusive - state.type.fullRange.start).toInt() - 1
     val scheme = MaterialTheme.colorScheme
 
-    AppCard(
-        modifier = modifier
-            .fillMaxWidth()
-            .animateContentSize(animationSpec = com.cebolao.lotofacil.ui.theme.Motion.Spring.gentle()),
-        variant = if (active) CardVariant.Solid else CardVariant.Outlined,
-        color = if (!active) MaterialTheme.colorScheme.surfaceContainerLow else Color.Unspecified,
-        contentPadding = Dimen.CardContentPadding
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        onClick = { onToggle(!state.isEnabled) },
+        border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant),
+        colors = CardDefaults.cardColors(
+            containerColor = if (state.isEnabled) scheme.surface else scheme.surfaceContainer
+        )
     ) {
-        Column(modifier = Modifier.padding(Dimen.SpacingShort)) {
-            Header(
-                state = state,
-                active = active,
-                missing = missingData,
-                onInfo = onInfo,
-                onToggle = onToggle
-            )
-
-            AnimatedVisibility(
-                visible = active,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
+        Column(modifier = Modifier.padding(Dimen.Spacing12)) {
+            // Header Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Content(state = state, onRange = onRange)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // Icon
+                    Surface(
+                        color = if (state.isEnabled) scheme.primaryContainer else scheme.surfaceContainerHighest,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(Dimen.CornerRadiusSmall),
+                        modifier = Modifier.size(Dimen.IconLarge)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                           Icon(
+                               imageVector = state.type.filterIcon,
+                               contentDescription = null,
+                               tint = if (state.isEnabled) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                               modifier = Modifier.size(Dimen.IconSmall)
+                           )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.width(Dimen.Spacing12))
+                    
+                    Text(
+                        text = stringResource(state.type.titleRes),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (state.isEnabled) scheme.onSurface else scheme.onSurface.copy(alpha = 0.6f)
+                    )
+
+                    IconButton(onClick = onInfo) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = stringResource(
+                                R.string.filter_info_button_description,
+                                stringResource(state.type.titleRes)
+                            ),
+                            tint = scheme.onSurfaceVariant,
+                            modifier = Modifier.size(Dimen.IconSmall)
+                        )
+                    }
+                }
+                
+                Switch(
+                    checked = state.isEnabled,
+                    onCheckedChange = onToggle,
+                    modifier = Modifier.scale(0.8f) 
+                )
+            }
+            
+            // Content Row
+            if (state.isEnabled) {
+                FilterControls(state, onRange, steps)
             }
         }
     }
 }
 
 @Composable
-private fun Header(
-    state: FilterState,
-    active: Boolean,
-    missing: Boolean,
-    onInfo: () -> Unit,
-    onToggle: (Boolean) -> Unit
+private fun FilterControls(
+    state: FilterState, 
+    onRange: (ClosedFloatingPointRange<Float>) -> Unit,
+    steps: Int
 ) {
     val scheme = MaterialTheme.colorScheme
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
-    ) {
-        Icon(
-            imageVector = state.type.filterIcon,
-            contentDescription = null,
-            tint = if (active) scheme.primary else scheme.onSurfaceVariant,
-            modifier = Modifier.size(Dimen.IconMedium)
-        )
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null, // No ripple for text tap, just action
-                    enabled = !missing,
-                    onClick = { onToggle(!state.isEnabled) }
-                )
-        ) {
-            Text(
-                text = stringResource(state.type.titleRes),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = scheme.onSurface
-            )
-            if (missing) {
-                Text(
-                    text = stringResource(R.string.filters_unavailable_data),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = scheme.error
-                )
-            }
-        }
-
-        IconButton(onClick = onInfo) {
-            Icon(
-                imageVector = AppIcons.InfoOutlined,
-                contentDescription = null,
-                tint = scheme.onSurfaceVariant
-            )
-        }
-
-        Switch(
-            checked = state.isEnabled,
-            onCheckedChange = onToggle,
-            enabled = !missing,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = scheme.onPrimary,
-                checkedTrackColor = scheme.primary,
-                uncheckedThumbColor = scheme.outline,
-                uncheckedTrackColor = scheme.surfaceContainerHighest,
-                uncheckedBorderColor = scheme.outline
-            )
-        )
-    }
-}
-
-@Composable
-private fun Content(
-    state: FilterState,
-    onRange: (ClosedFloatingPointRange<Float>) -> Unit
-) {
-    val steps = remember(state.type.fullRange) {
-        val delta = (state.type.fullRange.endInclusive - state.type.fullRange.start).toInt()
-        max(0, delta - 1)
-    }
-
-    Column(modifier = Modifier.padding(top = Dimen.SpacingShort)) {
-        // Header com informações do range
+    Column(modifier = Modifier.padding(top = Dimen.Spacing8)) {
+        // Range Values
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Dimen.Spacing4),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Dimen.Spacing4),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
                     text = stringResource(R.string.filters_current_range),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = scheme.onSurfaceVariant
                 )
                 Text(
                     text = "${state.selectedRange.start.toInt()} - ${state.selectedRange.endInclusive.toInt()}",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = scheme.primary
                 )
             }
             
-            Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
+            val coverage = calculateRangeCoverage(state)
+            // Coverage Badge
+            Surface(
+                color = scheme.secondaryContainer,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(Dimen.CornerRadiusSmall)
+            ) {
                 Text(
-                    text = stringResource(R.string.filters_coverage),
+                    text = "${String.format(java.util.Locale.getDefault(), "%.1f", coverage)}% ${stringResource(R.string.filters_coverage)}", 
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                val coverage = calculateRangeCoverage(state)
-                Text(
-                    text = "${String.format(java.util.Locale.getDefault(), "%.1f", coverage)}%",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (coverage >= 80f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
+                    fontWeight = FontWeight.Bold,
+                    color = scheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = Dimen.Spacing8, vertical = Dimen.Spacing4)
                 )
             }
         }
@@ -219,70 +176,52 @@ private fun Content(
             modifier = Modifier.padding(top = Dimen.Spacing4, start = Dimen.Spacing4, end = Dimen.Spacing4),
         )
 
-        // Informações detalhadas do range
         RangeInfoSection(state)
     }
 }
 
 @Composable
 private fun RangeInfoSection(state: FilterState) {
-    val currentRange = state.selectedRange.endInclusive - state.selectedRange.start
-    val totalRange = state.type.fullRange.endInclusive - state.type.fullRange.start
-    val coveragePercentage = (currentRange / totalRange * 100f)
-    
-    // Verificar se está usando range recomendado
-    val isRecommended = state.selectedRange == state.type.defaultRange
-    val isWideRange = coveragePercentage >= 75f
-    val isNarrowRange = coveragePercentage <= 25f
-    
-    AnimatedVisibility(
-        visible = true,
-        enter = fadeIn() + expandVertically()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = Dimen.Spacing4, end = Dimen.Spacing4, top = Dimen.Spacing4),
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+    val scheme = MaterialTheme.colorScheme
+    Column(modifier = Modifier.fillMaxWidth().padding(top = Dimen.Spacing4)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Dimen.Spacing4),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Indicador de range recomendado
-            if (!isRecommended) {
-                RangeIndicator(
-                    icon = AppIcons.Info,
-                    text = stringResource(
-                        R.string.filter_recommended_range,
-                        state.type.defaultRange.start.toInt(),
-                        state.type.defaultRange.endInclusive.toInt()
-                    ),
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-            }
-            
-            // Indicadores de cobertura
-            if (isWideRange) {
-                RangeIndicator(
-                    icon = AppIcons.TrendingUp,
-                    text = stringResource(R.string.filter_wide_range),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            
-            if (isNarrowRange) {
-                RangeIndicator(
-                    icon = AppIcons.TrendingDown,
-                    text = stringResource(R.string.filter_narrow_range),
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
+             RangeIndicator(
+                 icon = Icons.Default.ArrowDownward, 
+                 text = "${stringResource(R.string.filters_min_label)}: ${state.type.fullRange.start.toInt()}", 
+                 color = scheme.onSurfaceVariant
+             )
+             RangeIndicator(
+                 icon = Icons.Default.ArrowUpward, 
+                 text = "${stringResource(R.string.filters_max_label)}: ${state.type.fullRange.endInclusive.toInt()}", 
+                 color = scheme.onSurfaceVariant
+             )
         }
+        
+        // Recommended Row
+        Text(
+            text = stringResource(
+                R.string.filter_recommended_range, 
+                state.type.defaultRange.start.toInt(), 
+                state.type.defaultRange.endInclusive.toInt()
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+            color = scheme.secondary,
+            modifier = Modifier
+                .padding(top = Dimen.Spacing4, start = Dimen.Spacing4)
+                .align(Alignment.CenterHorizontally)
+        )
     }
 }
 
 @Composable
 private fun RangeIndicator(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     text: String,
-    color: androidx.compose.ui.graphics.Color
+    color: Color
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -307,30 +246,6 @@ private fun calculateRangeCoverage(state: FilterState): Float {
     val currentRange = state.selectedRange.endInclusive - state.selectedRange.start
     val totalRange = state.type.fullRange.endInclusive - state.type.fullRange.start
     return if (totalRange > 0) (currentRange / totalRange * 100f) else 0f
-}
-
-@Composable
-private fun Label(
-    text: String,
-    value: Int,
-    align: Alignment.Horizontal = Alignment.Start
-) {
-    val scheme = MaterialTheme.colorScheme
-
-    Column(horizontalAlignment = align) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = scheme.onSurfaceVariant
-        )
-        Text(
-            text = value.toString(),
-            style = MaterialTheme.typography.titleMedium,
-            fontFamily = FontFamilyDisplay,
-            color = scheme.primary,
-            fontWeight = FontWeight.Medium
-        )
-    }
 }
 
 @Preview(showBackground = true)

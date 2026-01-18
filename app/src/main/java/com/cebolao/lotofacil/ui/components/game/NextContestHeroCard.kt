@@ -1,24 +1,32 @@
 package com.cebolao.lotofacil.ui.components.game
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.NextDrawInfo
-import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
@@ -28,99 +36,101 @@ fun NextContestHeroCard(
 ) {
     if (info == null) return
 
-    AppCard(
+    val scheme = MaterialTheme.colorScheme
+    
+    // Gradient or solid primary for that "official" look
+    val containerColor = scheme.primary
+    val userContentColor = scheme.onPrimary
+
+    ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        variant = CardVariant.Solid,
-        contentPadding = Dimen.Spacing12
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = containerColor,
+            contentColor = userContentColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimen.ElevationMedium)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Dimen.Spacing16),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
         ) {
-            // Header with Contest Number
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = MaterialTheme.shapes.extraLarge,
-                modifier = Modifier.padding(bottom = Dimen.Spacing4)
-            ) {
-                 Text(
-                    text = stringResource(R.string.home_next_contest, info.contestNumber),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = Dimen.Spacing12, vertical = Dimen.Spacing4)
-                )
-            }
+            // Header: NEXT CONTEST 1234
+            Text(
+                text = stringResource(R.string.home_next_contest, info.contestNumber).uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = userContentColor.copy(alpha = 0.8f),
+                letterSpacing = Dimen.TrackingWidest
+            )
 
-            // Main Prize
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.widget_label_prize_estimate).uppercase(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    letterSpacing = Dimen.TrackingWidest
-                )
-                Text(
-                    text = info.formattedPrize,
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            // Prize Value (Hero)
+            Text(
+                text = info.formattedPrize,
+                style = MaterialTheme.typography.displaySmall, // Bigger
+                fontWeight = FontWeight.ExtraBold,
+                color = userContentColor,
+                textAlign = TextAlign.Center
+            )
 
-            // Date and Accumulation section
+            Text(
+                text = stringResource(R.string.widget_label_prize_estimate),
+                style = MaterialTheme.typography.labelSmall,
+                color = userContentColor.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(Dimen.Spacing8))
+
+            // Footer: Date | Final 5
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing12),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = userContentColor.copy(alpha = 0.1f),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(Dimen.Spacing8),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Date Box
-                AppCard(
-                    modifier = Modifier.weight(1f),
-                    variant = CardVariant.Solid,
-                    contentPadding = Dimen.Spacing8
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.widget_label_draw_date),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = info.formattedDate,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                // Date
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.widget_label_draw_date),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = userContentColor.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = info.formattedDate,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = userContentColor
+                    )
                 }
 
-                // Final Five Accumulation Box
-                AppCard(
-                    modifier = Modifier.weight(1f),
-                    variant = CardVariant.Solid,
-                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
-                    contentPadding = Dimen.Spacing8
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.next_contest_final_five_label),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                        Text(
-                            text = info.formattedPrizeFinalFive,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                    }
+                // Vertical Divider
+                Box(
+                    modifier = Modifier
+                        .size(1.dp, 24.dp)
+                        .background(userContentColor.copy(alpha = 0.2f))
+                )
+
+                // Final 5
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.next_contest_final_five_label),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = userContentColor.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = info.formattedPrizeFinalFive,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = userContentColor
+                    )
                 }
             }
         }

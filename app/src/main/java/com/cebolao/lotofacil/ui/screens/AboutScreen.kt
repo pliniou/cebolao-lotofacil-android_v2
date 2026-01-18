@@ -1,5 +1,7 @@
 package com.cebolao.lotofacil.ui.screens
 
+import android.R.attr.label
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -14,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,42 +26,47 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.data.repository.THEME_MODE_DARK
 import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
-import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.stats.FormattedText
-import com.cebolao.lotofacil.ui.components.game.GameRulesCard
-import com.cebolao.lotofacil.ui.components.layout.SectionHeader
-import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
-import com.cebolao.lotofacil.ui.components.stats.StatisticsExplanationCard
-import com.cebolao.lotofacil.ui.components.common.StudioHero
-import com.cebolao.lotofacil.ui.theme.AccentPalette
-import com.cebolao.lotofacil.ui.theme.AppIcons
-import com.cebolao.lotofacil.ui.theme.Dimen
-import com.cebolao.lotofacil.ui.theme.Motion
-import com.cebolao.lotofacil.ui.theme.TextPrimaryDark
-import com.cebolao.lotofacil.ui.theme.TextPrimaryLight
+import com.cebolao.lotofacil.presentation.viewmodel.MainUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.MainViewModel
-
+import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
 import com.cebolao.lotofacil.ui.components.common.AppDivider
 import com.cebolao.lotofacil.ui.components.common.StandardInfoRow
-import com.cebolao.lotofacil.presentation.viewmodel.MainUiEvent
+import com.cebolao.lotofacil.ui.components.common.StudioHero
+import com.cebolao.lotofacil.ui.components.game.GameRulesCard
+import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.SectionHeader
+import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.stats.FormattedText
+import com.cebolao.lotofacil.ui.components.stats.StatisticsExplanationCard
+import com.cebolao.lotofacil.ui.theme.AccentPalette
+import com.cebolao.lotofacil.ui.theme.AppIcons
+import com.cebolao.lotofacil.ui.theme.DarkTextPrimary
+import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.LightTextPrimary
+import com.cebolao.lotofacil.ui.theme.Motion
 
 // Constants for URLs
 private const val URL_CAIXA = "https://loterias.caixa.gov.br/Paginas/Lotofacil.aspx"
@@ -88,6 +97,7 @@ fun AboutScreenContent(
     listState: LazyListState
 ) {
     val context = LocalContext.current
+    var urlToOpen by remember { mutableStateOf<String?>(null) }
 
     fun openUrl(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -121,7 +131,7 @@ fun AboutScreenContent(
                     verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
                     ProbabilityCard()
-                    CaixaCard { openUrl(URL_CAIXA) }
+                    CaixaCard { urlToOpen = URL_CAIXA }
                 }
             }
 
@@ -184,14 +194,14 @@ fun AboutScreenContent(
                                 AboutItemRow(
                                     icon = AppIcons.Info,
                                     text = stringResource(R.string.about_terms)
-                                ) { openUrl(URL_TERMS) }
+                                ) { urlToOpen = URL_TERMS }
                             }
 
                             if (URL_PRIVACY.isNotBlank()) {
                                 AboutItemRow(
                                     icon = AppIcons.Info,
                                     text = stringResource(R.string.about_privacy_policy)
-                                ) { openUrl(URL_PRIVACY) }
+                                ) { urlToOpen = URL_PRIVACY }
                             }
                         }
                     }
@@ -211,6 +221,21 @@ fun AboutScreenContent(
                 )
             }
         }
+    }
+
+    // External Link Confirmation Dialog
+    urlToOpen?.let { url ->
+        AppConfirmationDialog(
+            title = R.string.about_external_link_title,
+            message = R.string.about_external_link_message,
+            confirmText = R.string.about_external_link_confirm,
+            onConfirm = {
+                openUrl(url)
+                urlToOpen = null
+            },
+            onDismiss = { urlToOpen = null },
+            icon = AppIcons.Launch
+        )
     }
 }
 
@@ -255,7 +280,7 @@ private fun ThemeModeSection(
     Column(verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)) {
         SettingsSectionHeader(
             icon = AppIcons.Tune,
-            title = "Modo de Tema"
+            title = stringResource(R.string.about_theme_mode)
         )
 
         Column(
@@ -264,13 +289,13 @@ private fun ThemeModeSection(
         ) {
             ThemeModeOption(
                 icon = AppIcons.StarFilled,
-                label = "Claro",
+                label = stringResource(R.string.about_theme_light),
                 isSelected = currentTheme == THEME_MODE_LIGHT,
                 onClick = { onThemeChange(THEME_MODE_LIGHT) }
             )
             ThemeModeOption(
                 icon = AppIcons.StarOutlined,
-                label = "Escuro",
+                label = stringResource(R.string.about_theme_dark),
                 isSelected = currentTheme == THEME_MODE_DARK,
                 onClick = { onThemeChange(THEME_MODE_DARK) }
             )
@@ -289,7 +314,12 @@ private fun ThemeModeOption(
 
     AppCard(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics {
+                role = Role.RadioButton
+                stateDescription = if (isSelected) label else ""
+            },
         outlined = !isSelected,
         color = if (isSelected) scheme.primaryContainer.copy(alpha = 0.55f) else scheme.surface,
         contentPadding = Dimen.ItemSpacing
@@ -328,7 +358,7 @@ private fun AccentPaletteSection(
     Column(verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)) {
         SettingsSectionHeader(
             icon = AppIcons.Tune,
-            title = "Cor de Destaque"
+            title = stringResource(R.string.about_accent_color)
         )
 
         // 6 opções em grid de 2 linhas (3 + 3), evitando apertar rótulos.
@@ -352,6 +382,7 @@ private fun AccentPaletteSection(
     }
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 private fun AccentColorButton(
     palette: AccentPalette,
@@ -360,17 +391,18 @@ private fun AccentColorButton(
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
+    val contentDesc = stringResource(R.string.about_accessibility_select_accent, label)
     val label = when (palette) {
-        AccentPalette.AZUL -> "Azul"
-        AccentPalette.ROXO -> "Roxo"
-        AccentPalette.VERDE -> "Verde"
-        AccentPalette.AMARELO -> "Amarelo"
-        AccentPalette.ROSA -> "Rosa"
-        AccentPalette.LARANJA -> "Laranja"
+        AccentPalette.AZUL -> stringResource(R.string.about_accent_blue)
+        AccentPalette.ROXO -> stringResource(R.string.about_accent_purple)
+        AccentPalette.VERDE -> stringResource(R.string.about_accent_green)
+        AccentPalette.AMARELO -> stringResource(R.string.about_accent_yellow)
+        AccentPalette.ROSA -> stringResource(R.string.about_accent_pink)
+        AccentPalette.LARANJA -> stringResource(R.string.about_accent_orange)
     }
 
     // Contraste automático para seeds muito claras (ex.: amarelo)
-    val onSeed = if (palette.seed.luminance() > 0.62f) TextPrimaryLight else TextPrimaryDark
+    val onSeed = if (palette.seed.luminance() > 0.62f) LightTextPrimary else DarkTextPrimary
 
     val scale by animateFloatAsState(
         targetValue = if (isSelected) Motion.Offset.SELECTSCALE else 1f,
@@ -382,7 +414,12 @@ private fun AccentColorButton(
         onClick = onClick,
         modifier = modifier
             .height(Dimen.ActionButtonHeight)
-            .scale(scale),
+            .scale(scale)
+            .semantics {
+                role = Role.Button
+                stateDescription = if (isSelected) label else ""
+                this.contentDescription = contentDesc
+            },
         color = palette.seed,
         shape = MaterialTheme.shapes.large,
         border = if (isSelected) {

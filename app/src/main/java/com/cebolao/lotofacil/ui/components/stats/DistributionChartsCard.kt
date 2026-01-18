@@ -5,19 +5,22 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.StatisticPattern
@@ -86,20 +89,26 @@ fun DistributionChartsCard(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
         ) {
-            // Pattern Selector
-            PatternSelector(
-                selectedPattern = selectedPattern,
-                onPatternSelected = onPatternSelected
-            )
+            // Pattern Selector Area - Explicit container to ensure it stays above
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            ) {
+                PatternSelector(
+                    selectedPattern = selectedPattern,
+                    onPatternSelected = onPatternSelected
+                )
+            }
 
+            // Chart Area - Ensure explicit height to avoid clipping axis
             BarChart(
                 data = chartData.toImmutableList(),
                 maxValue = maxValue,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimen.BarChartHeight),
+                    .height(Dimen.BarChartHeight + 40.dp), // Extra space for rotated labels
                 chartHeight = Dimen.BarChartHeight,
                 chartType = ChartType.BAR,
                 showNormalLine = showNormalLine,
@@ -107,6 +116,9 @@ fun DistributionChartsCard(
                 stdDev = stdDev?.toFloat(),
                 highlightValue = highlightValue
             )
+            
+            // Helpful spacer at the bottom
+            Spacer(modifier = Modifier.height(Dimen.Spacing4))
         }
     }
 }
@@ -119,12 +131,12 @@ private fun PatternSelector(
 ) {
     val patterns = remember { StatisticPattern.entries }
 
-    FlowRow(
+    LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8, Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
+        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+        contentPadding = PaddingValues(horizontal = 0.dp)
     ) {
-        patterns.forEach { pattern ->
+        items(patterns.toList()) { pattern ->
             val label = patternLabel(pattern)
             CustomChip(
                 selected = pattern == selectedPattern,

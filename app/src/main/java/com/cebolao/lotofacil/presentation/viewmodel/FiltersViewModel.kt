@@ -36,7 +36,7 @@ sealed interface NavigationEvent {
      */
     data class ShowSnackbar(
         @param:StringRes val messageRes: Int,
-        @param:StringRes val labelRes: Int? = null
+        val formatArgs: List<Any> = emptyList()
     ) : NavigationEvent
 
     /**
@@ -81,7 +81,8 @@ data class FiltersScreenState(
     val generationState: GenerationUiState = GenerationUiState.Idle,
     val lastDraw: Set<Int>? = null,
     val showResetDialog: Boolean = false,
-    val filterInfoToShow: FilterType? = null
+    val filterInfoToShow: FilterType? = null,
+    val showStrictConfirmation: Boolean = false
 )
 
 /**
@@ -99,6 +100,7 @@ class FiltersViewModel @Inject constructor(
     private val _lastDraw = MutableStateFlow<Set<Int>?>(null)
     private val _showResetDialog = MutableStateFlow(false)
     private val _filterInfoToShow = MutableStateFlow<FilterType?>(null)
+    private val _showStrictConfirmation = MutableStateFlow(false)
     private val _events = Channel<NavigationEvent>(Channel.BUFFERED)
 
     /**
@@ -122,14 +124,24 @@ class FiltersViewModel @Inject constructor(
         _generationState,
         _lastDraw,
         _showResetDialog,
-        _filterInfoToShow
-    ) { filterStates, generationState, lastDraw, showResetDialog, filterInfoToShow ->
+        _filterInfoToShow,
+        _showStrictConfirmation
+    ) { args ->
+        @Suppress("UNCHECKED_CAST")
+        val filterStates = args[0] as List<FilterState>
+        val generationState = args[1] as GenerationUiState
+        val lastDraw = args[2] as? Set<Int>
+        val showResetDialog = args[3] as Boolean
+        val filterInfoToShow = args[4] as? FilterType
+        val showStrictConfirmation = args[5] as Boolean
+
         FiltersScreenState(
             filterStates = filterStates,
             generationState = generationState,
             lastDraw = lastDraw,
             showResetDialog = showResetDialog,
-            filterInfoToShow = filterInfoToShow
+            filterInfoToShow = filterInfoToShow,
+            showStrictConfirmation = showStrictConfirmation
         )
     }.stateIn(
         viewModelScope,
@@ -153,6 +165,8 @@ class FiltersViewModel @Inject constructor(
             FiltersUiEvent.DismissResetDialog -> dismissResetDialog()
             is FiltersUiEvent.ShowFilterInfo -> showFilterInfo(event.type)
             FiltersUiEvent.DismissFilterInfo -> dismissFilterInfo()
+            FiltersUiEvent.ConfirmStrictGeneration -> confirmStrictGeneration()
+            FiltersUiEvent.DismissStrictConfirmation -> dismissStrictConfirmation()
         }
     }
 
@@ -185,12 +199,33 @@ class FiltersViewModel @Inject constructor(
                 }
             }
         }
-        _events.trySend(NavigationEvent.ShowSnackbar(R.string.filter_preset_applied, null))
+        _events.trySend(NavigationEvent.ShowSnackbar(R.string.filter_preset_applied, formatArgs = listOf(preset.labelRes)))
     }
+
+    private var pendingQuantity: Int = 10
 
     private fun generateGames(quantity: Int) {
          if (_generationState.value is GenerationUiState.Loading) return
+         
+         val filters = _filterStates.value.filter { it.isEnabled }
+         
+         // Simple heuristic to check strictness (can be improved)
+         // If many filters are enabled and ranges are narrow, it's strict.
+         // For now, let's just check if "Strict" preset is roughly applied or if we have > 4 active filters with narrow ranges.
+         // This is a placeholder for a more complex domain logic check if needed.
+         val activeFilters = filters.size
+         val isVeryStrict = activeFilters >= 5 // Example threshold
+         
+         if (isVeryStrict && !_showStrictConfirmation.value) {
+             pendingQuantity = quantity
+             _showStrictConfirmation.value = true
+             return
+         }
 
+         startGeneration(quantity, filters)
+    }
+
+    private fun startGeneration(quantity: Int, filters: List<FilterState>) {
         generationJob?.cancel()
         generationJob = launchCatching(
             onError = {
@@ -198,8 +233,6 @@ class FiltersViewModel @Inject constructor(
             }
         ) {
             _generationState.value = GenerationUiState.Loading(0, quantity)
-
-            val filters = _filterStates.value.filter { it.isEnabled }
             
             // Debouncer for UI updates
             var lastProgressUpdate = 0L
@@ -246,6 +279,7 @@ class FiltersViewModel @Inject constructor(
     private fun confirmResetFilters() {
         _showResetDialog.value = false
         _filterStates.value = FilterType.defaults()
+        _events.trySend(NavigationEvent.ShowSnackbar(R.string.filters_reset_success))
     }
 
     private fun dismissResetDialog() {
@@ -258,6 +292,16 @@ class FiltersViewModel @Inject constructor(
 
     private fun dismissFilterInfo() {
         _filterInfoToShow.value = null
+    }
+
+    private fun confirmStrictGeneration() {
+        _showStrictConfirmation.value = false
+        val filters = _filterStates.value.filter { it.isEnabled }
+        startGeneration(pendingQuantity, filters)
+    }
+
+    private fun dismissStrictConfirmation() {
+        _showStrictConfirmation.value = false
     }
 
     private fun cancelGeneration() {
@@ -284,6 +328,8 @@ sealed interface FiltersUiEvent {
     data object DismissResetDialog : FiltersUiEvent
     data class ShowFilterInfo(val type: FilterType) : FiltersUiEvent
     data object DismissFilterInfo : FiltersUiEvent
+    data object ConfirmStrictGeneration : FiltersUiEvent
+    data object DismissStrictConfirmation : FiltersUiEvent
 }
 
 /**
