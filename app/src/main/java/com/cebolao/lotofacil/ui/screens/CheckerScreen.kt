@@ -36,9 +36,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -282,24 +282,12 @@ fun CheckerScreenContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+
             // Card de instruções (Idle)
             // Show only if no game score and no results (pure idle)
             if (uiState is CheckerUiState.Idle && gameScore == null) {
                 item(key = "instructions") {
-                    AppCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = Dimen.ItemSpacing),
-                        outlined = false,
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        contentPadding = Dimen.CardContentPadding
-                    ) {
-                        MessageState(
-                            icon = AppIcons.Success,
-                            title = stringResource(R.string.checker_how_it_works_title),
-                            message = stringResource(R.string.checker_how_it_works_desc)
-                        )
-                    }
+                    InstructionsCard()
                 }
             }
 
@@ -308,6 +296,28 @@ fun CheckerScreenContent(
                 CheckerResultSection(uiState, gameScore)
             }
         }
+    }
+}
+
+/**
+ * Instructions card shown when checker is idle.
+ * Follows design system patterns for consistency.
+ */
+@Composable
+private fun InstructionsCard() {
+    AppCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = Dimen.ItemSpacing),
+        outlined = false,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        contentPadding = Dimen.CardContentPadding
+    ) {
+        MessageState(
+            icon = AppIcons.Success,
+            title = stringResource(R.string.checker_how_it_works_title),
+            message = stringResource(R.string.checker_how_it_works_desc)
+        )
     }
 }
 

@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.ui.components.stats
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,8 +19,13 @@ import com.cebolao.lotofacil.ui.components.common.StandardInfoRow
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
-@SuppressLint("DefaultLocale")
+private val ptBrLocale = Locale("pt", "BR")
+private val percentageFormat = DecimalFormat("0.00", DecimalFormatSymbols(ptBrLocale))
+
 @Composable
 fun FinancialPerformanceCard(
     report: CheckReport,
@@ -46,7 +50,7 @@ fun FinancialPerformanceCard(
             StandardInfoRow(
                 icon = if (report.financialMetrics.breakEven) AppIcons.TrendingUp else AppIcons.TrendingDown,
                 title = "Resultado",
-                description = "R$ ${report.financialMetrics.profit} (ROI: ${String.format("%.2f", report.financialMetrics.roi)}%)"
+                description = "R$ ${report.financialMetrics.profit} (ROI: ${percentageFormat.format(report.financialMetrics.roi)}%)"
             )
         }
     }

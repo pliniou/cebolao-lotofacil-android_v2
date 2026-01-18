@@ -79,7 +79,7 @@ object WidgetUtils {
         }
     }
 
-    @Suppress("NewApi")
+    @androidx.annotation.RequiresApi(android.os.Build.VERSION_CODES.S)
     fun buildResponsiveRemoteViews(
         small: RemoteViews,
         medium: RemoteViews,

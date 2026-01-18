@@ -92,7 +92,7 @@ class CheckGameUseCase @Inject constructor(
 
         } catch (e: CancellationException) {
             throw e
-        } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
+        } catch (e: Exception) {
             logger.error(TAG, "Analysis failed", e)
             emit(AppResult.Failure(e.toAppError()))
         }

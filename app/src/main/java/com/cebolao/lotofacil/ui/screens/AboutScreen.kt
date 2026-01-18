@@ -382,7 +382,6 @@ private fun AccentPaletteSection(
     }
 }
 
-@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 private fun AccentColorButton(
     palette: AccentPalette,

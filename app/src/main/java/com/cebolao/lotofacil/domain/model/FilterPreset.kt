@@ -17,7 +17,6 @@ data class FilterPreset(
     val rules: Map<FilterType, ClosedFloatingPointRange<Float>>
 )
 
-@Suppress("unused")
 object FilterPresets {
 
     val all: List<FilterPreset> = listOf(

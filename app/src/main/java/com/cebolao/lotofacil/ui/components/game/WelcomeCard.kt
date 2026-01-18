@@ -36,14 +36,18 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+private const val MORNING_START_HOUR = 5
+private const val MORNING_END_HOUR = 11
+private const val AFTERNOON_START_HOUR = 12
+private const val AFTERNOON_END_HOUR = 17
+
 /**
  * Retorna o ícone apropriado baseado no horário do dia.
  */
-@Suppress("MagicNumber")
 private fun getGreetingIcon(hour: Int): ImageVector {
     return when (hour) {
-        in 5..11 -> Icons.Filled.WbSunny
-        in 12..17 -> Icons.Filled.WbTwilight
+        in MORNING_START_HOUR..MORNING_END_HOUR -> Icons.Filled.WbSunny
+        in AFTERNOON_START_HOUR..AFTERNOON_END_HOUR -> Icons.Filled.WbTwilight
         else -> Icons.Filled.NightsStay
     }
 }
@@ -51,7 +55,6 @@ private fun getGreetingIcon(hour: Int): ImageVector {
 /**
  * Card de boas-vindas com saudação dinâmica, data e frase motivacional.
  */
-@Suppress("MagicNumber")
 @Composable
 fun WelcomeCard(
     modifier: Modifier = Modifier
@@ -62,8 +65,8 @@ fun WelcomeCard(
     val currentDate = remember { LocalDate.now() }
 
     val greetingRes = when (currentTime.hour) {
-        in 5..11 -> R.string.greeting_morning
-        in 12..17 -> R.string.greeting_afternoon
+        in MORNING_START_HOUR..MORNING_END_HOUR -> R.string.greeting_morning
+        in AFTERNOON_START_HOUR..AFTERNOON_END_HOUR -> R.string.greeting_afternoon
         else -> R.string.greeting_night
     }
 

@@ -50,7 +50,7 @@ class AnalyzeGameUseCase @Inject constructor(
             }
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
-        } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
+        } catch (e: Exception) {
              AppResult.Failure(e.toAppError())
         }
     }

@@ -185,7 +185,7 @@ private fun RowScope.OnboardingNextButton(
                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                 }
             },
-            modifier = Modifier.widthIn(min = 120.dp),
+            modifier = Modifier.widthIn(min = Dimen.ControlWidthMedium),
             isFullWidth = false
         )
     }

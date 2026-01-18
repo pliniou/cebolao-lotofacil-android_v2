@@ -6,8 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -15,52 +20,44 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.LocalResources
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.rememberNavController
-import com.cebolao.lotofacil.ui.components.layout.StandardScreenHeader
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.model.FilterPreset
+import com.cebolao.lotofacil.domain.model.FilterPresets
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
 import com.cebolao.lotofacil.navigation.GeneratedGamesRoute
+import com.cebolao.lotofacil.presentation.viewmodel.FiltersScreenState
+import com.cebolao.lotofacil.presentation.viewmodel.FiltersUiEvent
+import com.cebolao.lotofacil.presentation.viewmodel.FiltersViewModel
+import com.cebolao.lotofacil.presentation.viewmodel.GenerationUiState
+import com.cebolao.lotofacil.presentation.viewmodel.NavigationEvent
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
+import com.cebolao.lotofacil.ui.components.common.InfoDialog
 import com.cebolao.lotofacil.ui.components.filter.FilterGroupColumn
 import com.cebolao.lotofacil.ui.components.filter.FilterPresetSelector
 import com.cebolao.lotofacil.ui.components.filter.GenerationActionsPanel
-import com.cebolao.lotofacil.ui.components.common.InfoDialog
-import com.cebolao.lotofacil.ui.components.stats.InfoPoint
-import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.filter.filterSection
+import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.layout.StandardScreenHeader
+import com.cebolao.lotofacil.ui.components.stats.InfoPoint
+import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.filterIcon
-import com.cebolao.lotofacil.presentation.viewmodel.FiltersUiEvent
-import com.cebolao.lotofacil.presentation.viewmodel.FiltersScreenState
-import com.cebolao.lotofacil.presentation.viewmodel.FiltersViewModel
-import com.cebolao.lotofacil.presentation.viewmodel.NavigationEvent
-import com.cebolao.lotofacil.presentation.viewmodel.GenerationUiState
-import com.cebolao.lotofacil.domain.model.FilterPreset
-import com.cebolao.lotofacil.domain.model.FilterPresets
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.collectLatest
 
 data class FilterCategory(
@@ -73,8 +70,8 @@ fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltView
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
-    val resources = LocalResources.current
-    val currentResources by rememberUpdatedState(resources)
+    val context = LocalContext.current
+    val currentResources by rememberUpdatedState(context.resources)
     
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->

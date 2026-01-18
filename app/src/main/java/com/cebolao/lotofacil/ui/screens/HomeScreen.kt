@@ -1,11 +1,20 @@
 package com.cebolao.lotofacil.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,8 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -140,25 +151,13 @@ fun HomeScreenContent(
                             delayMillis = staggerDelay(3).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
-                            androidx.compose.foundation.layout.Column {
-                                LastDrawCard(
-                                    draw = draw,
-                                    details = successState.details,
-                                    onCheckGame = { numbers ->
-                                        onNavigateToChecker(numbers)
-                                    },
-                                    onRefresh = {
-                                        onEvent(HomeUiEvent.ForceSync)
-                                    },
-                                    modifier = Modifier.padding(horizontal = Dimen.ScreenPadding)
-                                )
-                                androidx.compose.material3.TextButton(
-                                    onClick = onNavigateToResults,
-                                    modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally)
-                                ) {
-                                    androidx.compose.material3.Text(stringResource(R.string.results_title))
-                                }
-                            }
+                            LastDrawSection(
+                                draw = draw,
+                                details = successState.details,
+                                onCheckGame = onNavigateToChecker,
+                                onRefresh = { onEvent(HomeUiEvent.ForceSync) },
+                                onNavigateToResults = onNavigateToResults
+                            )
                         }
                     }
                 }
@@ -209,6 +208,42 @@ fun HomeScreenContent(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Section displaying the last draw with navigation to checker and results.
+ * Follows design system spacing and component patterns.
+ */
+@Composable
+private fun LastDrawSection(
+    draw: com.cebolao.lotofacil.ui.model.UiDraw,
+    details: com.cebolao.lotofacil.ui.model.UiDrawDetails?,
+    onCheckGame: (Set<Int>) -> Unit,
+    onRefresh: () -> Unit,
+    onNavigateToResults: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
+    ) {
+        LastDrawCard(
+            draw = draw,
+            details = details,
+            onCheckGame = onCheckGame,
+            onRefresh = onRefresh
+        )
+        
+        TextButton(
+            onClick = onNavigateToResults,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = stringResource(R.string.results_title),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
