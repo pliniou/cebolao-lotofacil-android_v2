@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.baselineprofile)
 }
 
 kotlin {
@@ -71,9 +70,6 @@ android {
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
     }
 
-    baselineProfile {
-        mergeIntoMain = true
-    }
 }
 
 dependencies {
@@ -116,7 +112,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.androidx.profileinstaller)
-    baselineProfile(project(":baselineprofile"))
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

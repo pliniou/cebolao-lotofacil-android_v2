@@ -15,7 +15,7 @@ fun LotofacilApiResult.toDraw(): Draw {
 private fun String?.parseDateToMillis(): Long? {
     if (this == null) return null
     return try {
-        val format = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
+        val format = SimpleDateFormat("dd/MM/yyyy", Locale.forLanguageTag("pt-BR"))
         format.parse(this)?.time
     } catch (_: Exception) {
         null

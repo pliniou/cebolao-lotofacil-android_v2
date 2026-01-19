@@ -77,7 +77,7 @@ class HistoryRemoteDataSourceImpl @Inject constructor(
 ) : HistoryRemoteDataSource {
 
     private val dateFormatter: DateTimeFormatter =
-        DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("pt", "BR"))
+        DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("pt-BR"))
 
     override suspend fun getLatestDraw(): LotofacilApiResult? = withContext(ioDispatcher) {
         retryOnHttp429(logger, tag = "getLatestDraw") {

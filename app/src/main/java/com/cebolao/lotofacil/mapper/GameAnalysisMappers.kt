@@ -14,7 +14,7 @@ typealias UiGameAnalysisResult = com.cebolao.lotofacil.ui.model.UiGameAnalysisRe
  */
 fun GameMetrics.toSimpleStats(): ImmutableList<Pair<String, String>> {
     return listOf(
-        "Média de acertos" to String.format(Locale("pt", "BR"), "%.2f", averageHit),
+        "Média de acertos" to String.format(Locale.forLanguageTag("pt-BR"), "%.2f", averageHit),
         "Máximo de acertos" to "$maxHit",
         "Mínimo de acertos" to "$minHit",
         "Total de acertos" to "$totalHits"

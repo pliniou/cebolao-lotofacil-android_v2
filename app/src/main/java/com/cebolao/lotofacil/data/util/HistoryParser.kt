@@ -24,7 +24,7 @@ object HistoryParser {
      */
     private val dateFormat: ThreadLocal<SimpleDateFormat> =
         ThreadLocal.withInitial {
-            SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
+            SimpleDateFormat("dd/MM/yyyy", Locale.forLanguageTag("pt-BR"))
         }
 
     fun parseLine(line: String): Draw? {

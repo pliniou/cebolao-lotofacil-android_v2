@@ -23,7 +23,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-private val ptBrLocale = Locale("pt", "BR")
+private val ptBrLocale = Locale.forLanguageTag("pt-BR")
 private val percentageFormat = DecimalFormat("0.00", DecimalFormatSymbols(ptBrLocale))
 
 @Composable

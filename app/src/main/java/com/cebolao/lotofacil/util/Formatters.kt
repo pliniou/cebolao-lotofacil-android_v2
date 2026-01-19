@@ -6,7 +6,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 object Formatters {
-    private val appLocale = Locale(LOCALE_LANGUAGE, LOCALE_COUNTRY)
+    private val appLocale = Locale.forLanguageTag("$LOCALE_LANGUAGE-$LOCALE_COUNTRY")
     fun formatCurrency(value: Number): String {
         return NumberFormat.getCurrencyInstance(appLocale).format(value)
     }

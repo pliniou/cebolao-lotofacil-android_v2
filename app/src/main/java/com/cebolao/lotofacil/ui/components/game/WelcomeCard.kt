@@ -71,7 +71,7 @@ fun WelcomeCard(
     }
 
     val dateString = remember(currentDate) {
-        val locale = Locale("pt", "BR")
+        val locale = Locale.forLanguageTag("pt-BR")
         DateTimeFormatter
             .ofLocalizedDate(FormatStyle.MEDIUM)
             .withLocale(locale)

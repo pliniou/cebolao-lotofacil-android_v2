@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "CebolaoLotofacilGenerator"
-include(":app", ":baselineprofile")
+include(":app")
