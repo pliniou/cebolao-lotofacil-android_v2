@@ -1,11 +1,9 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class StatisticsReport(
     @SerialName("most_frequent_numbers")

@@ -1,10 +1,8 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class FilterState(
     val type: FilterType,

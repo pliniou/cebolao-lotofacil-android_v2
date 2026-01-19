@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
@@ -13,7 +12,6 @@ enum class ScoreStatus {
     BAD
 }
 
-@SuppressLint("UnsafeOptInUsageError")
 @Immutable
 @Serializable
 data class MetricEvaluation(
@@ -23,7 +21,6 @@ data class MetricEvaluation(
     val message: String
 )
 
-@SuppressLint("UnsafeOptInUsageError")
 @Immutable
 @Serializable
 data class GameScore(

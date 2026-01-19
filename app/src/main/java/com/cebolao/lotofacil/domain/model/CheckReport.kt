@@ -1,13 +1,11 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 /**
  * Relatório completo de uma conferência de jogo, incluindo metadados de auditoria
  */
-@SuppressLint("UnsafeOptInUsageError")
 @Immutable
 @Serializable
 data class CheckReport(

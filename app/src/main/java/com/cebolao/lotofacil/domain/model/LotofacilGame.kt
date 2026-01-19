@@ -1,10 +1,8 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import com.cebolao.lotofacil.domain.GameConstants
 import kotlinx.serialization.Serializable
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 @ConsistentCopyVisibility
 data class LotofacilGame internal constructor(

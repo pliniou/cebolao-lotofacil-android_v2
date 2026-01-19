@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 
 /**
@@ -18,7 +17,6 @@ data class DrawDetails(
     val prizeRates: List<PrizeRate>
 )
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class WinnerLocation(
     val state: String,
@@ -26,7 +24,6 @@ data class WinnerLocation(
     val count: Int
 )
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class PrizeRate(
     val description: String,

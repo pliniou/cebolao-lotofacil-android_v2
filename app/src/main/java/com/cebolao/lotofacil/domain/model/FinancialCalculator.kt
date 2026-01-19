@@ -1,12 +1,10 @@
 package com.cebolao.lotofacil.domain.model
 
-import android.annotation.SuppressLint
 import com.cebolao.lotofacil.domain.GameConstants
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class FinancialProjection(
     val investment: String,

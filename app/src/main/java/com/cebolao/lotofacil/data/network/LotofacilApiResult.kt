@@ -1,10 +1,8 @@
 package com.cebolao.lotofacil.data.network
 
-import android.annotation.SuppressLint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class LotofacilApiResult(
     @SerialName("numero")
@@ -41,7 +39,6 @@ data class LotofacilApiResult(
     val valorAcumuladoConcursoEspecial: Double = 0.0
 )
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class RateioPremio(
     @SerialName("descricaoFaixa")
@@ -52,7 +49,6 @@ data class RateioPremio(
     val valorPremio: Double = 0.0
 )
 
-@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class MunicipioUFGanhadores(
     @SerialName("municipio")
