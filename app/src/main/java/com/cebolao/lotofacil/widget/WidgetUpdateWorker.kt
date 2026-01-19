@@ -15,7 +15,6 @@ import androidx.work.WorkerParameters
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.repository.GameRepository
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.domain.repository.SyncStatus
 import com.cebolao.lotofacil.util.DEFAULT_NUMBER_FORMAT
 import com.cebolao.lotofacil.util.Formatters
 import dagger.assisted.Assisted
@@ -34,20 +33,26 @@ class WidgetUpdateWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "WidgetUpdateWorker"
+        private const val MAX_ATTEMPTS = 3
     }
 
     override suspend fun doWork(): Result = runCatching {
         updateAllWidgets()
-        // Sync não pode “derrubar” o widget
-        historyRepository.syncHistory().join()
-        val synced = historyRepository.syncStatus.value is SyncStatus.Success
-        if (synced) {
+
+        // Sync nao pode derrubar o widget; se falhar seguimos conforme WorkManager.
+        val syncResult = historyRepository.syncHistoryIfNeeded()
+        if (syncResult.isSuccess) {
             updateAllWidgets()
         }
-        Result.success()
+
+        if (syncResult.isFailure && shouldRetry()) {
+            Result.retry()
+        } else {
+            Result.success()
+        }
     }.getOrElse { e ->
-        Log.e(TAG, "Widget update failed", e)
-        if (runAttemptCount < 3) Result.retry() else Result.failure()
+        Log.e(TAG, "Widget update failed (attempt ${runAttemptCount + 1})", e)
+        if (shouldRetry()) Result.retry() else Result.failure()
     }
 
     private suspend fun updateAllWidgets() {
@@ -79,7 +84,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
         ids.forEach { id ->
             val provider = LastDrawWidgetProvider::class.java
 
-            // Monta as 3 variantes sempre (Android 12+ seleciona nativamente; pré-12 usa fallback)
+            // Monta as 3 variantes sempre (Android 12+ seleciona nativamente; pre-12 usa fallback)
             val small = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.SMALL), provider, id)
             val medium = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.MEDIUM), provider, id)
             val large = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.LARGE), provider, id)
@@ -116,7 +121,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
                 val title = "${context.getString(R.string.widget_next_contest_title_generic)} ${details.nextContestNumber}"
                 val date = details.nextContestDate ?: context.getString(R.string.widget_placeholder_date)
                 val prize = Formatters.formatCurrency(details.nextEstimatedPrize)
-                
+
                 applyNextContestContent(small, title, date, prize)
                 applyNextContestContent(medium, title, date, prize)
                 applyNextContestContent(large, title, date, prize)
@@ -144,7 +149,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
             val medium = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.MEDIUM), provider, id)
             val large = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.LARGE), provider, id)
 
-            // Título é sempre o mesmo
+            // Titulo e sempre o mesmo
             small.setTextViewText(R.id.widget_title, context.getString(R.string.widget_pinned_game_title))
             medium.setTextViewText(R.id.widget_title, context.getString(R.string.widget_pinned_game_title))
             large.setTextViewText(R.id.widget_title, context.getString(R.string.widget_pinned_game_title))
@@ -219,7 +224,6 @@ class WidgetUpdateWorker @AssistedInject constructor(
      */
     private fun columnsForVariantOrRuntime(appWidgetId: Int, variant: WidgetSizeVariant): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Perfil por variante (bom equilíbrio para 15 números)
             return when (variant) {
                 WidgetSizeVariant.SMALL -> 4
                 WidgetSizeVariant.MEDIUM -> 5
@@ -227,7 +231,6 @@ class WidgetUpdateWorker @AssistedInject constructor(
             }
         }
 
-        // < Android 12: calcula de acordo com minWidth/minHeight reais
         val opts = AppWidgetManager.getInstance(context).getAppWidgetOptions(appWidgetId)
         val w = max(0, opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0))
         val h = max(0, opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0))
@@ -254,8 +257,6 @@ class WidgetUpdateWorker @AssistedInject constructor(
         val cellDp = (ballDp + (marginDp * 2f)).coerceAtLeast(1f)
 
         var cols = floor((effectiveW / cellDp).toDouble()).toInt().coerceIn(4, 6)
-
-        // Altura curta: aumenta colunas para reduzir linhas
         if (h in 1..110) cols = (cols + 1).coerceAtMost(6)
 
         return cols
@@ -322,4 +323,6 @@ class WidgetUpdateWorker @AssistedInject constructor(
             views.addView(containerId, rowView)
         }
     }
+
+    private fun shouldRetry(): Boolean = runAttemptCount + 1 < MAX_ATTEMPTS
 }

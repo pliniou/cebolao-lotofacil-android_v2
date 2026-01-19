@@ -2,42 +2,53 @@ package com.cebolao.lotofacil.data.repository
 
 import com.cebolao.lotofacil.data.local.db.CheckRunDao
 import com.cebolao.lotofacil.data.local.db.CheckRunEntity
+import com.cebolao.lotofacil.di.IoDispatcher
 import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.DrawWindow
 import com.cebolao.lotofacil.domain.model.FinancialProjection
 import com.cebolao.lotofacil.domain.repository.CheckRunRepository
 import com.cebolao.lotofacil.domain.util.Logger
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val TAG = "CheckRunRepository"
+
 @Singleton
 class CheckRunRepositoryImpl @Inject constructor(
     private val checkRunDao: CheckRunDao,
     private val json: Json,
-    private val logger: Logger
+    private val logger: Logger,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CheckRunRepository {
 
     override suspend fun saveCheckRun(report: CheckReport, lotteryId: String): Long {
         val entity = report.toEntity(lotteryId, json)
-        return checkRunDao.insert(entity)
+        return withContext(ioDispatcher) { checkRunDao.insert(entity) }
     }
 
     override fun getAllCheckRuns(): Flow<List<CheckReport>> {
         return checkRunDao.getAllCheckRuns().map { entities ->
             entities.mapNotNull { it.toCheckReport(json) }
-        }
+        }.flowOn(ioDispatcher)
     }
 
     override suspend fun getCheckRunByHash(hash: String): CheckReport? {
-        return checkRunDao.getCheckRunByHash(hash)?.toCheckReport(json)
+        return withContext(ioDispatcher) {
+            checkRunDao.getCheckRunByHash(hash)?.toCheckReport(json)
+        }
     }
 
     override suspend fun getRecentCheckRuns(limit: Int): List<CheckReport> {
-        return checkRunDao.getRecentCheckRuns(limit).mapNotNull { it.toCheckReport(json) }
+        return withContext(ioDispatcher) {
+            checkRunDao.getRecentCheckRuns(limit).mapNotNull { it.toCheckReport(json) }
+        }
     }
 
     private fun CheckReport.toEntity(lotteryId: String, json: Json): CheckRunEntity {
@@ -69,7 +80,7 @@ class CheckRunRepositoryImpl @Inject constructor(
                 sourceHash = sourceHash
             )
         } catch (_: Exception) {
-            logger.warning("CheckRunRepository", "Failed to decode CheckRunEntity id=$id", null)
+            logger.warning(TAG, "Failed to decode CheckRunEntity id=$id", null)
             null
         }
     }

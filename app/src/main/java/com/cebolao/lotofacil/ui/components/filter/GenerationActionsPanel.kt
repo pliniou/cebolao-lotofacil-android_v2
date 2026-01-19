@@ -35,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.components.common.PrimaryActionButton
 import com.cebolao.lotofacil.ui.components.layout.AppCard
@@ -57,7 +56,7 @@ fun GenerationActionsPanel(
     androidx.compose.material3.Card(
         modifier = modifier.fillMaxWidth(),
         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = scheme.surfaceContainerHigh), // Consistent with bottom sheet style
-        border = androidx.compose.foundation.BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.12f))
+        border = androidx.compose.foundation.BorderStroke(Dimen.Border.Thin, scheme.outlineVariant.copy(alpha = 0.12f))
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

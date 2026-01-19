@@ -21,6 +21,7 @@ import com.cebolao.lotofacil.domain.usecase.CheckGameUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
 import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.navigation.CheckerRoute
+import com.cebolao.lotofacil.util.toUserMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -182,7 +183,8 @@ class CheckerViewModel @Inject constructor(
                     }
                 }
                 is AppResult.Failure -> {
-                    _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed)
+                    val msg = result.error.toUserMessageRes()
+                    _uiState.value = CheckerUiState.Error(msg)
                 }
             }
         }
@@ -225,9 +227,14 @@ class CheckerViewModel @Inject constructor(
 
                 val computedIntensities = if (history.isNotEmpty()) {
                     val totalDraws = history.size
+                    val counts = mutableMapOf<Int, Int>()
+                    history.forEach { draw ->
+                        draw.numbers.forEach { n ->
+                            counts[n] = (counts[n] ?: 0) + 1
+                        }
+                    }
                     numbers.associateWith { n ->
-                        val count = history.count { draw -> n in draw.numbers }
-                        (count.toFloat() / totalDraws).coerceIn(0f, 1f)
+                        ((counts[n] ?: 0).toFloat() / totalDraws).coerceIn(0f, 1f)
                     }
                 } else {
                     numbers.associateWith { 0.5f }

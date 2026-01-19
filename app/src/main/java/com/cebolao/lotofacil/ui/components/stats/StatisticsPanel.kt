@@ -320,7 +320,7 @@ private fun StatRow(
                             highlightColor = highlightColor,
                             isOverdue = isOverdue,
                             unit = unit,
-                            modifier = Modifier.widthIn(min = 80.dp)
+                            modifier = Modifier.widthIn(min = Dimen.TableColumnWidthLarge)
                         )
                     }
                 }

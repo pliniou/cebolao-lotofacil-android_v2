@@ -92,6 +92,7 @@ class HomeViewModel @Inject constructor(
     private val _selectedTimeWindow = MutableStateFlow(0)
     private val _selectedPattern = MutableStateFlow(StatisticPattern.SUM)
     private val _syncMessageEvent = MutableStateFlow<Int?>(null)
+    private val _syncError = MutableStateFlow<Int?>(null)
 
     val syncStatus: StateFlow<SyncStatus> = observeSyncStatusUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), SyncStatus.Idle)
@@ -142,8 +143,9 @@ class HomeViewModel @Inject constructor(
         combinedData,
         _selectedTimeWindow,
         _selectedPattern,
-        _syncMessageEvent
-    ) { (homeResult, status, statsState), window, pattern, syncMsg ->
+        _syncMessageEvent,
+        _syncError
+    ) { (homeResult, status, statsState), window, pattern, syncMsg, syncErr ->
 
         val screenState = when (homeResult) {
             null -> HomeScreenState.Loading
@@ -165,7 +167,7 @@ class HomeViewModel @Inject constructor(
             isSyncing = status is SyncStatus.Syncing,
             selectedPattern = pattern,
             selectedTimeWindow = window,
-            syncMessageRes = syncMsg
+            syncMessageRes = syncMsg ?: syncErr
         )
     }.stateIn(
         viewModelScope,
@@ -227,10 +229,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             when (syncHistoryUseCase()) {
                 is AppResult.Success -> {
-                    // Sync success handled by repository state flow
+                    _syncError.value = null
                 }
                 is AppResult.Failure -> {
-                    // Sync failure also reflected in repository state, but we could show snackbar here if needed
+                    _syncError.value = R.string.general_error_title
                 }
             }
         }

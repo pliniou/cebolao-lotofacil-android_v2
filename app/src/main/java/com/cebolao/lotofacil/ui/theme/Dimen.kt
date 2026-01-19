@@ -38,6 +38,7 @@ object Dimen {
     val TableColumnWidthLarge = 80.dp
     val TableColumnWidthXLarge = 100.dp
     val LoadingCardHeight = 120.dp
+    val GameCardMinHeight = 250.dp
     val ChartHeightSmall = 140.dp
     val ChartHeightMini = 100.dp
     val MiniBarWidth = 40.dp
@@ -53,6 +54,7 @@ object Dimen {
     val IconLarge = 32.dp
     val LoadingIndicatorSize = 36.dp
     val Logo = 80.dp
+    val IconTiny = 18.dp
 
     // --- Lotofácil Balls (Compactado) ---
     val BallSizeLarge = 40.dp
@@ -66,6 +68,11 @@ object Dimen {
     val BallTextMedium = 12.sp
     val BallTextSmall = 9.sp
     val BarChartHeight = 160.dp
+    val ChartPreviewHeight = 200.dp
+    val ChartAxisLabelPadding = 40.dp
+    val ChartLineStroke = 3.dp
+    val ChartDotRadiusSmall = 3.dp
+    val ChartDotRadiusLarge = 5.dp
 
     // --- Shapes ---
     val CardCornerRadius = 24.dp
@@ -81,6 +88,28 @@ object Dimen {
     
     object Elevation {
         val None = 0.dp
+        val Level1 = 1.dp
         val Level2 = 2.dp
+        val Level3 = 3.dp
+        val Level4 = 4.dp
+        val Level5 = 6.dp
+    }
+    
+    object TouchTarget {
+        /** Tamanho mínimo de toque recomendado (48dp) */
+        val Minimum = 48.dp
+        /** Tamanho confortável para elementos primários */
+        val Comfortable = 56.dp
+        /** Tamanho para botões de ação principais */
+        val Action = 64.dp
+    }
+    
+    object Ripple {
+        /** Raio do efeito ripple para botões pequenos */
+        val Small = 20.dp
+        /** Raio do efeito ripple para botões médios */
+        val Medium = 28.dp
+        /** Raio do efeito ripple para botões grandes */
+        val Large = 36.dp
     }
 }

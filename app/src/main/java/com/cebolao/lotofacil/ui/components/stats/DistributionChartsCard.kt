@@ -108,7 +108,7 @@ fun DistributionChartsCard(
                 maxValue = maxValue,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimen.BarChartHeight + 40.dp), // Extra space for rotated labels
+                    .height(Dimen.BarChartHeight + Dimen.ChartAxisLabelPadding), // Extra space for rotated labels
                 chartHeight = Dimen.BarChartHeight,
                 chartType = ChartType.BAR,
                 showNormalLine = showNormalLine,

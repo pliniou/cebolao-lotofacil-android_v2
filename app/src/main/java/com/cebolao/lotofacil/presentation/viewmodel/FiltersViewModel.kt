@@ -119,28 +119,35 @@ class FiltersViewModel @Inject constructor(
         }
     }
 
+    private data class FiltersPartialState(
+        val filterStates: List<FilterState>,
+        val generationState: GenerationUiState,
+        val lastDraw: Set<Int>?,
+        val showResetDialog: Boolean,
+        val filterInfoToShow: FilterType?
+    )
+
     val uiState: StateFlow<FiltersScreenState> = combine(
         _filterStates,
         _generationState,
         _lastDraw,
         _showResetDialog,
-        _filterInfoToShow,
-        _showStrictConfirmation
-    ) { args ->
-        @Suppress("UNCHECKED_CAST")
-        val filterStates = args[0] as List<FilterState>
-        val generationState = args[1] as GenerationUiState
-        val lastDraw = args[2] as? Set<Int>
-        val showResetDialog = args[3] as Boolean
-        val filterInfoToShow = args[4] as? FilterType
-        val showStrictConfirmation = args[5] as Boolean
-
-        FiltersScreenState(
+        _filterInfoToShow
+    ) { filterStates, generationState, lastDraw, showResetDialog, filterInfoToShow ->
+        FiltersPartialState(
             filterStates = filterStates,
             generationState = generationState,
             lastDraw = lastDraw,
             showResetDialog = showResetDialog,
-            filterInfoToShow = filterInfoToShow,
+            filterInfoToShow = filterInfoToShow
+        )
+    }.combine(_showStrictConfirmation) { partial, showStrictConfirmation ->
+        FiltersScreenState(
+            filterStates = partial.filterStates,
+            generationState = partial.generationState,
+            lastDraw = partial.lastDraw,
+            showResetDialog = partial.showResetDialog,
+            filterInfoToShow = partial.filterInfoToShow,
             showStrictConfirmation = showStrictConfirmation
         )
     }.stateIn(

@@ -6,6 +6,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 
+/**
+ * Paletas de cores de destaque disponíveis para o tema.
+ * Cada paleta define a cor primária que será usada em todo o tema.
+ */
 enum class AccentPalette(val seed: Color) {
     AZUL(BrandAzul),
     ROXO(BrandRoxo),
@@ -69,17 +73,17 @@ private class ColorSchemeBuilder(
     private fun buildDark() = darkColorScheme(
         primary = primary,
         onPrimary = onPrimary,
-        primaryContainer = primary.copy(alpha = 0.15f),
+        primaryContainer = primary.copy(alpha = 0.18f), // Melhor visibilidade em dark mode
         onPrimaryContainer = primary,
 
         secondary = secondary,
         onSecondary = Color.White,
-        secondaryContainer = secondary.copy(alpha = 0.15f),
+        secondaryContainer = secondary.copy(alpha = 0.18f),
         onSecondaryContainer = secondary,
 
         tertiary = BrandAmarelo,
         onTertiary = Color.Black,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.15f),
+        tertiaryContainer = BrandAmarelo.copy(alpha = 0.18f),
         onTertiaryContainer = BrandAmarelo,
 
         background = backgroundLayer(0),
@@ -104,7 +108,7 @@ private class ColorSchemeBuilder(
 
         error = ErrorBase,
         onError = Color.White,
-        errorContainer = ErrorBase.copy(alpha = 0.15f),
+        errorContainer = ErrorBase.copy(alpha = 0.18f),
         onErrorContainer = ErrorBase,
 
         surfaceTint = primary,
@@ -117,17 +121,17 @@ private class ColorSchemeBuilder(
     private fun buildLight() = lightColorScheme(
         primary = primary,
         onPrimary = onPrimary,
-        primaryContainer = primary.copy(alpha = 0.08f),
+        primaryContainer = primary.copy(alpha = 0.10f), // Melhor visibilidade em light mode
         onPrimaryContainer = primary,
 
         secondary = secondary,
         onSecondary = Color.White,
-        secondaryContainer = secondary.copy(alpha = 0.08f),
+        secondaryContainer = secondary.copy(alpha = 0.10f),
         onSecondaryContainer = secondary,
 
         tertiary = BrandAmarelo,
         onTertiary = Color.Black,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.08f),
+        tertiaryContainer = BrandAmarelo.copy(alpha = 0.10f),
         onTertiaryContainer = Color.Black,
 
         background = backgroundLayer(0),
@@ -152,7 +156,7 @@ private class ColorSchemeBuilder(
 
         error = ErrorBase,
         onError = Color.White,
-        errorContainer = ErrorBase.copy(alpha = 0.12f),
+        errorContainer = ErrorBase.copy(alpha = 0.14f), // Melhor contraste
         onErrorContainer = ErrorBase,
 
         surfaceTint = primary,

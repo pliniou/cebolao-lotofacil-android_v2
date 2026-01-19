@@ -29,7 +29,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.ui.theme.Alpha
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.FontFamilyNumeric
@@ -120,7 +119,7 @@ fun NumberBall(
         shape = BallConfig.modernShape(),
         color = background,
         contentColor = content,
-        shadowElevation = 0.dp, // Flat design enforcement
+        shadowElevation = Dimen.Elevation.None, // Flat design enforcement
         border = if (colors.border != Color.Transparent) {
             BorderStroke(Dimen.Border.Hairline, colors.border)
         } else {

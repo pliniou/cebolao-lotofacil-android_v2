@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
@@ -243,7 +242,7 @@ fun CheckerScreenContent(
                         contentColor = if (isComplete) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                         shape = CircleShape,
                         tonalElevation = Dimen.Elevation.None,
-                        shadowElevation = 0.dp
+                        shadowElevation = Dimen.Elevation.None
                     ) {
                         Text(
                             text = "${selectedNumbers.size}/${GameConstants.GAME_SIZE}",
@@ -344,7 +343,7 @@ private fun CheckerBottomBar(
 
     Surface(
         tonalElevation = Dimen.Elevation.None,
-        shadowElevation = 0.dp,
+        shadowElevation = Dimen.Elevation.None,
         color = scheme.surfaceContainer,
         modifier = Modifier.fillMaxWidth()
     ) {

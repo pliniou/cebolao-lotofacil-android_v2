@@ -8,13 +8,13 @@ import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
+import com.cebolao.lotofacil.domain.exception.SyncException
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.repository.SyncStatus
 import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.util.toAppError
-import com.cebolao.lotofacil.domain.exception.SyncException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -29,13 +29,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "HistoryRepository"
 private const val API_RESULT_FRESHNESS_MS = 10 * 60 * 1000L
+
+private data class LatestApiResult(
+    val payload: LotofacilApiResult,
+    val timestampMs: Long
+) {
+    fun isFresh(now: Long = System.currentTimeMillis()): Boolean =
+        now - timestampMs <= API_RESULT_FRESHNESS_MS
+}
 
 @Singleton
 class HistoryRepositoryImpl @Inject constructor(
@@ -46,14 +54,8 @@ class HistoryRepositoryImpl @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : HistoryRepository {
 
-    // LRU cache for frequently accessed draws
     private val drawCache = DrawLruCache(maxSize = 100)
-
-    // Session-only cache: valid for a short freshness window and cleared on sync failure.
-    @Volatile
-    private var latestApiResult: LotofacilApiResult? = null
-    @Volatile
-    private var latestApiResultTimestamp: Long? = null
+    private val latestApiResultRef = AtomicReference<LatestApiResult?>()
 
     private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
     override val syncStatus: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
@@ -66,46 +68,33 @@ class HistoryRepositoryImpl @Inject constructor(
         localDataSource.observeLocalHistory()
             .map { normalizeHistory(it) }
 
-    override fun observeLastDraw(): Flow<Draw?> = 
+    override fun observeLastDraw(): Flow<Draw?> =
         localDataSource.observeLastDraw()
 
     override suspend fun getHistory(): List<Draw> {
-        // Always fetch full history from database for statistics accuracy.
-        // The LRU cache only holds a subset (e.g., 100), so returning it
-        // would result in incorrect statistics calculation.
         val draws = normalizeHistory(localDataSource.getLocalHistory())
-        
-        // Optimistically update cache with recent ones (last 100)
-        // We reverse or takeLast depending on sort order, but cache logic handles eviction.
-        // To avoid thrashing, we could only put the last N, but putAll handles it.
-        // For efficiency, let's just put the top 100 if the list is large.
+
         if (draws.isNotEmpty()) {
-            val toCache = draws.take(100) // Assuming draws are sorted DESC (newest first)
+            val toCache = draws.take(100)
             drawCache.putAll(toCache)
         }
-        
+
         return draws
     }
 
     override suspend fun getLastDraw(): Draw? {
-        // Try from API cache when fresh (session-only validity window).
-        val fromApi = latestApiResult?.toDraw()
-        if (fromApi != null && isLatestApiResultFresh()) {
-            // Update cache
+        getFreshApiResult()?.toDraw()?.let { fromApi ->
             drawCache.put(fromApi.contestNumber, fromApi)
             return fromApi
         }
 
-        // Prefer local DB when API cache is stale or unavailable.
         val lastDraw = localDataSource.getLastDraw()
         if (lastDraw != null) {
             drawCache.put(lastDraw.contestNumber, lastDraw)
             return lastDraw
         }
 
-        // Fallback to memory cache
-        val draws = drawCache.getAll()
-        val lastFromCache = draws.maxByOrNull { it.contestNumber }
+        val lastFromCache = drawCache.getAll().maxByOrNull { it.contestNumber }
         if (lastFromCache != null) {
             logger.debug(TAG, "Returning last draw from cache: ${lastFromCache.contestNumber}")
             return lastFromCache
@@ -116,25 +105,23 @@ class HistoryRepositoryImpl @Inject constructor(
 
     override suspend fun getLastDrawDetails(): DrawDetails? {
         val lastDraw = localDataSource.getLastDraw() ?: return null
-        
-        // 1. Try local DB
+
         val cachedDetails = localDataSource.getDrawDetails(lastDraw.contestNumber)
         if (cachedDetails != null) {
-             return cachedDetails.toDrawDetails(lastDraw)
+            return cachedDetails.toDrawDetails(lastDraw)
         }
 
-        // 2. Try API result cache
-        return latestApiResult?.let { 
-             val entity = it.toDrawDetailsEntity()
-             localDataSource.saveDrawDetails(entity)
-             entity.toDrawDetails(lastDraw) 
+        return getFreshApiResult()?.let { result ->
+            val entity = result.toDrawDetailsEntity()
+            localDataSource.saveDrawDetails(entity)
+            entity.toDrawDetails(lastDraw)
         }
     }
 
     override fun syncHistory(): Job = synchronized(this) {
         runningSyncJob?.takeIf { it.isActive }?.let { return it }
 
-        val job = scope.launch {
+        val job = scope.launch(ioDispatcher) {
             syncHistoryIfNeeded()
         }
         runningSyncJob = job
@@ -149,7 +136,7 @@ class HistoryRepositoryImpl @Inject constructor(
                 return@withLock inFlight
             }
 
-            val newDeferred = scope.async {
+            val newDeferred = scope.async(ioDispatcher) {
                 runSyncIfNeeded()
             }
             syncDeferred = newDeferred
@@ -190,11 +177,9 @@ class HistoryRepositoryImpl @Inject constructor(
             _syncStatus.value = SyncStatus.Syncing
             logger.info(TAG, "Starting history sync")
 
-            // Use SyncManager for sync logic
-            latestApiResult = syncManager.performIncrementalSync()
-            latestApiResultTimestamp = System.currentTimeMillis()
-            
-            // Clear cache after successful sync to force refresh
+            val latestResult = syncManager.performIncrementalSync()
+            cacheLatestApiResult(latestResult)
+
             drawCache.clear()
             logger.debug(TAG, "Cache cleared after sync")
 
@@ -202,14 +187,12 @@ class HistoryRepositoryImpl @Inject constructor(
             logger.info(TAG, "Sync completed successfully")
             Result.success(Unit)
         } catch (e: IOException) {
-            latestApiResult = null
-            latestApiResultTimestamp = null
+            cacheLatestApiResult(null)
             logger.error(TAG, "Network sync failed", e)
             _syncStatus.value = SyncStatus.Failed(e.toAppError())
             Result.failure(e)
         } catch (e: SyncException) {
-            latestApiResult = null
-            latestApiResultTimestamp = null
+            cacheLatestApiResult(null)
             logger.error(TAG, "Sync service error", e)
             _syncStatus.value = SyncStatus.Failed(e.toAppError())
             Result.failure(e)
@@ -218,22 +201,22 @@ class HistoryRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun isLatestApiResultFresh(now: Long = System.currentTimeMillis()): Boolean {
-        val timestamp = latestApiResultTimestamp ?: return false
-        return now - timestamp <= API_RESULT_FRESHNESS_MS
-    }
-
-    /**
-     * Normaliza lista de concursos para garantir ordenaÇõÇœo (desc) e remoÇõÇœo de duplicidades,
-     * evitando contagens incorretas nas estatisticas e no checker.
-     */
     private fun normalizeHistory(draws: List<Draw>): List<Draw> {
         if (draws.isEmpty()) return emptyList()
         val sorted = draws.sortedByDescending { it.contestNumber }
         val deduped = sorted.distinctBy { it.contestNumber }
         if (deduped.size != sorted.size) {
-            logger.warning(TAG, "Histórico continha duplicados; normalizado para ${deduped.size} registros")
+            logger.warning(TAG, "Historico continha duplicados; normalizado para ${deduped.size} registros")
         }
         return deduped
+    }
+
+    private fun getFreshApiResult(now: Long = System.currentTimeMillis()): LotofacilApiResult? =
+        latestApiResultRef.get()?.takeIf { it.isFresh(now) }?.payload
+
+    private fun cacheLatestApiResult(result: LotofacilApiResult?) {
+        latestApiResultRef.set(
+            result?.let { LatestApiResult(payload = it, timestampMs = System.currentTimeMillis()) }
+        )
     }
 }

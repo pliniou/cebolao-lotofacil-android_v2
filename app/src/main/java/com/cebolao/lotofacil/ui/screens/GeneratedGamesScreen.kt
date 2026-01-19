@@ -49,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -451,7 +450,7 @@ private fun GameList(
                         index = index + 1,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 250.dp),
+                            .heightIn(min = Dimen.GameCardMinHeight),
                         onAction = { action -> onAction(action, game) }
                     )
                 }

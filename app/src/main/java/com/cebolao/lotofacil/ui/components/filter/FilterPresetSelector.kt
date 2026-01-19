@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterPreset
 import com.cebolao.lotofacil.ui.components.layout.AppCard
@@ -104,7 +103,7 @@ fun FilterPresetSelector(
             onDismissRequest = { expanded = false },
             modifier = Modifier.fillMaxWidth(0.9f),
             containerColor = scheme.surfaceContainer, // M3 container color
-            tonalElevation = 0.dp, // Flat design
+            tonalElevation = Dimen.Elevation.None, // Flat design
             shadowElevation = Dimen.Elevation.Level2 // Keeping shadow for dropdown to separate from background
         ) {
             presets.forEach { preset ->

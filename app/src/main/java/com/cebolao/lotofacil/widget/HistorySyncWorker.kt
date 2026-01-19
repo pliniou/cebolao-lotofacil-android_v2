@@ -6,14 +6,14 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.domain.repository.SyncStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 private const val TAG = "HistorySyncWorker"
+private const val MAX_ATTEMPTS = 3
 
 /**
- * Fase 2: orquestra o sync do histórico via WorkManager (sem disparar rede no init do repository).
+ * Orquestra o sync do historico via WorkManager (sem disparar rede no init do repository).
  */
 @HiltWorker
 class HistorySyncWorker @AssistedInject constructor(
@@ -23,18 +23,17 @@ class HistorySyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result = runCatching {
-        historyRepository.syncHistory().join()
-        when (val status = historyRepository.syncStatus.value) {
-            is SyncStatus.Success,
-            is SyncStatus.Idle -> Result.success()
-            is SyncStatus.Syncing -> if (runAttemptCount < 3) Result.retry() else Result.failure()
-            is SyncStatus.Failed -> {
-                Log.e(TAG, "History sync failed: ${status.error}")
-                if (runAttemptCount < 3) Result.retry() else Result.failure()
-            }
+        val result = historyRepository.syncHistoryIfNeeded()
+        if (result.isSuccess) {
+            Result.success()
+        } else {
+            Log.e(TAG, "History sync failed (attempt ${runAttemptCount + 1})", result.exceptionOrNull())
+            if (shouldRetry()) Result.retry() else Result.failure()
         }
     }.getOrElse { e ->
-        Log.e(TAG, "History sync failed", e)
-        if (runAttemptCount < 3) Result.retry() else Result.failure()
+        Log.e(TAG, "History sync failed (attempt ${runAttemptCount + 1})", e)
+        if (shouldRetry()) Result.retry() else Result.failure()
     }
+
+    private fun shouldRetry(): Boolean = runAttemptCount + 1 < MAX_ATTEMPTS
 }

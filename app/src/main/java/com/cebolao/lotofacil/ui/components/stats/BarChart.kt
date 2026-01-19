@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.core.content.res.ResourcesCompat
@@ -234,7 +233,7 @@ private class ChartPaints(
     val grid = Paint().apply {
         isAntiAlias = true
         color = colors.line.toArgb()
-        strokeWidth = density.run { 1.dp.toPx() }
+        strokeWidth = density.run { Dimen.Border.Thin.toPx() }
         style = Paint.Style.STROKE
         pathEffect = android.graphics.DashPathEffect(floatArrayOf(10f, 10f), 0f)
     }
@@ -250,7 +249,7 @@ private class ChartPaints(
     val linePaint = Paint().apply {
         isAntiAlias = true
         color = colors.primary.toArgb()
-        strokeWidth = density.run { 3.dp.toPx() }
+        strokeWidth = density.run { Dimen.ChartLineStroke.toPx() }
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
@@ -383,7 +382,11 @@ private fun DrawScope.drawLineChart(
         val showDot = isHighlighted || meetsPredicate || isSelected || (data.size <= 20) || (index % 3 == 0)
 
         if (showDot) {
-            val dotRadius = if (isSelected || isHighlighted || meetsPredicate) 5.dp.toPx() else 3.dp.toPx()
+            val dotRadius = if (isSelected || isHighlighted || meetsPredicate) {
+                Dimen.ChartDotRadiusLarge.toPx()
+            } else {
+                Dimen.ChartDotRadiusSmall.toPx()
+            }
             val paint = if (isHighlighted || meetsPredicate) p.highlightDotPaint else p.dotPaint
             drawContext.canvas.nativeCanvas.drawCircle(x, y, dotRadius, paint)
         }
@@ -517,7 +520,7 @@ private fun BarChartPreview() {
             BarChart(
                 data = mockData,
                 maxValue = 100,
-                modifier = Modifier.fillMaxSize().height(200.dp),
+                modifier = Modifier.fillMaxSize().height(Dimen.ChartPreviewHeight),
                 chartType = ChartType.BAR
             )
         }
@@ -533,7 +536,7 @@ private fun LineChartPreview() {
             BarChart(
                 data = mockData,
                 maxValue = 100,
-                modifier = Modifier.fillMaxSize().height(200.dp),
+                modifier = Modifier.fillMaxSize().height(Dimen.ChartPreviewHeight),
                 chartType = ChartType.LINE,
                 showNormalLine = true,
                 mean = 5.5f,

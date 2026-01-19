@@ -7,7 +7,8 @@ import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -22,24 +23,29 @@ class ResultsViewModel @Inject constructor(
     private val historyRepository: HistoryRepository
 ) : BaseViewModel() {
 
-    val uiState: StateFlow<ResultsUiState> = historyRepository.observeHistory()
-        .map { draws ->
-            if (draws.isEmpty()) {
-                ResultsUiState.Loading // Or Empty state, but Loading covers initial sync
-            } else {
-                ResultsUiState.Success(draws)
-            }
+    private val syncMessage = MutableStateFlow<Int?>(null)
+
+    val uiState: StateFlow<ResultsUiState> = combine(
+        historyRepository.observeHistory(),
+        syncMessage
+    ) { draws, errorRes ->
+        when {
+            draws.isNotEmpty() -> ResultsUiState.Success(draws)
+            errorRes != null -> ResultsUiState.Error(errorRes)
+            else -> ResultsUiState.Loading
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
-            initialValue = ResultsUiState.Loading
-        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
+        initialValue = ResultsUiState.Loading
+    )
 
     init {
-        // Ensure sync triggers if needed
         launchCatching {
             historyRepository.syncHistoryIfNeeded()
+                .onFailure {
+                    syncMessage.value = com.cebolao.lotofacil.R.string.results_error_message
+                }
         }
     }
 }

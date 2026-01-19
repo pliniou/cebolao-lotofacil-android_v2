@@ -49,19 +49,68 @@ val DarkTextTertiary = Slate500
 val SuccessBase = Color(0xFF22C55E)
 val WarningBase = Color(0xFFF59E0B)
 val ErrorBase = Color(0xFFEF4444)
+val InfoBase = Color(0xFF3B82F6)
 
+// Legacy aliases - mantidos para compatibilidade
 val SuccessColor = SuccessBase
 val WarningColor = WarningBase
 val ErrorColor = ErrorBase
+
+// --- STATUS COLOR VARIANTS ---
+// Success variants
+val SuccessLight = Color(0xFFDCFCE7)
+val SuccessDark = Color(0xFF16A34A)
+
+// Warning variants
+val WarningLight = Color(0xFFFEF3C7)
+val WarningDark = Color(0xFFD97706)
+
+// Error variants
+val ErrorLight = Color(0xFFFEE2E2)
+val ErrorDark = Color(0xFFDC2626)
+
+// Info variants
+val InfoLight = Color(0xFFDBEAFE)
+val InfoDark = Color(0xFF1E40AF)
+
+// --- ACCENT COLOR VARIANTS ---
+// Azul variants
+val BrandAzulLight = Color(0xFF3377FF)
+val BrandAzulDark = Color(0xFF0044CC)
+
+// Roxo variants
+val BrandRoxoLight = Color(0xFF7C3AED)
+val BrandRoxoDark = Color(0xFF5B21B6)
+
+// Verde variants
+val BrandVerdeLight = Color(0xFF34D399)
+val BrandVerdeDark = Color(0xFF059669)
+
+// Amarelo variants
+val BrandAmareloLight = Color(0xFFFCD34D)
+val BrandAmareloDark = Color(0xFFF59E0B)
+
+// Rosa variants
+val BrandRosaLight = Color(0xFFF472B6)
+val BrandRosaDark = Color(0xFFDB2777)
+
+// Laranja variants
+val BrandLaranjaLight = Color(0xFFFBBF24)
+val BrandLaranjaDark = Color(0xFFEA580C)
 
 // --- GLASSMORPHISM TOKENS ---
 val GlassSurfaceLight = Color.White.copy(alpha = 0.72f)
 val GlassSurfaceDark = Slate900.copy(alpha = 0.65f)
 
+// --- OVERLAY & INTERACTION STATES ---
 object Alpha {
     const val DIVIDER = 0.75f
     const val DIVIDER_SUBTLE = 0.5f
     const val DISABLED = 0.38f
     const val OVERLAY = 0.12f
     const val SCRIM = 0.32f
+    const val HOVER = 0.08f
+    const val PRESSED = 0.12f
+    const val FOCUS = 0.12f
+    const val DRAG = 0.16f
 }

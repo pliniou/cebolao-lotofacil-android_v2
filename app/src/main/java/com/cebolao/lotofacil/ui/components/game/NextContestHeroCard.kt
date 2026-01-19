@@ -24,7 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.NextDrawInfo
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -114,7 +113,7 @@ fun NextContestHeroCard(
                 // Vertical Divider
                 Box(
                     modifier = Modifier
-                        .size(1.dp, 24.dp)
+                        .size(Dimen.Border.Thin, Dimen.IconMedium)
                         .background(userContentColor.copy(alpha = 0.2f))
                 )
 

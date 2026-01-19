@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.WinnerLocation
 import com.cebolao.lotofacil.ui.components.common.AppTable
@@ -164,7 +163,7 @@ fun LastDrawCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(Dimen.IconTiny),
                         strokeWidth = Dimen.Border.Thick,
                         color = scheme.primary
                     )
@@ -431,13 +430,13 @@ private fun EmptyDataState(onRefresh: () -> Unit) {
             Spacer(modifier = Modifier.width(Dimen.Spacing8))
              IconButton(
                 onClick = onRefresh,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(Dimen.IconMedium)
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
                     contentDescription = stringResource(R.string.action_retry),
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(Dimen.IconSmall)
                 )
             }
         }
