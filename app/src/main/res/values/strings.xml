@@ -25,7 +25,6 @@
     <string name="city">Cidade</string>
     <string name="count_short">Qtd</string>
     <string name="and_more_count">e mais %1$d…</string>
-    <string name="prize_is_accumulated">Acumulou!</string>
     <string name="action_retry">Tentar novamente</string>
     <string name="general_error_title">Algo deu errado</string>
     <string name="general_loading">Carregando…</string>
@@ -102,8 +101,6 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="widget_label_prize_estimate">Prêmio estimado</string>
     <string name="widget_label_draw_date">Data do sorteio</string>
     <string name="home_analysis_period">Período de Análise</string>
-    <string name="home_all_contests">Todos os concursos</string>
-    <string name="home_last_contests_format" tools:ignore="PluralsCandidate">Últimos %1$d concursos</string>
 
     <!-- Attention / Disclaimer card -->
     <string name="attention_title">Cuidado</string>
@@ -237,10 +234,15 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="about_accent_yellow">Amarelo</string>
     <string name="about_accent_pink">Rosa</string>
     <string name="about_accent_orange">Laranja</string>
-    <string name="about_accessibility_select_theme">Selecionar modo %1$s</string>
     <string name="about_accessibility_select_accent">Selecionar cor de destaque %1$s</string>
-    <string name="about_prob_hits_format">%1$d acertos</string>
-    <string name="about_prob_n_numbers">%1$d Números</string>
+    <plurals name="about_prob_hits_format">
+        <item quantity="one">%1$d acerto</item>
+        <item quantity="other">%1$d acertos</item>
+    </plurals>
+    <plurals name="about_prob_n_numbers">
+        <item quantity="one">%1$d Número</item>
+        <item quantity="other">%1$d Números</item>
+    </plurals>
 
     <!-- Studio -->
     <string name="studio_name">Cebola Studios</string>
@@ -301,8 +303,6 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="checker_view_chart">Gráfico</string>
     <string name="checker_view_table">Tabela</string>
     <string name="checker_showing_last_12">Mostrando últimos 12 concursos</string>
-    <string name="checker_recent_hits_toggle_table">Ver tabela</string>
-    <string name="checker_recent_hits_limited">Mostrando ultimos %1$d concursos</string>
     <string name="checker_results_header_wins">Prêmios</string>
     <string name="checker_results_header_no_wins">Sem prêmios</string>
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analisado em %1$d concursos</string>
@@ -330,8 +330,6 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="filters_current_range">Range Atual</string>
     <string name="filters_coverage">Cobertura</string>
     <string name="filter_recommended_range">Recomendado: %1$d a %2$d</string>
-    <string name="filter_wide_range">Range amplo</string>
-    <string name="filter_narrow_range">Range estreito</string>
     <string name="filters_button_generate">Gerar Jogos</string>
     <string name="filters_button_generating_progress" tools:keep="@string/filters_button_generating_progress">Gerando…</string>
     <string name="filter_preset_applied">Estratégia aplicada: %1$s</string>
@@ -346,7 +344,10 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="stats_time_window_last">Últimos %d</string>
     <string name="stats_unit_times">vezes</string>
     <string name="stats_unit_contests">concursos</string>
-    <string name="stats_period_selected">Período alterado para os últimos %d concursos</string>
+    <plurals name="stats_period_selected">
+        <item quantity="one">Período alterado para o último %d concurso</item>
+        <item quantity="other">Período alterado para os últimos %d concursos</item>
+    </plurals>
     <string name="stats_period_all_selected">Período alterado para todos os concursos</string>
     <string name="common_back">Voltar</string>
     <string name="filters_reset_dialog_title">Resetar Filtros</string>
@@ -372,8 +373,6 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="filters_save_error">Erro ao salvar jogos gerados.</string>
 
     <!-- Checker Details -->
-    <string name="checker_hide_frequency">Ocultar Frequência</string>
-    <string name="checker_show_frequency">Mostrar Frequência</string>
     <string name="checker_range_analysis_title">Análise por Faixa de Acertos</string>
     <string name="checker_total_analyzed" tools:ignore="PluralsCandidate">Total analisado: %1$d jogos</string>
     <string name="checker_avg_hits">Média de acertos: %.1f</string>
@@ -413,11 +412,9 @@ Teimosinha: concorra com a mesma aposta por 2, 3, 4, 6, 8, 9, 12, 18 ou 24 concu
     <string name="games_empty_state_title">Nenhum jogo</string>
     <string name="games_empty_state_description">Use o gerador para criar novos jogos.</string>
     <string name="games_tab_new">Novos</string>
-    <string name="game_card_unpinned">Desfixado</string>
-    <string name="game_card_pinned">Fixado</string>
 
     <!-- Share -->
-    <string name="share_game_text_format">🎲 Meu jogo Lotofácil:
+    <string name="share_game_text_format" tools:ignore="PluralsCandidate">🎲 Meu jogo Lotofácil:
 %1$s
 
 📊 Estatísticas:
@@ -501,18 +498,11 @@ Gerado com Cebolão Lotofácil</string>
     <string name="about_version_title">Versão</string>
 
     <!-- Confirmations (New) -->
-    <string name="filters_reset_confirmation_message">Todos os filtros serão restaurados ao padrão. Deseja continuar?</string>
-    <string name="games_clear_confirmation_title">Limpar Jogos Não Fixados?</string>
-    <string name="games_clear_confirmation_message">Todos os jogos não fixados serão removidos permanentemente. Tem certeza?</string>
-    <string name="checker_clear_confirmation_title">Limpar Seleção?</string>
-    <string name="checker_clear_confirmation_message">Todas as dezenas selecionadas serão removidas. Deseja continuar?</string>
-    <string name="checker_clear_confirm">Limpar</string>
 
     <!-- Success Messages (New) -->
     <string name="filters_reset_success">Filtros restaurados ao padrão</string>
     <string name="games_delete_success">Jogo excluído com sucesso</string>
     <string name="games_clear_success">Jogos não fixados removidos</string>
-    <string name="checker_numbers_cleared">Seleção limpa</string>
     <string name="games_pin_success">Jogo fixado</string>
     <string name="games_unpin_success">Jogo desfixado</string>
 

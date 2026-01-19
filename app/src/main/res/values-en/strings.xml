@@ -23,7 +23,6 @@
     <string name="city">City</string>
     <string name="count_short">Qty</string>
     <string name="and_more_count" tools:ignore="PluralsCandidate">and %1$d more…</string>
-    <string name="prize_is_accumulated">Accumulated!</string>
     <string name="action_retry">Try again</string>
     <string name="general_loading">Loading…</string>
     <string name="open_external_link">Open external link</string>
@@ -98,8 +97,6 @@
     <string name="widget_label_prize_estimate">Est. Prize</string>
     <string name="widget_label_draw_date">Draw Date</string>
     <string name="home_analysis_period">Analysis Period</string>
-    <string name="home_all_contests">All draws</string>
-    <string name="home_last_contests_format" tools:ignore="PluralsCandidate">Last %1$d draws</string>
 
     <!-- Attention / Disclaimer card -->
     <string name="attention_title">Caution</string>
@@ -172,7 +169,10 @@
     <string name="stats_time_window_last">Last %d</string>
     <string name="stats_unit_times">times</string>
     <string name="stats_unit_contests">draws</string>
-    <string name="stats_period_selected">Period changed to the last %d draws</string>
+    <plurals name="stats_period_selected">
+        <item quantity="one">Period changed to the last %d draw</item>
+        <item quantity="other">Period changed to the last %d draws</item>
+    </plurals>
     <string name="stats_period_all_selected">Period changed to all draws</string>
     <string name="common_back">Back</string>
 
@@ -242,10 +242,15 @@
     <string name="about_accent_yellow">Yellow</string>
     <string name="about_accent_pink">Pink</string>
     <string name="about_accent_orange">Orange</string>
-    <string name="about_accessibility_select_theme">Select %1$s mode</string>
     <string name="about_accessibility_select_accent">Select %1$s accent color</string>
-    <string name="about_prob_hits_format">%1$d hits</string>
-    <string name="about_prob_n_numbers">%1$d Numbers</string>
+    <plurals name="about_prob_hits_format">
+        <item quantity="one">%1$d hit</item>
+        <item quantity="other">%1$d hits</item>
+    </plurals>
+    <plurals name="about_prob_n_numbers">
+        <item quantity="one">%1$d Number</item>
+        <item quantity="other">%1$d Numbers</item>
+    </plurals>
 
     <!-- Studio -->
     <string name="studio_name">Cebola Studios</string>
@@ -311,8 +316,6 @@
     <string name="checker_view_chart">Chart</string>
     <string name="checker_view_table">Table</string>
     <string name="checker_showing_last_12">Showing last 12 draws</string>
-    <string name="checker_recent_hits_toggle_table">View table</string>
-    <string name="checker_recent_hits_limited">Showing last %1$d draws</string>
     <string name="checker_results_header_wins">Prizes</string>
     <string name="checker_results_header_no_wins">No prizes</string>
     <string name="checker_results_analysis_in_contests" tools:ignore="PluralsCandidate">Analyzed in %1$d draws</string>
@@ -350,8 +353,6 @@
     <string name="filters_current_range">Current Range</string>
     <string name="filters_coverage">Coverage</string>
     <string name="filter_recommended_range">Recommended: %1$d to %2$d</string>
-    <string name="filter_wide_range">Wide range</string>
-    <string name="filter_narrow_range">Narrow range</string>
     <string name="filters_button_generate">Generate Games</string>
     <string name="filters_button_generating_progress">Generating…</string>
     <string name="filter_preset_applied">Strategy applied: %1$s</string>
@@ -381,8 +382,6 @@
     <string name="filters_save_error">Error saving generated games.</string>
 
     <!-- Checker Details -->
-    <string name="checker_hide_frequency">Hide Frequency</string>
-    <string name="checker_show_frequency">Show Frequency</string>
     <string name="checker_info_title">Check Information</string>
     <string name="checker_info_window_label">Draw Window:</string>
     <string name="checker_info_date_label">Date/Time:</string>
@@ -404,8 +403,6 @@
     <string name="games_empty_state_title">No games</string>
     <string name="games_empty_state_description">Use the generator to create new games.</string>
     <string name="games_tab_new">New</string>
-    <string name="game_card_unpinned">Unpinned</string>
-    <string name="game_card_pinned">Pinned</string>
 
     <!-- Share -->
     <string name="share_game_text_format">🎲 My Lotofácil game:\n%1$s\n\n📊 Stats:\nSum: %2$d | Evens: %3$d\nPrimes: %4$d | Frame: %5$d\nCenter: %6$d | Fib.: %7$d\nMult. 3: %8$d | Repet.: %9$d\nSeq.: %10$d\n\nGenerated with Cebolão Lotofácil</string>
@@ -480,18 +477,11 @@
     <string name="home_pull_to_refresh_hint">Pull down to sync again.</string>
 
     <!-- Confirmations (New) -->
-    <string name="filters_reset_confirmation_message">All filters will be restored to default. Do you want to continue?</string>
-    <string name="games_clear_confirmation_title">Clear Unpinned Games?</string>
-    <string name="games_clear_confirmation_message">All unpinned games will be permanently removed. Are you sure?</string>
-    <string name="checker_clear_confirmation_title">Clear Selection?</string>
-    <string name="checker_clear_confirmation_message">All selected numbers will be removed. Do you want to continue?</string>
-    <string name="checker_clear_confirm">Clear</string>
 
     <!-- Success Messages (New) -->
     <string name="filters_reset_success">Filters restored to default</string>
     <string name="games_delete_success">Game deleted successfully</string>
     <string name="games_clear_success">Unpinned games removed</string>
-    <string name="checker_numbers_cleared">Selection cleared</string>
     <string name="games_pin_success">Game pinned</string>
     <string name="games_unpin_success">Game unpinned</string>
 

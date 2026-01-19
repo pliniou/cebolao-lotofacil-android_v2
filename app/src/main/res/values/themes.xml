@@ -11,8 +11,6 @@
         <!-- android:windowLightNavigationBar movido para values-v27 -->
     </style>
 
-    <style name="Theme" parent="android:Theme.Material.Light.NoActionBar" />
-
     <!-- Theme Splash Screen -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/app_background</item>

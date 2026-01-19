@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -164,7 +165,7 @@ private fun TimeWindowSelector(
                 val selectionMessage = if (window == 0) {
                     stringResource(R.string.stats_period_all_selected)
                 } else {
-                    stringResource(R.string.stats_period_selected, window)
+                    pluralStringResource(R.plurals.stats_period_selected, window, window)
                 }
 
                 CustomChip(

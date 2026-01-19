@@ -8,9 +8,6 @@
         <!-- false = ícones claros -->
         <item name="android:windowLightStatusBar">false</item>
     </style>
-
-    <style name="Theme" parent="android:Theme.Material.NoActionBar" />
-
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/app_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>

@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -239,7 +240,7 @@ private fun ProbabilitiesTable() {
         probabilities.forEachIndexed { index, data ->
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
                 Text(
-                    text = stringResource(R.string.about_prob_n_numbers, data.numbers),
+                    text = pluralStringResource(R.plurals.about_prob_n_numbers, data.numbers, data.numbers),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = scheme.primary
@@ -248,7 +249,12 @@ private fun ProbabilitiesTable() {
                 AppTable(
                     data = AppTableData(
                         headers = emptyList(), // No headers for nested tables
-                        rows = data.items.map { listOf(stringResource(R.string.about_prob_hits_format, it.hits), it.probability) },
+                        rows = data.items.map {
+                            listOf(
+                                pluralStringResource(R.plurals.about_prob_hits_format, it.hits, it.hits),
+                                it.probability
+                            )
+                        },
                         weights = listOf(1f, 1.2f),
                         textAligns = listOf(TextAlign.Start, TextAlign.End)
                     ),

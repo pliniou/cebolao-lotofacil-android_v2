@@ -5,7 +5,6 @@
 
     <!-- NEUTRALS & SURFACES (Dark Theme) -->
     <color name="surface_dark">#0F172A</color>        <!-- Slate 900 (Surface 1) -->
-    <color name="surface_variant_dark">#1E293B</color> <!-- Slate 800 (Surface 2) -->
     <color name="on_surface_dark">#FFFFFF</color>
     <color name="on_surface_variant_dark">#94A3B8</color> <!-- Slate 400 -->
     <color name="outline_dark">#1E293B</color>
