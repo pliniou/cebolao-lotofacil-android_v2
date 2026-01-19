@@ -1,6 +1,6 @@
 [versions]
 # Build & Kotlin
-agp = "8.13.2"
+agp = "8.3.2"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.25"
 desugar = "2.1.4"

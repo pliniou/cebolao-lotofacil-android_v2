@@ -85,7 +85,6 @@ fun GameCard(
             )
 
             GameCardActions(
-                onAnalyze = { onAction(GameCardAction.Analyze) },
                 onDelete = { onAction(GameCardAction.Delete) },
                 onShare = { onAction(GameCardAction.Share) },
                 onCheck = { onAction(GameCardAction.Check) }
@@ -96,7 +95,6 @@ fun GameCard(
 
 @Composable
 private fun GameCardActions(
-    onAnalyze: () -> Unit,
     onDelete: () -> Unit,
     onShare: () -> Unit,
     onCheck: () -> Unit
@@ -108,13 +106,6 @@ private fun GameCardActions(
         horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing4, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onAnalyze) {
-            Icon(
-                imageVector = AppIcons.Analytics,
-                contentDescription = stringResource(R.string.game_card_action_analyze),
-                tint = scheme.onSurfaceVariant
-            )
-        }
         IconButton(onClick = onShare) {
             Icon(
                 imageVector = AppIcons.Share,

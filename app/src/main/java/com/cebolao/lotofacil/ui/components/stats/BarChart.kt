@@ -481,7 +481,7 @@ private fun DrawScope.drawNormalLine(
             else -> 1.5f              // Para ranges pequenos (como contagens)
         }
         
-        val predictedCount = (totalCount * bucketWidth * pdf * scaleFactor).toInt().coerceAtLeast(0)
+        val predictedCount = (totalCount * bucketWidth * pdf * scaleFactor).toInt().coerceAtLeast(0).coerceAtMost(max)
         val y = TOP_PADDING_PX + m.drawHeight - m.getHeight(predictedCount, max)
 
         if (!started) {

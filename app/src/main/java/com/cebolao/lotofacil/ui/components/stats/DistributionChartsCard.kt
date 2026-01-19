@@ -68,39 +68,39 @@ fun DistributionChartsCard(
         }
     }
 
-    AppCard(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        variant = CardVariant.Solid,
-        title = stringResource(R.string.home_distribution_title),
-        contentPadding = Dimen.Spacing12,
-        headerActions = {
-            // Legenda do destaque (último concurso)
-            if (highlightValue != null) {
-                Canvas(modifier = Modifier.size(Dimen.IndicatorHeightSmall)) {
-                    drawCircle(color = scheme.error)
-                }
-                Text(
-                    text = stringResource(R.string.distribution_last_label, highlightValue),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = scheme.onSurfaceVariant
-                )
-            }
-        }
+        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
     ) {
+        // Pattern Selector - Outside the card to prevent overlap
+        PatternSelector(
+            selectedPattern = selectedPattern,
+            onPatternSelected = onPatternSelected
+        )
+
+        AppCard(
+            modifier = Modifier.fillMaxWidth(),
+            variant = CardVariant.Solid,
+            title = stringResource(R.string.home_distribution_title),
+            contentPadding = Dimen.Spacing12,
+            headerActions = {
+                // Legenda do destaque (último concurso)
+                if (highlightValue != null) {
+                    Canvas(modifier = Modifier.size(Dimen.IndicatorHeightSmall)) {
+                        drawCircle(color = scheme.error)
+                    }
+                    Text(
+                        text = stringResource(R.string.distribution_last_label, highlightValue),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = scheme.onSurfaceVariant
+                    )
+                }
+            }
+        ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
         ) {
-            // Pattern Selector Area - Explicit container to ensure it stays above
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-            ) {
-                PatternSelector(
-                    selectedPattern = selectedPattern,
-                    onPatternSelected = onPatternSelected
-                )
-            }
 
             // Chart Area - Ensure explicit height to avoid clipping axis
             BarChart(
@@ -119,6 +119,7 @@ fun DistributionChartsCard(
             
             // Helpful spacer at the bottom
             Spacer(modifier = Modifier.height(Dimen.Spacing4))
+        }
         }
     }
 }
