@@ -1,6 +1,6 @@
 package com.cebolao.lotofacil.domain.usecase
 
-import android.database.sqlite.SQLiteException
+
 import com.cebolao.lotofacil.di.IoDispatcher
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.model.AppResult
@@ -31,7 +31,7 @@ class ToggleGamePinUseCase @Inject constructor(
             AppResult.Success(Unit)
         } catch (e: IOException) {
             AppResult.Failure(e.toAppError())
-        } catch (e: SQLiteException) {
+        } catch (e: Exception) {
             AppResult.Failure(e.toAppError())
         }
     }

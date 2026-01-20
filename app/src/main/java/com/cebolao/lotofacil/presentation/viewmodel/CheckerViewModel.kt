@@ -1,6 +1,6 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
-import android.database.sqlite.SQLiteException
+
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -177,7 +177,7 @@ class CheckerViewModel @Inject constructor(
                             checkRunRepository.saveCheckRun(report)
                         } catch (e: IOException) {
                             logger.warning(TAG, "Network error saving check run telemetry: ${e.message}")
-                        } catch (e: SQLiteException) {
+                        } catch (e: Exception) {
                             logger.warning(TAG, "Database error saving check run telemetry: ${e.message}")
                         }
                     }

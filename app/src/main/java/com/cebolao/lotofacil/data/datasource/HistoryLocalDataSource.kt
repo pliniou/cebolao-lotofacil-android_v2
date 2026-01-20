@@ -1,7 +1,7 @@
 package com.cebolao.lotofacil.data.datasource
 
 import android.content.Context
-import android.database.sqlite.SQLiteException
+
 import androidx.room.withTransaction
 import com.cebolao.lotofacil.data.util.HistoryParser
 import com.cebolao.lotofacil.data.local.db.AppDatabase
@@ -132,7 +132,7 @@ class HistoryLocalDataSourceImpl @Inject constructor(
             logger.info(TAG, "Populated ${entities.size} draws from assets.")
         } catch (e: IOException) {
             logger.error(TAG, "Error populating from assets", e)
-        } catch (e: SQLiteException) {
+        } catch (e: Exception) {
             logger.error(TAG, "Database error populating from assets", e)
         }
     }

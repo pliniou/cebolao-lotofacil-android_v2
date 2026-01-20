@@ -78,6 +78,7 @@ object Dimen {
     // --- Shapes (Flat Design: preferring larger, softer corners) ---
     val CardCornerRadius = 28.dp
     val CornerRadiusSmall = 16.dp
+    val CornerRadiusMedium = 20.dp
     val CornerRadiusTiny = 4.dp
 
     object Border {

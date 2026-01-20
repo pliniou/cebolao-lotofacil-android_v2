@@ -18,12 +18,12 @@ kotlin {
 
 android {
     namespace = "com.cebolao.lotofacil"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.cebolao.lotofacil"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -69,6 +69,12 @@ android {
     composeCompiler {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = true
+        disable.addAll(listOf("RememberReturnType"))
     }
 
 }

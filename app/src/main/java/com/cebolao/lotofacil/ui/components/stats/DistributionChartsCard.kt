@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -48,13 +50,14 @@ fun DistributionChartsCard(
         prepareData(stats, selectedPattern).toImmutableList()
     }
     val maxValue by remember(chartData) {
-        derivedStateOf { chartData.maxOfOrNull { it.second } ?: 0 }
+        derivedStateOf { (chartData.maxOfOrNull { it.second } ?: 0) as Int }
     }
 
     val statsAnalysis by remember(chartData) {
         derivedStateOf { calculateWeightedMeanAndStdDev(chartData) }
     }
-    val (mean, stdDev) = statsAnalysis
+    val mean = statsAnalysis.first
+    val stdDev = statsAnalysis.second
 
     val showNormalLine by remember(mean, stdDev, selectedPattern, chartData.size) {
         derivedStateOf {
@@ -72,7 +75,7 @@ fun DistributionChartsCard(
                 } else {
                     rawValue.toString()
                 }
-            }
+            } as String?
         }
     }
 
@@ -94,12 +97,13 @@ fun DistributionChartsCard(
             contentPadding = Dimen.Spacing16, // Aumentado para 16dp
             headerActions = {
                 // Legenda do destaque (último concurso)
-                if (highlightValue != null) {
+                val highlight = highlightValue
+                if (highlight != null) {
                     Canvas(modifier = Modifier.size(Dimen.IndicatorHeightSmall)) {
                         drawCircle(color = scheme.error)
                     }
                     Text(
-                        text = stringResource(R.string.distribution_last_label, highlightValue),
+                        text = stringResource(R.string.distribution_last_label, highlight),
                         style = MaterialTheme.typography.labelSmall,
                         color = scheme.onSurfaceVariant
                     )

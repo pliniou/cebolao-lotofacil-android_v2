@@ -1,15 +1,15 @@
 [versions]
 # Build & Kotlin
-agp = "8.3.2"
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.25"
+agp = "8.7.3"
+kotlin = "2.1.10"
+ksp = "2.1.10-1.0.29"
 desugar = "2.1.4"
 
 # Android Core & Compose
 coreKtx = "1.13.1"
 lifecycle = "2.8.3"
 activityCompose = "1.9.0"
-composeBom = "2024.10.01"
+composeBom = "2025.01.00"
 navigationCompose = "2.8.5"
 splashScreen = "1.0.1"
 
@@ -71,7 +71,6 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollections" }
-
 
 # Retrofit / OkHttp
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }

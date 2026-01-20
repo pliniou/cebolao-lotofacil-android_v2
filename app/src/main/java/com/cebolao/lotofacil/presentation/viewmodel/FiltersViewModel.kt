@@ -250,9 +250,9 @@ class FiltersViewModel @Inject constructor(
                         // Update progress roughly every 100ms or so to keep UI responsive without overhead
                         if (now - lastProgressUpdate > 100) {
                             val msgRes = when(type.step) {
-                                GenerationStep.RANDOM_START -> R.string.filters_button_generating
-                                GenerationStep.HEURISTIC_START -> R.string.filters_button_generating_heuristic
-                                GenerationStep.RANDOM_FALLBACK -> R.string.filters_button_generating_fallback
+                                GenerationStep.RANDOM_START -> R.string.game_generator_random_start
+                                GenerationStep.HEURISTIC_START -> R.string.game_generator_heuristic_start
+                                GenerationStep.RANDOM_FALLBACK -> R.string.game_generator_random_fallback
                             }
                             _generationState.value = GenerationUiState.Loading(progress.current, quantity, msgRes)
                             lastProgressUpdate = now

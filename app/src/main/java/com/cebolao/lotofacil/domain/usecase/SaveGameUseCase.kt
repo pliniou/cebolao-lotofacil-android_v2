@@ -1,6 +1,6 @@
 package com.cebolao.lotofacil.domain.usecase
 
-import android.database.sqlite.SQLiteException
+
 import com.cebolao.lotofacil.di.IoDispatcher
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.LotofacilGame
@@ -21,7 +21,7 @@ class SaveGameUseCase @Inject constructor(
             AppResult.Success(Unit)
         } catch (e: IOException) {
             AppResult.Failure(e.toAppError())
-        } catch (e: SQLiteException) {
+        } catch (e: Exception) {
             AppResult.Failure(e.toAppError())
         }
     }

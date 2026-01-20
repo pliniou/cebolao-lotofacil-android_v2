@@ -137,7 +137,7 @@ private fun EnhancedMetricItem(
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
-    val progress = remember(currentValue, maxValue) { 
+    val progress = remember(currentValue, maxValue) {
         (currentValue / maxValue.toFloat()).coerceIn(0f, 1f)
     }
     
