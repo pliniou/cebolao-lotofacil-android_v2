@@ -21,6 +21,7 @@
 
     <string name="location_not_informed">Não informado</string>
     <string name="winners_by_state">Ganhadores por Estado</string>
+    <string name="winners_empty_state">Sem ganhadores nesta faixa</string>
     <string name="uf">UF</string>
     <string name="city">Cidade</string>
     <string name="count_short">Qtd</string>

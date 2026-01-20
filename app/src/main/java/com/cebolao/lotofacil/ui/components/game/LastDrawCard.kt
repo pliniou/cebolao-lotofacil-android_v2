@@ -385,7 +385,7 @@ private fun WinnersByStateSection(winners: List<WinnerLocation>, onRefresh: () -
         )
 
         if (winners.isEmpty()) {
-            EmptyDataState(onRefresh)
+            WinnersEmptyState()
         } else {
             val headers = listOf(
                 stringResource(R.string.uf),
@@ -447,6 +447,31 @@ private fun EmptyDataState(onRefresh: () -> Unit) {
                     modifier = Modifier.size(Dimen.IconSmall)
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun WinnersEmptyState() {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth(),
+        tonalElevation = Dimen.Elevation.None,
+        shadowElevation = Dimen.Elevation.None
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Dimen.Spacing12),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(R.string.winners_empty_state),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

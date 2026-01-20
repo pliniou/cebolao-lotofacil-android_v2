@@ -77,7 +77,8 @@ fun ResultsScreen(
                 is ResultsUiState.Success -> {
                     items(
                         items = state.draws.sortedByDescending { it.contestNumber },
-                        key = { it.contestNumber }
+                        key = { it.contestNumber },
+                        contentType = { "draw_item" }
                     ) { draw ->
                         DrawListItem(draw = draw)
                     }
