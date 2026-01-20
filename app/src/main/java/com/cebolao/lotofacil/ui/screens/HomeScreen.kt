@@ -226,7 +226,7 @@ private fun LastDrawSection(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
+        verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8) // Reduzido de Medium para 8dp
     ) {
         LastDrawCard(
             draw = draw,

@@ -165,24 +165,21 @@ fun CheckerScreenContent(
 
     val shouldShowHeatmap = isHeatmapEnabled && uiState is CheckerUiState.Success
     val scheme = MaterialTheme.colorScheme
-    val heatmapColors = remember(
-        shouldShowHeatmap,
-        heatmapIntensities,
-        scheme.primary,
-        scheme.tertiary,
-        scheme.error
-    ) {
-        if (shouldShowHeatmap) {
-            heatmapIntensities.mapValues { (_, intensity) ->
-                getHeatmapColor(
-                    intensity = intensity,
-                    cold = scheme.primary,
-                    mid = scheme.tertiary,
-                    hot = scheme.error
-                )
+    
+    val heatmapColors by remember(shouldShowHeatmap, heatmapIntensities, scheme) {
+        derivedStateOf {
+            if (shouldShowHeatmap) {
+                heatmapIntensities.mapValues { (_, intensity) ->
+                    getHeatmapColor(
+                        intensity = intensity,
+                        cold = scheme.primary,
+                        mid = scheme.tertiary,
+                        hot = scheme.error
+                    )
+                }
+            } else {
+                null
             }
-        } else {
-            null
         }
     }
 
@@ -242,7 +239,8 @@ fun CheckerScreenContent(
                         contentColor = if (isComplete) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                         shape = CircleShape,
                         tonalElevation = Dimen.Elevation.None,
-                        shadowElevation = Dimen.Elevation.None
+                        shadowElevation = Dimen.Elevation.None,
+                        border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant)
                     ) {
                         Text(
                             text = "${selectedNumbers.size}/${GameConstants.GAME_SIZE}",
@@ -344,7 +342,7 @@ private fun CheckerBottomBar(
     Surface(
         tonalElevation = Dimen.Elevation.None,
         shadowElevation = Dimen.Elevation.None,
-        color = scheme.surfaceContainer,
+        color = scheme.surfaceContainerLow,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(

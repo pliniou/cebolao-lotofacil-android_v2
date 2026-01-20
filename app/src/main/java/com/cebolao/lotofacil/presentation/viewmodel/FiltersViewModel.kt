@@ -9,6 +9,7 @@ import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
 import com.cebolao.lotofacil.domain.service.GenerationFailureReason
 import com.cebolao.lotofacil.domain.service.GenerationProgressType
+import com.cebolao.lotofacil.domain.service.GenerationStep
 import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
@@ -216,12 +217,9 @@ class FiltersViewModel @Inject constructor(
          
          val filters = _filterStates.value.filter { it.isEnabled }
          
-         // Simple heuristic to check strictness (can be improved)
-         // If many filters are enabled and ranges are narrow, it's strict.
-         // For now, let's just check if "Strict" preset is roughly applied or if we have > 4 active filters with narrow ranges.
-         // This is a placeholder for a more complex domain logic check if needed.
+         // Simple heuristic to check strictness
          val activeFilters = filters.size
-         val isVeryStrict = activeFilters >= 5 // Example threshold
+         val isVeryStrict = activeFilters >= 5
          
          if (isVeryStrict && !_showStrictConfirmation.value) {
              pendingQuantity = quantity
@@ -249,9 +247,14 @@ class FiltersViewModel @Inject constructor(
                 when (type) {
                     is GenerationProgressType.Step -> {
                         val now = System.currentTimeMillis()
-                        // Update progress roughly every 100ms or so
+                        // Update progress roughly every 100ms or so to keep UI responsive without overhead
                         if (now - lastProgressUpdate > 100) {
-                            _generationState.value = GenerationUiState.Loading(progress.current, quantity)
+                            val msgRes = when(type.step) {
+                                GenerationStep.RANDOM_START -> R.string.filters_button_generating
+                                GenerationStep.HEURISTIC_START -> R.string.filters_button_generating_heuristic
+                                GenerationStep.RANDOM_FALLBACK -> R.string.filters_button_generating_fallback
+                            }
+                            _generationState.value = GenerationUiState.Loading(progress.current, quantity, msgRes)
                             lastProgressUpdate = now
                         }
                     }
@@ -259,7 +262,7 @@ class FiltersViewModel @Inject constructor(
                         val games = type.games
                         
                         // Save games
-                        when (saveGeneratedGamesUseCase(games)) {
+                        when (val saveResult = saveGeneratedGamesUseCase(games)) {
                              is AppResult.Success -> {
                                  _generationState.value = GenerationUiState.Success(games.size)
                                  _events.trySend(NavigationEvent.NavigateToGeneratedGames)

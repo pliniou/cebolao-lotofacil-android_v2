@@ -79,6 +79,7 @@ fun StatisticsPanel(
         modifier = modifier.fillMaxWidth(),
         variant = CardVariant.Solid,
         color = scheme.surfaceContainer,
+        outlined = true,
         hasBorder = true,
         title = stringResource(R.string.home_statistics_center),
         headerActions = {
@@ -193,13 +194,13 @@ private fun StatsContent(stats: UiStatisticsReport) {
 
     @Suppress("ConfigurationScreenWidthHeight")
     val configuration = LocalConfiguration.current
-    @Suppress("ConfigurationScreenWidthHeight")
+    
     // Use derivedStateOf for configuration-based layout decision to optimize recompositions
-    val useColumnLayout = remember {
+    val useColumnLayout by remember(configuration.screenWidthDp) {
         derivedStateOf {
             configuration.screenWidthDp < PHONE_BREAKPOINT_DP
         }
-    }.value
+    }
 
     val primary = MaterialTheme.colorScheme.primary
     val error = MaterialTheme.colorScheme.error

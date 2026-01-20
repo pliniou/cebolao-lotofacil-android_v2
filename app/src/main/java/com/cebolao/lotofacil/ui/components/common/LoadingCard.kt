@@ -33,7 +33,7 @@ fun LoadingCard(
             .fillMaxWidth()
             .height(height),
         outlined = true,
-        contentPadding = Dimen.CardContentPadding
+        contentPadding = Dimen.Spacing16
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -44,7 +44,7 @@ fun LoadingCard(
                 modifier = Modifier.size(Dimen.IconMedium),
                 strokeWidth = Dimen.Border.Thin
             )
-            Spacer(Modifier.width(Dimen.ItemSpacing))
+            Spacer(Modifier.width(Dimen.Spacing12))
             Column(
                 verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
                 horizontalAlignment = Alignment.Start

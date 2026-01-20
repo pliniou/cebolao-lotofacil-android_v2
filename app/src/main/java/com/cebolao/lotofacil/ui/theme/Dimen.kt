@@ -12,17 +12,18 @@ object Dimen {
     val Spacing16 = 16.dp
     val Spacing20 = 20.dp
     val Spacing24 = 24.dp
+    val Spacing32 = 32.dp
 
-    // --- Semantic Spacing (Compactado para melhor aproveitamento) ---
+    // --- Semantic Spacing ---
     val SpacingShort = Spacing4
     val SpacingMedium = Spacing12
-    val SectionSpacing = Spacing16
+    val SectionSpacing = Spacing24 // Aumentado para melhor separação visual (flat design)
     val ItemSpacing = Spacing8
     val TrackingWidest = 2.sp
-    val ElevationMedium = 6.dp
+    val ElevationMedium = 0.dp // Reduzido para 0dp para garantir visual "flat"
 
-    // --- Layout (Compactado) ---
-    val ScreenPadding = Spacing12
+    // --- Layout ---
+    val ScreenPadding = Spacing16
     val CardContentPadding = Spacing16
     val BottomContentPadding = 112.dp
     val LayoutMaxWidth = 900.dp
@@ -56,7 +57,7 @@ object Dimen {
     val Logo = 80.dp
     val IconTiny = 18.dp
 
-    // --- Lotofácil Balls (Compactado) ---
+    // --- Lotofácil Balls ---
     val BallSizeLarge = 40.dp
     val BallSizeMedium = 28.dp 
     val BallSizeSmall = 20.dp
@@ -74,10 +75,10 @@ object Dimen {
     val ChartDotRadiusSmall = 3.dp
     val ChartDotRadiusLarge = 5.dp
 
-    // --- Shapes ---
-    val CardCornerRadius = 24.dp
-    val CornerRadiusSmall = 12.dp
-    val CornerRadiusTiny = 3.dp
+    // --- Shapes (Flat Design: preferring larger, softer corners) ---
+    val CardCornerRadius = 28.dp
+    val CornerRadiusSmall = 16.dp
+    val CornerRadiusTiny = 4.dp
 
     object Border {
         val Hairline = 0.5.dp
@@ -88,28 +89,22 @@ object Dimen {
     
     object Elevation {
         val None = 0.dp
-        val Level1 = 1.dp
-        val Level2 = 2.dp
-        val Level3 = 3.dp
-        val Level4 = 4.dp
-        val Level5 = 6.dp
+        val Level1 = 0.dp // Leveling everything to 0dp for flat design
+        val Level2 = 0.dp
+        val Level3 = 0.dp
+        val Level4 = 0.dp
+        val Level5 = 0.dp
     }
     
     object TouchTarget {
-        /** Tamanho mínimo de toque recomendado (48dp) */
         val Minimum = 48.dp
-        /** Tamanho confortável para elementos primários */
         val Comfortable = 56.dp
-        /** Tamanho para botões de ação principais */
         val Action = 64.dp
     }
     
     object Ripple {
-        /** Raio do efeito ripple para botões pequenos */
         val Small = 20.dp
-        /** Raio do efeito ripple para botões médios */
         val Medium = 28.dp
-        /** Raio do efeito ripple para botões grandes */
         val Large = 36.dp
     }
 }

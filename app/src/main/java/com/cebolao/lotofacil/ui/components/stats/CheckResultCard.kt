@@ -50,7 +50,7 @@ fun CheckResultCard(
         outlined = true
     ) {
         Column(
-            modifier = Modifier.padding(Dimen.CardContentPadding),
+            modifier = Modifier.padding(Dimen.Spacing16),
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
         ) {
             val totalWins = result.scoreCounts.values.sum()

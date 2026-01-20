@@ -40,8 +40,8 @@ fun GameQualityCard(
 ) {
     AppCard(
         modifier = modifier.fillMaxWidth(),
-        outlined = false,
-        contentPadding = Dimen.CardContentPadding
+        outlined = true, // Force outlined for consistency
+        contentPadding = Dimen.Spacing16 // Standardizing padding
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
@@ -89,7 +89,7 @@ private fun ScoreBadge(score: Int, status: ScoreStatus) {
 
     Box(
         modifier = Modifier
-            .background(color.copy(alpha = 0.1f), RoundedCornerShape(Dimen.CornerRadiusSmall))
+            .background(color.copy(alpha = 0.1f), RoundedCornerShape(Dimen.CornerRadiusMedium))
             .padding(horizontal = Dimen.Spacing12, vertical = Dimen.Spacing8),
         contentAlignment = Alignment.Center
     ) {

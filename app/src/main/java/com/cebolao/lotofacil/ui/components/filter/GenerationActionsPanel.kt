@@ -36,9 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.ui.components.common.PrimaryActionButton
 import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 
@@ -51,17 +51,17 @@ fun GenerationActionsPanel(
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
-    val haptics = com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback()
+    val haptics = rememberHapticFeedback()
 
-    androidx.compose.material3.Card(
+    AppCard(
         modifier = modifier.fillMaxWidth(),
-        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = scheme.surfaceContainerHigh), // Consistent with bottom sheet style
-        border = androidx.compose.foundation.BorderStroke(Dimen.Border.Thin, scheme.outlineVariant.copy(alpha = 0.12f))
+        outlined = true,
+        color = scheme.surfaceContainerHigh,
+        contentPadding = Dimen.Spacing16
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
-            modifier = Modifier.padding(Dimen.Spacing12)
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
             Text(
                 text = stringResource(R.string.count_short),
@@ -74,7 +74,7 @@ fun GenerationActionsPanel(
                 quantity = quantity,
                 onQuantityChanged = { 
                     onQuantityChanged(it)
-                    haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.LIGHT)
+                    haptics.performHapticFeedback(HapticFeedbackType.LIGHT)
                 },
                 enabled = !isGenerating
             )
@@ -85,7 +85,7 @@ fun GenerationActionsPanel(
                 text = stringResource(R.string.filters_button_generate),
                 onClick = {
                     onGenerate()
-                    haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.MEDIUM)
+                    haptics.performHapticFeedback(HapticFeedbackType.MEDIUM)
                 },
                 isLoading = isGenerating,
                 modifier = Modifier.fillMaxWidth(),
@@ -107,8 +107,8 @@ private fun QuantitySelector(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort),
         modifier = Modifier
-            .background(scheme.surface, CircleShape) // Inner background for selector
-            .padding(Dimen.Spacing4) // Padding around the controls
+            .background(scheme.surface, CircleShape)
+            .padding(Dimen.Spacing4)
     ) {
         QuantityButton(
             icon = AppIcons.Remove,
@@ -119,7 +119,7 @@ private fun QuantitySelector(
 
         Box(
             modifier = Modifier
-                .width(Dimen.ControlWidthMedium) // Slightly wider for double digits
+                .width(Dimen.ControlWidthMedium)
                 .height(Dimen.ControlHeightMedium),
             contentAlignment = Alignment.Center
         ) {
@@ -150,8 +150,8 @@ private fun QuantitySelector(
 
         QuantityButton(
             icon = AppIcons.Add,
-            onClick = { if (quantity < 50) onQuantityChanged(quantity + 1) }, // Limit max quantity reasonable
-            enabled = enabled && quantity < 50,
+            onClick = { if (quantity < GameConstants.MAX_GENERATION_QUANTITY) onQuantityChanged(quantity + 1) },
+            enabled = enabled && quantity < GameConstants.MAX_GENERATION_QUANTITY,
             contentDescription = stringResource(R.string.filters_quantity_increase)
         )
     }
@@ -176,7 +176,7 @@ private fun QuantityButton(
             disabledContainerColor = scheme.surfaceContainerHighest,
             disabledContentColor = scheme.onSurfaceVariant.copy(alpha = 0.38f)
         ),
-        modifier = Modifier.size(Dimen.ControlHeightMedium) // Consistent touch target size
+        modifier = Modifier.size(Dimen.ControlHeightMedium)
     ) {
         Icon(
             imageVector = icon,

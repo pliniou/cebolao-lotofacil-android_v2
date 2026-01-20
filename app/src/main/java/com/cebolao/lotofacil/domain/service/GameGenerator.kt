@@ -12,11 +12,13 @@ import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.util.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.yield
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
@@ -57,8 +59,15 @@ class GameGenerator @Inject constructor(
         val context = initializeGenerationContext(quantity, filters, rnd, config)
         emit(GenerationProgress.step(GenerationStep.HEURISTIC_START, 0, quantity))
 
-        val result = executeGenerationLoop(context, config)
-        finalizeGeneration(result, context, quantity, seedVal)
+        try {
+            val result = executeGenerationLoop(context, config)
+            finalizeGeneration(result, context, quantity, seedVal)
+        } catch (e: Exception) {
+            // Re-throw cancellation
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            logger.error(TAG, "Unexpected error during game generation", e)
+            emit(GenerationProgress.failed(GenerationFailureReason.GENERIC_ERROR))
+        }
     }.flowOn(defaultDispatcher)
 
     private suspend fun initializeGenerationContext(
@@ -136,7 +145,7 @@ class GameGenerator @Inject constructor(
         return now - lastProgressAt > config.timeoutMs
     }
     
-    private fun tryRandomGeneration(context: GenerationContext, config: GeneratorConfig): Boolean {
+    private suspend fun tryRandomGeneration(context: GenerationContext, config: GeneratorConfig): Boolean {
         var attempts = 0
         
         while (attempts < config.maxRandomAttempts) {
@@ -154,6 +163,11 @@ class GameGenerator @Inject constructor(
                 trackRejection(context, metrics)
             }
             attempts++
+            
+            // Periodically yield to prevent blocking the UI thread too long
+            if (attempts % 50 == 0) {
+                yield()
+            }
         }
         
         return false
@@ -163,7 +177,7 @@ class GameGenerator @Inject constructor(
         val failedRule = context.rules.firstOrNull { !it.matches(metrics) }
         if (failedRule != null) {
             context.rejections[failedRule.type] = (context.rejections[failedRule.type] ?: 0) + 1
-            logger.debug(TAG, "Game rejected by filter: ${failedRule.type}")
+            // Removed verbose debug logging in tight loop to prevent log flooding and overhead
         }
     }
     
@@ -183,7 +197,7 @@ class GameGenerator @Inject constructor(
         )
     }
     
-    private fun tryBacktrackingGeneration(
+    private suspend fun tryBacktrackingGeneration(
         solver: BacktrackingSolver?,
         context: GenerationContext,
         config: GeneratorConfig
@@ -232,7 +246,13 @@ class GameGenerator @Inject constructor(
     }
     
     private fun logTelemetryDetails(telemetry: GenerationTelemetry, rejections: Map<FilterType, Int>) {
-        logger.info(TAG, "Telemetry - Success rate: ${"%.1f".format(telemetry.successRate * 100)}%, Avg time/game: ${telemetry.avgTimePerGame}ms")
+        // Safe formatting to avoid Locale issues if any
+        try {
+            logger.info(TAG, "Telemetry - Success rate: ${"%.1f".format(telemetry.successRate * 100)}%, Avg time/game: ${telemetry.avgTimePerGame}ms")
+        } catch (e: Exception) {
+            logger.warning(TAG, "Could not format telemetry logs", e)
+        }
+        
         telemetry.mostRestrictiveFilter?.let { filter ->
             logger.info(TAG, "Most restrictive filter: $filter (${rejections[filter]} rejections)")
         }
@@ -278,12 +298,11 @@ class GameGenerator @Inject constructor(
     )
     
     private fun generateRandomGame(random: Random): LotofacilGame {
-         // Simple shuffle
-         val numbers = GameConstants.ALL_NUMBERS
-             .shuffled(random)
-             .take(GameConstants.GAME_SIZE)
-             .toSet()
-         return LotofacilGame.fromNumbers(numbers)
+          val numbers = GameConstants.ALL_NUMBERS
+              .shuffled(random)
+              .take(GameConstants.GAME_SIZE)
+              .toSet()
+          return LotofacilGame.fromNumbers(numbers)
     }
     
     private fun isDiverseEnough(
@@ -342,7 +361,7 @@ class GameGenerator @Inject constructor(
             }
         }
 
-        fun findValidGame(): LotofacilGame? {
+        suspend fun findValidGame(): LotofacilGame? {
             lastSolution = null
             shuffleInPlace(candidates, rnd)
             for (i in currentSelection.indices) currentSelection[i] = 0
@@ -360,7 +379,7 @@ class GameGenerator @Inject constructor(
             return if (ok) lastSolution else null
         }
 
-        private fun solve(
+        private suspend fun solve(
             index: Int,
             currentSum: Int,
             currentEvens: Int,
@@ -370,6 +389,9 @@ class GameGenerator @Inject constructor(
             currentRepeated: Int,
             lastNum: Int
         ): Boolean {
+            // Check for cancellation in heavy recursive search
+            currentCoroutineContext().ensureActive()
+
             if (index == GameConstants.GAME_SIZE) {
                 return validateCompleteGame(
                     sum = currentSum,
@@ -435,7 +457,7 @@ class GameGenerator @Inject constructor(
             return isCountFeasible(current, bounds, remainingCount, availableMatch, availableNonMatch)
         }
 
-        private fun tryNumberSelection(
+        private suspend fun tryNumberSelection(
             index: Int,
             currentSum: Int,
             currentEvens: Int,
@@ -475,7 +497,13 @@ class GameGenerator @Inject constructor(
         ): Boolean {
             onAttempt()
 
-            val game = LotofacilGame.fromNumbers(currentSelection.toSet())
+            val gameSet = currentSelection.toSet()
+            
+            // Optimization: Only create the full LotofacilGame object AFTER preliminary filter check
+            // if we have filters that require full game object calculation like sequences.
+            // For LotoFacil, sequences are cheap but creating the object has some overhead in a deep solver.
+            
+            val game = LotofacilGame.fromNumbers(gameSet)
 
             val metrics = GameComputedMetrics(
                 sum = sum,

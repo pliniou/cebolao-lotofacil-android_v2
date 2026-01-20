@@ -109,7 +109,13 @@ fun AppCard(
         )
     } else null
 
-    val cardElevation = CardDefaults.cardElevation(defaultElevation = Dimen.Elevation.None)
+    val cardElevation = CardDefaults.cardElevation(
+        defaultElevation = Dimen.Elevation.None,
+        pressedElevation = Dimen.Elevation.None,
+        focusedElevation = Dimen.Elevation.None,
+        hoveredElevation = Dimen.Elevation.None,
+        draggedElevation = Dimen.Elevation.None
+    )
     val colors = CardDefaults.cardColors(containerColor = effectiveBackground)
 
     val baseModifier = if (onClick != null) {

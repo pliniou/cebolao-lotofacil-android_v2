@@ -40,9 +40,9 @@ fun StandardAttentionCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = Dimen.CardMaxWidth),
-            outlined = false,
+            outlined = true,
             color = scheme.inverseSurface,
-            contentPadding = Dimen.CardContentPadding
+            contentPadding = Dimen.Spacing16
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -11,6 +11,17 @@ object Formatters {
         return NumberFormat.getCurrencyInstance(appLocale).format(value)
     }
 
+    fun formatPercentage(value: Float): String {
+        return String.format(appLocale, "%.1f%%", value)
+    }
+
+    fun formatDate(date: java.time.LocalDate): String {
+        return java.time.format.DateTimeFormatter
+            .ofLocalizedDate(java.time.format.FormatStyle.MEDIUM)
+            .withLocale(appLocale)
+            .format(date)
+    }
+
     fun getLocale(): Locale = appLocale
 }
 

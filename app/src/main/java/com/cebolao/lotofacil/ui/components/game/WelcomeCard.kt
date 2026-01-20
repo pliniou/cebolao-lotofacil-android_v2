@@ -84,7 +84,8 @@ fun WelcomeCard(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         variant = CardVariant.Solid,
-        contentPadding = Dimen.Spacing12
+        outlined = true,
+        contentPadding = Dimen.Spacing16
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

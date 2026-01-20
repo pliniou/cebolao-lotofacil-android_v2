@@ -119,7 +119,8 @@ fun NumberBall(
         shape = BallConfig.modernShape(),
         color = background,
         contentColor = content,
-        shadowElevation = Dimen.Elevation.None, // Flat design enforcement
+        shadowElevation = Dimen.Elevation.None,
+        tonalElevation = Dimen.Elevation.None,
         border = if (colors.border != Color.Transparent) {
             BorderStroke(Dimen.Border.Hairline, colors.border)
         } else {

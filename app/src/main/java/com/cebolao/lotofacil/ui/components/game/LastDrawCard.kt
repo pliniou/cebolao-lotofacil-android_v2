@@ -60,7 +60,7 @@ fun LastDrawCard(
     AppCard(
         modifier = modifier.fillMaxWidth(),
         outlined = true,
-        contentPadding = Dimen.Spacing12
+        contentPadding = Dimen.Spacing16
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -88,10 +88,12 @@ fun LastDrawCard(
             // Stats (semantic surface)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = scheme.surfaceContainerHigh,
+                color = scheme.surfaceContainerLow,
                 contentColor = scheme.onSurfaceVariant,
                 shape = MaterialTheme.shapes.medium,
-                border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant)
+                border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant),
+                tonalElevation = Dimen.Elevation.None,
+                shadowElevation = Dimen.Elevation.None
             ) {
                 Column(
                     modifier = Modifier
@@ -117,7 +119,7 @@ fun LastDrawCard(
                     .fillMaxWidth(0.8f),
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = scheme.primary, // Using primary for more emphasis on results action
+                    containerColor = scheme.primary,
                     contentColor = scheme.onPrimary
                 ),
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
@@ -272,7 +274,9 @@ private fun StatItem(
         modifier = modifier,
         color = scheme.surface,
         contentColor = scheme.onSurface,
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.small,
+        tonalElevation = Dimen.Elevation.None,
+        shadowElevation = Dimen.Elevation.None
     ) {
         Column(
             modifier = Modifier
@@ -343,7 +347,9 @@ private fun LocationInfoSection(details: UiDrawDetails) {
         modifier = Modifier.fillMaxWidth(),
         color = scheme.surfaceVariant,
         contentColor = scheme.onSurfaceVariant,
-        shape = MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large,
+        tonalElevation = Dimen.Elevation.None,
+        shadowElevation = Dimen.Elevation.None
     ) {
         Column(
             modifier = Modifier
@@ -413,7 +419,9 @@ private fun EmptyDataState(onRefresh: () -> Unit) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        tonalElevation = Dimen.Elevation.None,
+        shadowElevation = Dimen.Elevation.None
     ) {
         Row(
             modifier = Modifier

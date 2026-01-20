@@ -57,8 +57,8 @@ object GameConstants {
     }
 
     // Game Generation Options
-
-
+    const val MAX_GENERATION_QUANTITY = 50
+    const val DEFAULT_GENERATION_QUANTITY = 5
     // Statistics Time Windows (number of contests to analyze)
     val TIME_WINDOWS = listOf(10, 20, 50, 100, 200, 500)
 

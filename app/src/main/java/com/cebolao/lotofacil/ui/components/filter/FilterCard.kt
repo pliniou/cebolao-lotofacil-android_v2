@@ -39,6 +39,7 @@ import com.cebolao.lotofacil.domain.model.FilterType
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.FontFamilyDisplay
 import com.cebolao.lotofacil.ui.theme.filterIcon
+import com.cebolao.lotofacil.util.Formatters
 
 @Composable
 fun FilterCard(
@@ -52,15 +53,14 @@ fun FilterCard(
     val steps = (state.type.fullRange.endInclusive - state.type.fullRange.start).toInt() - 1
     val scheme = MaterialTheme.colorScheme
 
-    Card(
+    com.cebolao.lotofacil.ui.components.layout.AppCard(
         modifier = modifier.fillMaxWidth(),
         onClick = { onToggle(!state.isEnabled) },
-        border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant),
-        colors = CardDefaults.cardColors(
-            containerColor = if (state.isEnabled) scheme.surface else scheme.surfaceContainer
-        )
+        outlined = true,
+        color = if (state.isEnabled) scheme.surface else scheme.surfaceContainer,
+        contentPadding = Dimen.Spacing16
     ) {
-        Column(modifier = Modifier.padding(Dimen.Spacing12)) {
+        Column {
             // Header Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -159,7 +159,7 @@ private fun FilterControls(
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(Dimen.CornerRadiusSmall)
             ) {
                 Text(
-                    text = "${String.format(java.util.Locale.getDefault(), "%.1f", coverage)}% ${stringResource(R.string.filters_coverage)}", 
+                    text = "${Formatters.formatPercentage(coverage)} ${stringResource(R.string.filters_coverage)}", 
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = scheme.onSecondaryContainer,

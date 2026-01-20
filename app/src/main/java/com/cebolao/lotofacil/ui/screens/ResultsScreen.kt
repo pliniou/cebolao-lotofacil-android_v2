@@ -95,7 +95,8 @@ fun DrawListItem(draw: Draw) {
 
     AppCard(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = Dimen.CardContentPadding
+        outlined = true,
+        contentPadding = Dimen.Spacing16
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)) {
             Row(

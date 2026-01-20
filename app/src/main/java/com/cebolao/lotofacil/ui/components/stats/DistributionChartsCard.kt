@@ -45,25 +45,33 @@ fun DistributionChartsCard(
     val scheme = MaterialTheme.colorScheme
 
     val chartData = remember(selectedPattern, stats) {
-        prepareData(stats, selectedPattern)
+        prepareData(stats, selectedPattern).toImmutableList()
     }
-    val maxValue = remember(chartData) { chartData.maxOfOrNull { it.second } ?: 0 }
+    val maxValue by remember(chartData) {
+        derivedStateOf { chartData.maxOfOrNull { it.second } ?: 0 }
+    }
 
-    val (mean, stdDev) = remember(chartData) { calculateWeightedMeanAndStdDev(chartData) }
-    val showNormalLine = remember(mean, stdDev, selectedPattern) {
-        // Linha normal faz sentido quando temos dados numéricos suficientes e distribuição razoável
-        mean != null && stdDev != null && stdDev > 0.0 && chartData.size >= 3
+    val statsAnalysis by remember(chartData) {
+        derivedStateOf { calculateWeightedMeanAndStdDev(chartData) }
+    }
+    val (mean, stdDev) = statsAnalysis
+
+    val showNormalLine by remember(mean, stdDev, selectedPattern, chartData.size) {
+        derivedStateOf {
+            mean != null && stdDev != null && stdDev > 0.0 && chartData.size >= 3
+        }
     }
 
     // Valor do último sorteio para destacar no gráfico
-    val highlightValue = remember(lastDraw, selectedPattern) {
-        lastDraw?.let { draw ->
-            val rawValue = calculatePatternValue(draw, selectedPattern)
-            if (selectedPattern == StatisticPattern.SUM) {
-                // "buckets" na mesma granularidade do histograma
-                ((rawValue / GameConstants.SUM_STEP) * GameConstants.SUM_STEP).toString()
-            } else {
-                rawValue.toString()
+    val highlightValue by remember(lastDraw, selectedPattern) {
+        derivedStateOf {
+            lastDraw?.let { draw ->
+                val rawValue = calculatePatternValue(draw, selectedPattern)
+                if (selectedPattern == StatisticPattern.SUM) {
+                    ((rawValue / GameConstants.SUM_STEP) * GameConstants.SUM_STEP).toString()
+                } else {
+                    rawValue.toString()
+                }
             }
         }
     }
@@ -81,8 +89,9 @@ fun DistributionChartsCard(
         AppCard(
             modifier = Modifier.fillMaxWidth(),
             variant = CardVariant.Solid,
+            outlined = true,
             title = stringResource(R.string.home_distribution_title),
-            contentPadding = Dimen.Spacing12,
+            contentPadding = Dimen.Spacing16, // Aumentado para 16dp
             headerActions = {
                 // Legenda do destaque (último concurso)
                 if (highlightValue != null) {
