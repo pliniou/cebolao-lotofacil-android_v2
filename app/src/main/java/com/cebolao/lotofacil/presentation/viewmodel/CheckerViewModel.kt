@@ -22,6 +22,7 @@ import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
 import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.navigation.CheckerRoute
 import com.cebolao.lotofacil.util.toUserMessageRes
+import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -157,7 +158,7 @@ class CheckerViewModel @Inject constructor(
             return
         }
         resetAnalysis()
-        launchCatching(
+        viewModelScope.launchCatching(
              onError = { _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed) }
         ) {
             _uiState.value = CheckerUiState.Loading
@@ -215,7 +216,7 @@ class CheckerViewModel @Inject constructor(
         }
 
         recomputeJob?.cancel()
-        recomputeJob = launchCatching {
+        recomputeJob = viewModelScope.launchCatching {
             val (score, intensities) = withContext(defaultDispatcher) {
                 val history = historyRepository.getHistory()
                 val lastDraw = history.firstOrNull()

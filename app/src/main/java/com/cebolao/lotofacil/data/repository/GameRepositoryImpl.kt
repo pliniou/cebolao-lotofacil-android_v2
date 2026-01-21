@@ -5,6 +5,8 @@ import com.cebolao.lotofacil.data.mapper.toLotofacilGame
 import com.cebolao.lotofacil.data.mapper.toUserGameEntity
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
+import com.cebolao.lotofacil.domain.model.AppError
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.repository.GameRepository
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
@@ -15,7 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -35,89 +37,72 @@ class GameRepositoryImpl @Inject constructor(
 
     override val unpinnedGames: StateFlow<ImmutableList<LotofacilGame>> = userGameDao
         .getUnpinnedGames()
-        .map { entities ->
-            entities.map { it.toLotofacilGame() }.toImmutableList()
-        }
+        .map { entities -> entities.map { it.toLotofacilGame() }.toImmutableList() }
+        .catch { emit(persistentListOf()) }
         .flowOn(ioDispatcher)
         .stateIn(scope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), persistentListOf())
 
     override val pinnedGames: StateFlow<ImmutableList<LotofacilGame>> = userGameDao
         .getPinnedGames()
-        .map { entities ->
-            entities.map { it.toLotofacilGame() }.toImmutableList()
-        }
+        .map { entities -> entities.map { it.toLotofacilGame() }.toImmutableList() }
+        .catch { emit(persistentListOf()) }
         .flowOn(ioDispatcher)
         .stateIn(scope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), persistentListOf())
 
-    override suspend fun addGeneratedGames(newGames: List<LotofacilGame>) = withContext(ioDispatcher) {
-        if (newGames.isEmpty()) return@withContext
-
-        // 1. Gather all masks from input
-        val inputMasks = newGames.map { it.mask }
-
-        // 2. Fetch existing masks from DB in one query
-        val existingMasks = userGameDao.getExistingMasks(inputMasks).toSet()
-
-        // 3. Filter out games that already exist
-        val gamesToInsert = newGames.filter { game ->
-            game.mask !in existingMasks
-        }
-
-        // 4. Transform to entities and bulk insert
-        if (gamesToInsert.isNotEmpty()) {
-            val entities = gamesToInsert.map { game ->
-                game.toUserGameEntity(
-                    source = "generated",
-                    seed = null,
-                    json = json
-                )
+    override suspend fun addGeneratedGames(newGames: List<LotofacilGame>) {
+        if (newGames.isEmpty()) return
+        withContext(ioDispatcher) {
+            runCatching {
+                val inputMasks = newGames.map { it.mask }
+                val existingMasks = userGameDao.getExistingMasks(inputMasks).toSet()
+                val gamesToInsert = newGames.filter { it.mask !in existingMasks }
+                if (gamesToInsert.isNotEmpty()) {
+                    val entities = gamesToInsert.map { game ->
+                        game.toUserGameEntity(source = "generated", seed = null, json = json)
+                    }
+                    userGameDao.insertAll(entities)
+                }
+            }.onFailure {
+                // Log or handle error centrally if needed
             }
-            userGameDao.insertAll(entities)
         }
     }
 
-    override suspend fun clearUnpinnedGames() = withContext(ioDispatcher) {
-        userGameDao.deleteAllUnpinned()
+    override suspend fun clearUnpinnedGames() {
+        withContext(ioDispatcher) {
+            runCatching { userGameDao.deleteAllUnpinned() }
+        }
     }
 
     override suspend fun getGame(mask: Long): LotofacilGame? = withContext(ioDispatcher) {
-        userGameDao.getGameByMask(mask)?.toLotofacilGame()
+        runCatching { userGameDao.getGameByMask(mask)?.toLotofacilGame() }.getOrNull()
     }
 
-    override suspend fun saveGame(game: LotofacilGame) = withContext(ioDispatcher) {
-        val existing = userGameDao.getGameByMask(game.mask)
-        if (existing != null) {
-            // Merge logic: preserve ID, source, seed, etc.
-            // Only update fields managed by Domain (pinned state, mainly)
-            val updated = existing.copy(
-                pinned = game.isPinned
-                // Note: timestamp in existing is likely creation time.
-                // If game.creationTimestamp is different, deciding which to keep is tricky.
-                // Usually creation time shouldn't change.
-            )
-            userGameDao.update(updated)
-        } else {
-            // New game: use default source "manual" unless we want to param it.
-            // Domain layer creating a game usually means Manual or Generated.
-            // If it came from generator, it should have been added via addGeneratedGames?
-            // If it's a manual toggle of a ghost game, it becomes manual.
-            userGameDao.insert(
-                game.toUserGameEntity(
-                    source = "manual",
-                    json = json
-                )
-            )
+    override suspend fun saveGame(game: LotofacilGame) {
+        withContext(ioDispatcher) {
+            runCatching {
+                val existing = userGameDao.getGameByMask(game.mask)
+                if (existing != null) {
+                    val updated = existing.copy(pinned = game.isPinned)
+                    userGameDao.update(updated)
+                } else {
+                    userGameDao.insert(game.toUserGameEntity(source = "manual", json = json))
+                }
+            }
         }
-        Unit
     }
 
-    override suspend fun deleteGame(gameToDelete: LotofacilGame) = withContext(ioDispatcher) {
-        userGameDao.deleteByMask(gameToDelete.mask)
+    override suspend fun deleteGame(gameToDelete: LotofacilGame) {
+        withContext(ioDispatcher) {
+            runCatching { userGameDao.deleteByMask(gameToDelete.mask) }
+        }
     }
 
     override suspend fun exportGames(): String = withContext(ioDispatcher) {
-        val allEntities = userGameDao.getAllGames().first()
-        val allGames = allEntities.map { it.toLotofacilGame() }
-        json.encodeToString(allGames)
+        runCatching {
+            val allEntities = userGameDao.getAllGames().first()
+            val allGames = allEntities.map { it.toLotofacilGame() }
+            json.encodeToString(allGames)
+        }.getOrDefault("[]")
     }
 }

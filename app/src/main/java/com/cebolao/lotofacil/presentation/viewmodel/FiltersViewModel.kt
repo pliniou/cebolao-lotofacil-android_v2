@@ -14,6 +14,7 @@ import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
+import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -232,7 +233,7 @@ class FiltersViewModel @Inject constructor(
 
     private fun startGeneration(quantity: Int, filters: List<FilterState>) {
         generationJob?.cancel()
-        generationJob = launchCatching(
+        generationJob = viewModelScope.launchCatching(
             onError = {
                 _generationState.value = GenerationUiState.Error(R.string.filters_generation_error)
             }

@@ -53,11 +53,11 @@ import com.cebolao.lotofacil.ui.theme.AppIcons
 @Composable
 fun HomeScreen(
     navController: NavController? = null,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    listState: LazyListState,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val listState = rememberLazyListState()
 
     uiState.syncMessageRes?.let { msgId ->
         val msg = stringResource(msgId)
@@ -91,12 +91,12 @@ fun HomeScreenContent(
     onNavigateToResults: () -> Unit,
     listState: LazyListState
     ) {
-    AppScreen(
-        title = stringResource(R.string.app_name),
-        subtitle = stringResource(R.string.home_subtitle),
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
-        val isRefreshing = uiState.isSyncing || uiState.screenState is HomeScreenState.Loading
+    val title = stringResource(R.string.app_name)
+    val subtitle = stringResource(R.string.home_subtitle)
+    val appScreenContent = @Composable { innerPadding: androidx.compose.foundation.layout.PaddingValues ->
+        val isRefreshing = remember(uiState.isSyncing, uiState.screenState) {
+            uiState.isSyncing || uiState.screenState is HomeScreenState.Loading
+        }
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,

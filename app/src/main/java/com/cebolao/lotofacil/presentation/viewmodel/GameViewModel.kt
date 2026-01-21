@@ -16,6 +16,7 @@ import com.cebolao.lotofacil.ui.model.UiGameAnalysisResult
 import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.model.toDomain
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
+import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -27,6 +28,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.ensureActive
 import java.math.BigDecimal
 import javax.inject.Inject
 import com.cebolao.lotofacil.mapper.toUiModel as toUiAnalysisResult
@@ -161,7 +164,7 @@ class GameViewModel @Inject constructor(
 
     private fun togglePinState(game: UiLotofacilGame) {
         _uiError.value = null
-        launchCatching(
+        viewModelScope.launchCatching(
             onError = {
                 _events.trySend(GameEffect.ShowSnackbar(R.string.error_toggle_pin_failed))
                 _uiError.value = R.string.error_toggle_pin_failed
@@ -195,7 +198,7 @@ class GameViewModel @Inject constructor(
     private fun confirmDeleteGame() {
         val game = _gameToDelete.value ?: return
         _uiError.value = null
-        launchCatching(
+        viewModelScope.launchCatching(
             onError = {
                 _events.trySend(GameEffect.ShowSnackbar(R.string.error_delete_game_failed))
                 _uiError.value = R.string.error_delete_game_failed
@@ -212,7 +215,7 @@ class GameViewModel @Inject constructor(
 
     private fun clearUnpinned() {
         _uiError.value = null
-        launchCatching(
+        viewModelScope.launchCatching(
             onError = {
                 _events.trySend(GameEffect.ShowSnackbar(R.string.error_clear_games_failed))
                 _uiError.value = R.string.error_clear_games_failed
@@ -228,7 +231,7 @@ class GameViewModel @Inject constructor(
 
         analyzeJob?.cancel()
         _uiError.value = null
-        analyzeJob = launchCatching {
+        analyzeJob = viewModelScope.launchCatching {
             _analysisState.value = GameAnalysisUiState.Loading
             val domainGame = game.toDomain()
             when (val result = analyzeGameUseCase(domainGame)) {
@@ -250,7 +253,7 @@ class GameViewModel @Inject constructor(
 
     private fun shareGame(game: UiLotofacilGame) {
         _uiError.value = null
-        launchCatching(
+        viewModelScope.launchCatching(
             onError = {
                 _events.trySend(GameEffect.ShowSnackbar(R.string.error_share_game_failed))
                 _uiError.value = R.string.error_share_game_failed

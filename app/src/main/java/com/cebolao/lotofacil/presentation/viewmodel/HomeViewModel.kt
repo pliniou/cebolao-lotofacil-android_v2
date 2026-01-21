@@ -23,6 +23,7 @@ import com.cebolao.lotofacil.util.Formatters
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import com.cebolao.lotofacil.util.toAppError
 import com.cebolao.lotofacil.util.toUserMessageRes
+import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

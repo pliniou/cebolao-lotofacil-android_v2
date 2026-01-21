@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
+import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +42,7 @@ class ResultsViewModel @Inject constructor(
     )
 
     init {
-        launchCatching {
+        viewModelScope.launchCatching {
             historyRepository.syncHistoryIfNeeded()
                 .onFailure {
                     syncMessage.value = com.cebolao.lotofacil.R.string.results_error_message

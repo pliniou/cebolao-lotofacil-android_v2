@@ -1,37 +1,28 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import android.util.Log
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
- * Base ViewModel class providing common functionality for error handling and coroutine launching.
+ * Base class for all ViewModels.  Provides a [CoroutineScope] with a supervisor job and a
+ * custom [CoroutineExceptionHandler] to prevent unhandled exceptions from crashing the app.
  */
 abstract class BaseViewModel : ViewModel() {
-    
-    /**
-     * Launches a coroutine with a default error handler that logs the exception.
-     * @param onError Optional callback to handle the error in the UI (e.g., show a snackbar).
-     * @param block The suspend block to execute.
-     */
-    protected fun launchCatching(
-        onError: ((Throwable) -> Unit)? = null,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job {
-        return viewModelScope.launch(
-            context = CoroutineExceptionHandler { _, throwable ->
-                // Log globally if possible, or trigger onError
-                if (onError != null) {
-                    onError(throwable)
-                } else {
-                    Log.e("BaseViewModel", "Uncaught exception in ViewModel", throwable)
-                }
-            },
-            block = block
-        )
+
+    /** Supervisor scope used to launch coroutines in derived ViewModels. */
+    protected val viewModelScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, throwable ->
+            // Default exception handling.  Override in subclasses if needed.
+            throwable.printStackTrace()
+        }
+    )
+
+    /** Launches a coroutine safely with the provided body and handles exceptions. */
+    protected fun launchSafely(block: suspend () -> Unit) {
+        viewModelScope.launch { runCatching { block() }.onFailure { it.printStackTrace() } }
     }
 }

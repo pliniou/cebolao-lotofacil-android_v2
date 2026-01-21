@@ -9,12 +9,12 @@ import com.cebolao.lotofacil.navigation.HomeRoute
 import com.cebolao.lotofacil.navigation.OnboardingRoute
 import com.cebolao.lotofacil.ui.theme.AccentPalette
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
+import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -97,7 +97,7 @@ class MainViewModel @Inject constructor(
      * Single entry point for UI events.
      */
     fun onEvent(event: MainUiEvent) {
-        launchCatching {
+        viewModelScope.launchCatching {
             when (event) {
                 is MainUiEvent.CompleteOnboarding -> {
                     updateAppConfigUseCase.completeOnboarding()

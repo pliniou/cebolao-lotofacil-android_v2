@@ -13,11 +13,14 @@ class GetAnalyzedStatsUseCase @Inject constructor(
     private val statisticsAnalyzer: StatisticsAnalyzer,
     @param:DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
-    suspend operator fun invoke(timeWindow: Int = 0): Result<StatisticsReport> = withContext(dispatcher) {
-        runCatching {
+    suspend operator fun invoke(timeWindow: Int = 0): AppResult<StatisticsReport> = withContext(dispatcher) {
+        try {
             require(timeWindow >= 0) { "timeWindow must be >= 0" }
             val history = historyRepository.getHistory()
-            statisticsAnalyzer.analyze(history, timeWindow)
+            val report = statisticsAnalyzer.analyze(history, timeWindow)
+            AppResult.Success(report)
+        } catch (e: Exception) {
+            com.cebolao.lotofacil.util.toAppError(e).let { AppResult.Failure(it) }
         }
     }
 }

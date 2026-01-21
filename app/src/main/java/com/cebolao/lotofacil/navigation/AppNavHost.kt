@@ -65,7 +65,16 @@ fun AppNavHost(
                 }
             }
         }
-        composable<HomeRoute> { HomeScreen(navController) }
+        composable<HomeRoute> { 
+            val hostState = androidx.compose.runtime.remember { androidx.compose.material3.SnackbarHostState() }
+            val lazyState = androidx.compose.foundation.lazy.rememberLazyListState()
+            
+            HomeScreen(
+                navController = navController,
+                listState = lazyState,
+                snackbarHostState = hostState
+            ) 
+        }
         composable<ResultsRoute> {
             ResultsScreen(
                 onNavigateBack = { navController.popBackStack() }
