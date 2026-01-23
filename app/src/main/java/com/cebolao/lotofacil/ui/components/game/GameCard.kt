@@ -31,7 +31,8 @@ fun GameCard(
     game: UiLotofacilGame,
     index: Int,
     modifier: Modifier = Modifier,
-    onAction: (GameCardAction) -> Unit
+    onAction: (GameCardAction) -> Unit,
+    onNumberItemRecompose: ((number: Int, count: Int) -> Unit)? = null
 ) {
     val scheme = MaterialTheme.colorScheme
     val isPinned = game.isPinned
@@ -81,7 +82,8 @@ fun GameCard(
                 modifier = Modifier.fillMaxWidth(),
                 maxSelection = GameConstants.GAME_SIZE,
                 sizeVariant = NumberBallSize.Small,
-                ballVariant = if (isPinned) NumberBallVariant.Secondary else NumberBallVariant.Neutral
+                ballVariant = if (isPinned) NumberBallVariant.Secondary else NumberBallVariant.Neutral,
+                onItemRecompose = onNumberItemRecompose
             )
 
             GameCardActions(

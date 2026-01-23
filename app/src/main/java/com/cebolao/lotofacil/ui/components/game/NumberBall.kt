@@ -40,7 +40,7 @@ enum class NumberBallSize { Large, Medium, Small }
 enum class NumberBallVariant { Primary, Secondary, Neutral, Hit, Miss }
 
 @Immutable
-private data class BallColors(
+internal data class BallColors(
     val container: Color,
     val content: Color,
     val border: Color
@@ -82,7 +82,7 @@ fun NumberBall(
 
     val background by animateColorAsState(colors.container, label = "ballBackground")
     val content by animateColorAsState(colors.content, label = "ballContent")
-    val targetScale by remember {
+    val targetScale by remember(isSelected, variant) {
         derivedStateOf {
             when {
                 isSelected -> Motion.Offset.SELECTSCALE
@@ -142,7 +142,9 @@ fun NumberBall(
     }
 }
 
-private fun resolveColors(
+
+
+internal fun resolveColors(
     isSelected: Boolean,
     variant: NumberBallVariant,
     scheme: ColorScheme,

@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -62,12 +63,28 @@ fun RecursiveStatsCard(
             )
             
             if (stats.size > 20) {
+                // For large stat lists we flatten the recursive structure into a simple list of
+                // (StatItem, nestingLevel) pairs and render it with a single LazyColumn. This
+                // avoids deep nested Columns/LazyColumns and keeps composition and measurement
+                // efficient for big datasets.
+                val flattened = remember(stats) {
+                    val list = mutableListOf<Pair<StatItem, Int>>()
+                    fun flatten(items: List<StatItem>, level: Int) {
+                        for (it in items) {
+                            list.add(it to level)
+                            if (it.subItems.isNotEmpty()) flatten(it.subItems, level + 1)
+                        }
+                    }
+                    flatten(stats, nestingLevel)
+                    list.toList()
+                }
+
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
-                    items(stats, key = { it.label + it.value }) { stat ->
-                        StatItemRow(item = stat, nestingLevel = nestingLevel)
+                    items(flattened, key = { (stat, level) -> stat.label + stat.value + level }) { (stat, level) ->
+                        StatItemRow(item = stat, nestingLevel = level)
                     }
                 }
             } else {

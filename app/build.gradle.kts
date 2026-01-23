@@ -167,6 +167,8 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)
+    // WorkManager testing helpers for instrumentation tests
+    androidTestImplementation("androidx.work:work-testing:2.9.0")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

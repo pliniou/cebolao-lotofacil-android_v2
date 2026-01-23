@@ -122,11 +122,13 @@ fun AppCard(
     )
     val colors = CardDefaults.cardColors(containerColor = effectiveBackground)
 
-    val baseModifier = if (onClick != null) {
-        modifier
-            .scale(scale)
-            .semantics { this.role = Role.Button }
-    } else modifier
+    val baseModifier = remember(onClick, modifier, scale) {
+        if (onClick != null) {
+            modifier
+                .scale(scale)
+                .semantics { this.role = Role.Button }
+        } else modifier
+    }
 
     CompositionLocalProvider(LocalCardNesting provides nestingLevel + 1) {
         val cardContent: @Composable ColumnScope.() -> Unit = {

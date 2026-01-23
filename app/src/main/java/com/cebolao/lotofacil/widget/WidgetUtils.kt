@@ -27,8 +27,8 @@ enum class WidgetSizeVariant { SMALL, MEDIUM, LARGE }
 
 object WidgetUtils {
 
-    private const val UNIQUE_WIDGET_UPDATE_ON_DEMAND = "WidgetUpdateOnDemand"
-    private const val UNIQUE_WIDGET_UPDATE_PERIODIC = "WidgetUpdatePeriodic"
+    internal const val UNIQUE_WIDGET_UPDATE_ON_DEMAND = "WidgetUpdateOnDemand"
+    internal const val UNIQUE_WIDGET_UPDATE_PERIODIC = "WidgetUpdatePeriodic"
 
     /**
      * Breakpoints em dp: universais e estáveis entre densidades/launchers.

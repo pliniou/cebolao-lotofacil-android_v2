@@ -22,14 +22,36 @@
         <!-- Main activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Widget providers remain unchanged -->
+        <!-- Widget providers: declare AppWidgetProvider receivers so widget resource XMLs are recognized by the manifest and lint -->
+        <receiver android:name=".widget.LastDrawWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/last_draw_widget_info" />
+        </receiver>
+
+        <receiver android:name=".widget.NextContestWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/next_contest_widget_info" />
+        </receiver>
+
+        <receiver android:name=".widget.PinnedGameWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/pinned_game_widget_info" />
+        </receiver>
+
         <!-- Disable default WorkManager initializer to use Hilt's Configuration.Provider -->
         <provider
             android:name="androidx.startup.InitializationProvider"

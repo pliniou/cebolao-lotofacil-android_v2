@@ -12,6 +12,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +40,9 @@ fun NumberGrid(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(
         Dimen.BallSpacing,
         Alignment.CenterHorizontally
-    )
+    ),
+    // Optional debug callback for tests/profiling. Null in production.
+    onItemRecompose: ((number: Int, count: Int) -> Unit)? = null
 ) {
     val isFull = remember(maxSelection, selectedNumbers.size) {
         derivedStateOf { maxSelection != null && selectedNumbers.size >= maxSelection }
@@ -63,27 +66,67 @@ fun NumberGrid(
             key(number) {
                 val isSelected = number in selectedNumbers
                 val clickable = !isFull || isSelected
-
                 val heatmapColor = remember(number, heatmapColors) { heatmapColors?.get(number) }
 
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = minSize, minHeight = minSize)
-                        .clip(CircleShape)
-                        .clickable(enabled = clickable) { currentOnNumberClick.value(number) }
-                ) {
-                    NumberBall(
-                        number = number,
-                        modifier = Modifier,
-                        sizeVariant = sizeVariant,
-                        isSelected = isSelected,
-                        isDisabled = !clickable,
-                        variant = ballVariant,
-                        customBackgroundColor = heatmapColor
-                    )
-                }
+                NumberGridItem(
+                    number = number,
+                    isSelected = isSelected,
+                    clickable = clickable,
+                    onNumberClick = { currentOnNumberClick.value(it) },
+                    minSize = minSize,
+                    sizeVariant = sizeVariant,
+                    ballVariant = ballVariant,
+                    heatmapColor = heatmapColor,
+                    onRecompose = onItemRecompose
+                )
             }
         }
     }
 }
+
+@Composable
+private fun NumberGridItem(
+    number: Int,
+    isSelected: Boolean,
+    clickable: Boolean,
+    onNumberClick: (Int) -> Unit,
+    minSize: androidx.compose.ui.unit.Dp,
+    sizeVariant: NumberBallSize,
+    ballVariant: NumberBallVariant,
+    heatmapColor: androidx.compose.ui.graphics.Color?,
+    onRecompose: ((number: Int, count: Int) -> Unit)? = null
+) {
+    val boxBaseModifier = remember(minSize) {
+        Modifier
+            .defaultMinSize(minWidth = minSize, minHeight = minSize)
+            .clip(CircleShape)
+    }
+
+    val boxModifier = remember(boxBaseModifier, clickable) {
+        if (clickable) boxBaseModifier.clickable { onNumberClick(number) } else boxBaseModifier
+    }
+
+    // Debug hook: count recompositions for profiling tests. SideEffect runs after each successful
+    // composition/recomposition, so it provides a simple counter for how often an item is recomposed.
+    val recomposeCount = remember { androidx.compose.runtime.mutableStateOf(0) }
+    SideEffect {
+        recomposeCount.value = recomposeCount.value + 1
+        onRecompose?.invoke(number, recomposeCount.value)
+    }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = boxModifier
+    ) {
+        NumberBall(
+            number = number,
+            modifier = Modifier,
+            sizeVariant = sizeVariant,
+            isSelected = isSelected,
+            isDisabled = !clickable,
+            variant = ballVariant,
+            customBackgroundColor = heatmapColor
+        )
+    }
+}
+

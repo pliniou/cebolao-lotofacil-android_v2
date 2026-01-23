@@ -11,9 +11,9 @@
 
     <!-- Common / Acessibilidade (Mantenha profissional para acessibilidade) -->
     <string name="number_ball_content_description">Dezena %1$d, %2$s.</string>
-    <string name="number_ball_status_hit" translatable="false">Acertou</string>
-    <string name="number_ball_status_miss" translatable="false">Errou</string>
-    <string name="number_ball_status_neutral" translatable="false">Neutro</string>
+    <string name="number_ball_status_hit">Acertou</string>
+    <string name="number_ball_status_miss">Errou</string>
+    <string name="number_ball_status_neutral">Neutro</string>
     <string name="general_back">Voltar</string>
     <string name="general_selected">Selecionado</string>
     <string name="general_cancel">Cancelar</string>
@@ -238,10 +238,12 @@
     <plurals name="about_prob_hits_format">
         <item quantity="one">%1$d acerto</item>
         <item quantity="other">%1$d acertos</item>
+        <item quantity="many">%1$d acertos</item>
     </plurals>
     <plurals name="about_prob_n_numbers">
         <item quantity="one">%1$d Número</item>
         <item quantity="other">%1$d Números</item>
+        <item quantity="many">%1$d Números</item>
     </plurals>
 
     <!-- Studio -->
@@ -278,9 +280,6 @@
     <string name="widget_last_draw_description" tools:keep="@string/widget_last_draw_description">Mostra o resultado do último sorteio da Lotofácil</string>
     <string name="widget_next_contest_description" tools:keep="@string/widget_next_contest_description">Mostra informações sobre o próximo concurso</string>
     <string name="widget_pinned_game_description" tools:keep="@string/widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
-    <string name="widget_placeholder_dash" translatable="false">--</string>
-    <string name="widget_placeholder_date" translatable="false">--/--</string>
-    <string name="widget_placeholder_number" translatable="false">00</string>
 
     <!-- Presets -->
     <string name="preset_standard">Padrão</string>
@@ -347,6 +346,7 @@
     <plurals name="stats_period_selected">
         <item quantity="one">Período alterado para o último %d concurso</item>
         <item quantity="other">Período alterado para os últimos %d concursos</item>
+        <item quantity="many">Período alterado para os últimos %d concursos</item>
     </plurals>
     <string name="stats_period_all_selected">Período alterado para todos os concursos</string>
     <string name="common_back">Voltar</string>
