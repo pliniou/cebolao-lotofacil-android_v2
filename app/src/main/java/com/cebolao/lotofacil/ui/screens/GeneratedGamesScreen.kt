@@ -49,7 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -318,7 +318,7 @@ fun GeneratedGamesScreenContent(
                     uiState.errorMessageRes != null -> {
                         StandardAttentionCard(
                             title = stringResource(R.string.general_error_title),
-                            message = stringResource(uiState.errorMessageRes!!),
+                            message = stringResource(uiState.errorMessageRes),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(

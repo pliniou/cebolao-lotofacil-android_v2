@@ -9,7 +9,7 @@ import androidx.annotation.StringRes
 sealed interface Async<out T> {
     data object Loading : Async<Nothing>
     data class Success<out T>(val data: T) : Async<T>
-    data class Error(@StringRes val messageRes: Int, val throwable: Throwable? = null) : Async<Nothing>
+    data class Error(@param:StringRes val messageRes: Int, val throwable: Throwable? = null) : Async<Nothing>
     data object Uninitialized : Async<Nothing>
 }
 

@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION", "UnstableApiUsage")
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -68,15 +66,13 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    // kotlinOptions removed - configuring via kotlin block
-
     buildFeatures {
         compose = true
         buildConfig = true
     }
 
+    @Suppress("UnstableApiUsage")
     composeOptions {
-        // Use Kotlin compiler extension version provided by the Compose BOM
         kotlinCompilerExtensionVersion = libs.versions.composeBom.get()
     }
 

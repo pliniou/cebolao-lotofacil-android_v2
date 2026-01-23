@@ -1,5 +1,4 @@
 plugins {
-    // Use aliases from the version catalog; these are resolved via `settings.gradle.kts`
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false

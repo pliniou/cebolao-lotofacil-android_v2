@@ -50,7 +50,7 @@ fun DistributionChartsCard(
         prepareData(stats, selectedPattern).toImmutableList()
     }
     val maxValue by remember(chartData) {
-        derivedStateOf { (chartData.maxOfOrNull { it.second } ?: 0) as Int }
+        derivedStateOf { (chartData.maxOfOrNull { it.second } ?: 0) }
     }
 
     val statsAnalysis by remember(chartData) {
@@ -75,7 +75,7 @@ fun DistributionChartsCard(
                 } else {
                     rawValue.toString()
                 }
-            } as String?
+            }
         }
     }
 

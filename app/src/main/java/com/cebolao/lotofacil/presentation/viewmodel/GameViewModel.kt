@@ -54,7 +54,7 @@ data class GameScreenUiState(
     val summary: GameSummary = GameSummary(),
     val analysisState: GameAnalysisUiState = GameAnalysisUiState.Idle,
     val isLoading: Boolean = false,
-    @StringRes val errorMessageRes: Int? = null
+    @param:StringRes val errorMessageRes: Int? = null
 )
 
 /**

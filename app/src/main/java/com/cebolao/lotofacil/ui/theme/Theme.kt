@@ -118,7 +118,7 @@ sealed class AccentPalette(
 }
 
 
-private fun lightColorScheme(palette: AccentPalette): ColorScheme = ColorScheme(
+private fun lightColorScheme(palette: AccentPalette): ColorScheme = androidx.compose.material3.lightColorScheme(
     primary = palette.primary,
     onPrimary = Color.White,
     primaryContainer = palette.primaryContainer,
@@ -157,7 +157,7 @@ private fun lightColorScheme(palette: AccentPalette): ColorScheme = ColorScheme(
     surfaceContainerLowest = Color.White
 )
 
-private fun darkColorScheme(palette: AccentPalette): ColorScheme = ColorScheme(
+private fun darkColorScheme(palette: AccentPalette): ColorScheme = androidx.compose.material3.darkColorScheme(
     primary = palette.primary,
     onPrimary = Color.Black,
     primaryContainer = palette.primaryContainer,
