@@ -390,7 +390,6 @@ private fun AccentColorButton(
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
-    val contentDesc = stringResource(R.string.about_accessibility_select_accent, label)
     val label = when (palette) {
         AccentPalette.AZUL -> stringResource(R.string.about_accent_blue)
         AccentPalette.ROXO -> stringResource(R.string.about_accent_purple)
@@ -399,9 +398,10 @@ private fun AccentColorButton(
         AccentPalette.ROSA -> stringResource(R.string.about_accent_pink)
         AccentPalette.LARANJA -> stringResource(R.string.about_accent_orange)
     }
+    val contentDesc = stringResource(R.string.about_accessibility_select_accent, label)
 
     // Contraste automático para seeds muito claras (ex.: amarelo)
-    val onSeed = if (palette.seed.luminance() > 0.62f) LightTextPrimary else DarkTextPrimary
+    val onSeed = if (palette.primary.luminance() > 0.62f) LightTextPrimary else DarkTextPrimary
 
     val scale by animateFloatAsState(
         targetValue = if (isSelected) Motion.Offset.SELECTSCALE else 1f,
@@ -419,7 +419,7 @@ private fun AccentColorButton(
                 stateDescription = if (isSelected) label else ""
                 this.contentDescription = contentDesc
             },
-        color = palette.seed,
+        color = palette.primary,
         shape = MaterialTheme.shapes.large,
         border = if (isSelected) {
             BorderStroke(Dimen.Border.Thick, scheme.primary)

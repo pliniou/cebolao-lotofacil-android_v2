@@ -14,16 +14,18 @@ object Dimen {
     val Spacing24 = 24.dp
     val Spacing32 = 32.dp
 
-    // --- Semantic Spacing ---
+    // Backward-compatible aliases used across the UI layer.
     val SpacingShort = Spacing4
     val SpacingMedium = Spacing12
-    val SectionSpacing = Spacing24 // Aumentado para melhor separação visual (flat design)
     val ItemSpacing = Spacing8
+    val SectionSpacing = Spacing24
+    val ScreenPadding = Spacing16
+
+    // --- Semantic Spacing (Scaled) ---
     val TrackingWidest = 2.sp
-    val ElevationMedium = 0.dp // Reduzido para 0dp para garantir visual "flat"
+    val ElevationMedium = 0.dp 
 
     // --- Layout ---
-    val ScreenPadding = Spacing16
     val CardContentPadding = Spacing16
     val BottomContentPadding = 112.dp
     val LayoutMaxWidth = 900.dp
@@ -75,7 +77,7 @@ object Dimen {
     val ChartDotRadiusSmall = 3.dp
     val ChartDotRadiusLarge = 5.dp
 
-    // --- Shapes (Flat Design: preferring larger, softer corners) ---
+    // --- Shapes ---
     val CardCornerRadius = 28.dp
     val CornerRadiusSmall = 16.dp
     val CornerRadiusMedium = 20.dp
@@ -90,7 +92,7 @@ object Dimen {
     
     object Elevation {
         val None = 0.dp
-        val Level1 = 0.dp // Leveling everything to 0dp for flat design
+        val Level1 = 0.dp
         val Level2 = 0.dp
         val Level3 = 0.dp
         val Level4 = 0.dp

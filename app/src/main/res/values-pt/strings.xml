@@ -414,17 +414,7 @@
     <string name="games_tab_new">Novos</string>
 
     <!-- Share -->
-    <string name="share_game_text_format" tools:ignore="PluralsCandidate">🎲 Meu jogo Lotofácil:
-%1$s
-
-📊 Estatísticas:
-Soma: %2$d | Pares: %3$d
-Primos: %4$d | Moldura: %5$d
-Miolo: %6$d | Fib.: %7$d
-Mult. 3: %8$d | Repet.: %9$d
-Seq.: %10$d
-
-Gerado com Cebolão Lotofácil</string>
+    <string name="share_game_text_format" tools:ignore="PluralsCandidate">Meu jogo Lotofácil:\n%1$s\n\nEstatísticas:\nSoma: %2$d | Pares: %3$d\nPrimos: %4$d | Moldura: %5$d\nMiolo: %6$d | Fib.: %7$d\nMult. 3: %8$d | Repet.: %9$d\nSeq.: %10$d\n\nGerado com Cebolão Lotofácil</string>
     <string name="share_error_message">Erro ao compartilhar jogo</string>
 
     <!-- General -->

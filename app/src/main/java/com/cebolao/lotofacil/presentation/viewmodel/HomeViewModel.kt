@@ -105,14 +105,10 @@ class HomeViewModel @Inject constructor(
     private val statsFlow = _selectedTimeWindow.flatMapLatest { window ->
         flow {
             emit(Async.Loading)
-            val result = getAnalyzedStatsUseCase(window)
-            result.fold(
-                onSuccess = { emit(Async.Success(it.toUiModel())) },
-                onFailure = { 
-                    val error = it.toAppError()
-                    emit(Async.Error(error.toUserMessageRes())) 
-                }
-            )
+            when (val result = getAnalyzedStatsUseCase(window)) {
+                is AppResult.Success -> emit(Async.Success(result.value.toUiModel()))
+                is AppResult.Failure -> emit(Async.Error(result.error.toUserMessageRes()))
+            }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), Async.Loading)
 

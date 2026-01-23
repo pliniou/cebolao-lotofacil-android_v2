@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -34,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -193,62 +193,58 @@ private fun StatsContent(stats: UiStatisticsReport) {
         )
     }
 
-    @Suppress("ConfigurationScreenWidthHeight")
-    val configuration = LocalConfiguration.current
-    
-    // Use derivedStateOf for configuration-based layout decision to optimize recompositions
-    val useColumnLayout by remember(configuration.screenWidthDp) {
-        derivedStateOf {
-            configuration.screenWidthDp < PHONE_BREAKPOINT_DP
-        }
-    }
-
     val primary = MaterialTheme.colorScheme.primary
     val error = MaterialTheme.colorScheme.error
 
-    Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny)) {
-        if (useColumnLayout) {
-            StatRow(
-                title = stringResource(R.string.home_hot_numbers),
-                data = preparedData.hotNumbers,
-                highlightColor = primary,
-                unit = stringResource(R.string.stats_unit_times)
-            )
-            StatRow(
-                title = stringResource(R.string.home_overdue_numbers),
-                data = preparedData.overdueNumbers,
-                highlightColor = error,
-                isOverdue = true,
-                unit = stringResource(R.string.stats_unit_contests)
-            )
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
-                ) {
-                    StatRow(
-                        title = stringResource(R.string.home_hot_numbers),
-                        data = preparedData.hotNumbers,
-                        highlightColor = primary,
-                        unit = stringResource(R.string.stats_unit_times)
-                    )
-                }
+    BoxWithConstraints {
+        val useColumnLayout by remember(maxWidth) {
+            derivedStateOf { maxWidth < PHONE_BREAKPOINT_DP.dp }
+        }
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+        Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingTiny)) {
+            if (useColumnLayout) {
+                StatRow(
+                    title = stringResource(R.string.home_hot_numbers),
+                    data = preparedData.hotNumbers,
+                    highlightColor = primary,
+                    unit = stringResource(R.string.stats_unit_times)
+                )
+                StatRow(
+                    title = stringResource(R.string.home_overdue_numbers),
+                    data = preparedData.overdueNumbers,
+                    highlightColor = error,
+                    isOverdue = true,
+                    unit = stringResource(R.string.stats_unit_contests)
+                )
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingMedium)
                 ) {
-                    StatRow(
-                        title = stringResource(R.string.home_overdue_numbers),
-                        data = preparedData.overdueNumbers,
-                        highlightColor = error,
-                        isOverdue = true,
-                        unit = stringResource(R.string.stats_unit_contests)
-                    )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+                    ) {
+                        StatRow(
+                            title = stringResource(R.string.home_hot_numbers),
+                            data = preparedData.hotNumbers,
+                            highlightColor = primary,
+                            unit = stringResource(R.string.stats_unit_times)
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+                    ) {
+                        StatRow(
+                            title = stringResource(R.string.home_overdue_numbers),
+                            data = preparedData.overdueNumbers,
+                            highlightColor = error,
+                            isOverdue = true,
+                            unit = stringResource(R.string.stats_unit_contests)
+                        )
+                    }
                 }
             }
         }
@@ -300,7 +296,6 @@ private fun StatRow(
                         Text(
                             text = stringResource(R.string.stats_no_data_message),
                             style = MaterialTheme.typography.labelSmall,
-                            fontSize = 10.sp,
                             color = scheme.onSurfaceVariant.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center
                         )
@@ -372,7 +367,6 @@ private fun StatItem(
                 text = unit,
                 style = MaterialTheme.typography.labelSmall,
                 color = scheme.onSurfaceVariant.copy(alpha = 0.7f),
-                fontSize = 10.sp,
                 textAlign = TextAlign.Center
             )
         }

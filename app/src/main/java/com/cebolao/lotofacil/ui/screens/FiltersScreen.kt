@@ -1,7 +1,7 @@
 package com.cebolao.lotofacil.ui.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,14 +23,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -53,7 +51,6 @@ import com.cebolao.lotofacil.ui.components.filter.FilterPresetSelector
 import com.cebolao.lotofacil.ui.components.filter.GenerationActionsPanel
 import com.cebolao.lotofacil.ui.components.filter.filterSection
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
-import com.cebolao.lotofacil.ui.components.layout.StandardScreenHeader
 import com.cebolao.lotofacil.ui.components.stats.InfoPoint
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -65,13 +62,25 @@ data class FilterCategory(
     val states: List<FilterState>
 )
 
+private data class PendingSnackbar(
+    val messageRes: Int,
+    val formatArgs: List<Any> = emptyList()
+)
+
 @Composable
 fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
-    val context = LocalContext.current
-    val currentResources by rememberUpdatedState(context.resources)
+    var pendingSnackbar by remember { mutableStateOf<PendingSnackbar?>(null) }
+
+    val snackbarMessage = pendingSnackbar?.let { pending ->
+        if (pending.formatArgs.isNotEmpty()) {
+            stringResource(pending.messageRes, *pending.formatArgs.toTypedArray())
+        } else {
+            stringResource(pending.messageRes)
+        }
+    }
     
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -85,18 +94,16 @@ fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltView
                 }
 
                 is NavigationEvent.ShowSnackbar -> {
-                    val message = if (event.formatArgs.isNotEmpty()) {
-                        currentResources.getString(
-                            event.messageRes,
-                            *event.formatArgs.toTypedArray()
-                        )
-                    } else {
-                        currentResources.getString(event.messageRes)
-                    }
-                    snackbarHostState.showSnackbar(message)
+                    pendingSnackbar = PendingSnackbar(event.messageRes, event.formatArgs)
                 }
             }
         }
+    }
+
+    LaunchedEffect(snackbarMessage) {
+        val message = snackbarMessage ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(message)
+        pendingSnackbar = null
     }
 
     FiltersScreenContent(
@@ -108,7 +115,6 @@ fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltView
     )
 }
 
-@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun FiltersScreenContent(
     uiState: FiltersScreenState,
@@ -117,8 +123,6 @@ fun FiltersScreenContent(
     listState: LazyListState,
     navCtrl: NavController
 ) {
-    val configuration = LocalConfiguration.current
-    val useColumnLayout = configuration.screenWidthDp >= 600
     val haptics = com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback()
 
     // Local state for quantity and preset selection
@@ -213,30 +217,24 @@ fun FiltersScreenContent(
         }
     }
 
-    val nav = navCtrl
-    // Using direct Scaffold to ensure correct hierarchy and z-index for Snackbar
-    androidx.compose.material3.Scaffold(
-        topBar = {
-            StandardScreenHeader(
-                title = stringResource(R.string.filters_title),
-                subtitle = stringResource(R.string.filters_subtitle),
-                navigationIcon = {
-                     IconButton(onClick = { nav.popBackStack() }) {
-                         Icon(
-                             imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
-                             contentDescription = stringResource(R.string.common_back)
-                         )
-                     }
-                },
-                actions = {
-                    TextButton(onClick = { 
-                        onEvent(FiltersUiEvent.RequestResetFilters)
-                        haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.LIGHT)
-                    }) {
-                        Text(stringResource(R.string.filters_reset_button_description))
-                    }
-                }
-            )
+    AppScreen(
+        title = stringResource(R.string.filters_title),
+        subtitle = stringResource(R.string.filters_subtitle),
+        navigationIcon = {
+            IconButton(onClick = { navCtrl.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.common_back)
+                )
+            }
+        },
+        actions = {
+            TextButton(onClick = {
+                onEvent(FiltersUiEvent.RequestResetFilters)
+                haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.LIGHT)
+            }) {
+                Text(stringResource(R.string.filters_reset_button_description))
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
@@ -251,6 +249,9 @@ fun FiltersScreenContent(
             )
         }
     ) { innerPadding ->
+        BoxWithConstraints {
+            val useColumnLayout = maxWidth >= 600.dp
+
         val categories = listOf(
             FilterCategory(R.string.filter_category_numeric, numericos),
             FilterCategory(R.string.filter_category_geometric, geometricos),
@@ -321,6 +322,7 @@ fun FiltersScreenContent(
                     )
                 }
             }
+        }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.cebolao.lotofacil.di
 import com.cebolao.lotofacil.BuildConfig
 
 import android.content.Context
+import android.os.Build
 import com.cebolao.lotofacil.data.network.ApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -29,14 +30,16 @@ object NetworkModule {
     private const val TIMEOUT_CONNECT_SECONDS = 30L
     private const val TIMEOUT_READ_SECONDS = 30L
     private const val MEDIA_TYPE_JSON = "application/json"
+    private const val HEADER_ACCEPT = "Accept"
+    private const val HEADER_USER_AGENT = "User-Agent"
 
     @Provides
     @Singleton
     fun provideJson(): Json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
-        encodeDefaults = true
-        prettyPrint = true
+        encodeDefaults = false
+        prettyPrint = BuildConfig.DEBUG
         isLenient = true
     }
 
@@ -57,14 +60,29 @@ object NetworkModule {
             } else {
                 HttpLoggingInterceptor.Level.NONE
             }
+            redactHeader("Authorization")
+            redactHeader("Cookie")
         }
 
         return OkHttpClient.Builder()
             .cache(cache)
+            .addInterceptor { chain ->
+                val request = chain.request()
+                val userAgent =
+                    "CebolaoLotofacil/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT})"
+
+                val enriched = request.newBuilder()
+                    .header(HEADER_ACCEPT, MEDIA_TYPE_JSON)
+                    .header(HEADER_USER_AGENT, userAgent)
+                    .build()
+
+                chain.proceed(enriched)
+            }
             .addInterceptor(logging)
             .connectTimeout(TIMEOUT_CONNECT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
+            .callTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .build()
     }

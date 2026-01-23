@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.core.content.res.ResourcesCompat
@@ -51,10 +52,7 @@ import kotlin.math.max
 import kotlin.math.round
 import kotlin.math.sqrt
 
-private const val Y_AXIS_WIDTH_PX = 80f
-private const val X_AXIS_HEIGHT_PX = 80f // Increased for rotated labels
-private const val TOP_PADDING_PX = 40f
-private const val GRID_LINES = 4
+private const val GRID_LINES = 5
 
 enum class ChartType { BAR, LINE }
 
@@ -62,6 +60,7 @@ enum class ChartType { BAR, LINE }
  * Componente de gráfico customizado (Barra ou Linha) usando Canvas.
  *
  * Suporta animação de entrada, seleção por toque, destaque de valores e linha de distribuição normal.
+ * Agora com dimensões escaláveis baseadas na densidade da tela.
  */
 @Composable
 fun BarChart(
@@ -83,7 +82,7 @@ fun BarChart(
 
     val colors = ChartColors(
         primary = MaterialTheme.colorScheme.primary,
-        secondary = MaterialTheme.colorScheme.secondary, // Better harmony for selection
+        secondary = MaterialTheme.colorScheme.secondary,
         highlight = MaterialTheme.colorScheme.error,
         text = MaterialTheme.colorScheme.onSurfaceVariant,
         line = MaterialTheme.colorScheme.outlineVariant,
@@ -92,7 +91,6 @@ fun BarChart(
         normalLine = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
     )
 
-    // Fallback seguro se a fonte não carregar no preview
     val typeface = remember {
         try {
             ResourcesCompat.getFont(context, R.font.stacksansnotch_bold) ?: Typeface.DEFAULT_BOLD
@@ -118,11 +116,11 @@ fun BarChart(
                 .fillMaxSize()
                 .pointerInput(data) {
                     detectTapGestures { offset ->
-                        selectedIndex = ChartMetrics(size.toSize(), data.size).getBarIndexAt(offset.x)
+                        selectedIndex = ChartMetrics(size.toSize(), data.size, density).getBarIndexAt(offset.x)
                     }
                 }
         ) {
-            val metrics = ChartMetrics(size, data.size)
+            val metrics = ChartMetrics(size, data.size, density)
             drawGrid(maxValue, metrics, paints.axis, paints.grid)
 
             if (chartType == ChartType.BAR) {
@@ -192,15 +190,21 @@ private data class ChartColors(
 )
 
 @Stable
-private class ChartMetrics(size: Size, val dataCount: Int) {
-    val drawHeight = size.height - X_AXIS_HEIGHT_PX - TOP_PADDING_PX
-    val yAxisX = Y_AXIS_WIDTH_PX
-    val totalWidth = size.width - yAxisX - 40f
+private class ChartMetrics(size: Size, val dataCount: Int, density: Density) {
+    // Dynamic dimensions in pixels
+    val topPadding = with(density) { 16.dp.toPx() }
+    val bottomPadding = with(density) { 40.dp.toPx() } // For X axis labels
+    val yAxisWidth = with(density) { 40.dp.toPx() }
+    
+    val drawHeight = size.height - bottomPadding - topPadding
+    val totalWidth = size.width - yAxisWidth - with(density) { 16.dp.toPx() } // Right padding
 
     val pointSpacing = if (dataCount > 1) totalWidth / (dataCount - 1) else totalWidth
-    val touchTargetWidth = pointSpacing.coerceAtMost(60f)
+    
+    // Minimum touch target size (48dp) logic could be applied here if needed
+    val touchTargetWidth = pointSpacing.coerceAtMost(with(density) { 60.dp.toPx() })
 
-    fun getX(index: Int): Float = yAxisX + (index * pointSpacing)
+    fun getX(index: Int): Float = yAxisWidth + (index * pointSpacing)
 
     fun getHeight(value: Int, max: Int): Float {
         if (max <= 0) return 0f
@@ -208,13 +212,13 @@ private class ChartMetrics(size: Size, val dataCount: Int) {
     }
 
     fun getBarIndexAt(x: Float): Int? {
-        if (x < yAxisX - touchTargetWidth / 2) return null
-        val relativeX = x - yAxisX
+        if (x < yAxisWidth) return null
+        val relativeX = x - yAxisWidth
         val index = (relativeX / pointSpacing).roundToInt()
         return if (index in 0 until dataCount) index else null
     }
 
-    private fun Float.roundToInt(): Int = round(this).toInt()
+    private fun Float.roundToInt(): Int = Math.round(this)
 }
 
 @Stable
@@ -226,7 +230,7 @@ private class ChartPaints(
     val axis = Paint().apply {
         isAntiAlias = true
         color = colors.text.toArgb()
-        textSize = density.run { 12.sp.toPx() }
+        textSize = density.run { 10.sp.toPx() } // Slightly smaller axis labels
         this.typeface = typeface
     }
 
@@ -241,7 +245,7 @@ private class ChartPaints(
     val label = Paint().apply {
         isAntiAlias = true
         color = colors.text.toArgb()
-        textSize = density.run { 11.sp.toPx() }
+        textSize = density.run { 10.sp.toPx() }
         textAlign = Paint.Align.CENTER
         this.typeface = typeface
     }
@@ -286,12 +290,12 @@ private fun DrawScope.drawGrid(
     val step = cappedMax / GRID_LINES.toFloat()
     for (i in 0..GRID_LINES) {
         val value = i * step
-        val y = TOP_PADDING_PX + m.drawHeight - m.getHeight(value.toInt(), cappedMax)
+        val y = m.topPadding + m.drawHeight - m.getHeight(value.toInt(), cappedMax)
 
-        drawContext.canvas.nativeCanvas.drawLine(m.yAxisX, y, size.width, y, gridPaint)
+        drawContext.canvas.nativeCanvas.drawLine(m.yAxisWidth, y, size.width, y, gridPaint)
         drawContext.canvas.nativeCanvas.drawText(
             value.toInt().toString(),
-            m.yAxisX - 16f,
+            m.yAxisWidth - 12f,
             y + 10f,
             textPaint.apply { textAlign = Paint.Align.RIGHT }
         )
@@ -314,8 +318,8 @@ private fun DrawScope.drawBars(
 
     data.forEachIndexed { index, (label, value) ->
         val height = m.getHeight(value, max) * prog
-        val x = m.yAxisX + (index * barSpacing) + (barSpacing - barWidth) / 2
-        val y = TOP_PADDING_PX + m.drawHeight - height
+        val x = m.yAxisWidth + (index * barSpacing) + (barSpacing - barWidth) / 2
+        val y = m.topPadding + m.drawHeight - height
 
         val isHighlighted = label == highlightVal
         val meetsPredicate = highlightPred?.invoke(value) ?: false
@@ -340,7 +344,7 @@ private fun DrawScope.drawBars(
         if (data.size <= 15 || index % skipInterval == 0 || index == data.size - 1) {
             drawContext.canvas.nativeCanvas.withSave {
                 val centerX = x + barWidth / 2
-                val baseY = size.height - 10f // Moved up slightly from the bottom edge
+                val baseY = size.height - 10f
                 if (data.size > 15) {
                     rotate(-45f, centerX, baseY)
                     drawText(label, centerX, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })
@@ -366,7 +370,7 @@ private fun DrawScope.drawLineChart(
     data.forEachIndexed { index, (_, value) ->
         val height = m.getHeight(value, max) * prog
         val x = m.getX(index)
-        val y = TOP_PADDING_PX + m.drawHeight - height
+        val y = m.topPadding + m.drawHeight - height
         if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
     }
     drawContext.canvas.nativeCanvas.drawPath(path.asAndroidPath(), p.linePaint)
@@ -374,7 +378,7 @@ private fun DrawScope.drawLineChart(
     data.forEachIndexed { index, (label, value) ->
         val height = m.getHeight(value, max) * prog
         val x = m.getX(index)
-        val y = TOP_PADDING_PX + m.drawHeight - height
+        val y = m.topPadding + m.drawHeight - height
 
         val isHighlighted = label == highlightVal
         val meetsPredicate = highlightPred?.invoke(value) ?: false
@@ -383,9 +387,9 @@ private fun DrawScope.drawLineChart(
 
         if (showDot) {
             val dotRadius = if (isSelected || isHighlighted || meetsPredicate) {
-                Dimen.ChartDotRadiusLarge.toPx()
+                5.dp.toPx() // dynamic
             } else {
-                Dimen.ChartDotRadiusSmall.toPx()
+                3.dp.toPx() // dynamic
             }
             val paint = if (isHighlighted || meetsPredicate) p.highlightDotPaint else p.dotPaint
             drawContext.canvas.nativeCanvas.drawCircle(x, y, dotRadius, paint)
@@ -397,7 +401,7 @@ private fun DrawScope.drawLineChart(
 
         if (data.size <= 10 || index % skipInterval == 0 || index == data.size - 1) {
             drawContext.canvas.nativeCanvas.withSave {
-                val baseY = size.height - 10f // Moved up slightly
+                val baseY = size.height - 10f
                 if (data.size > 10) {
                     rotate(-45f, x, baseY)
                     drawText(label, x, baseY, p.label.apply { textAlign = Paint.Align.RIGHT })
@@ -419,7 +423,7 @@ private fun DrawScope.drawTooltip(
     p: ChartPaints
 ) {
     val xCenter = m.getX(i)
-    val barTop = TOP_PADDING_PX + m.drawHeight - (m.getHeight(v, max) * prog) - 12f
+    val barTop = m.topPadding + m.drawHeight - (m.getHeight(v, max) * prog) - 12f
     val text = v.toString()
     val width = p.tooltip.measureText(text) + 48f
     val rect = RoundRect(
@@ -474,15 +478,14 @@ private fun DrawScope.drawNormalLine(
         val z = (value - mean) / stdDev
         val pdf = (1f / (stdDev * sqrt(2f * PI.toFloat()))) * exp(-0.5f * z * z)
         
-        // Ajustar a escala para melhor visualização
         val scaleFactor = when {
-            bucketWidth > 10f -> 0.8f  // Para ranges grandes (como soma)
-            bucketWidth > 2f -> 1.2f   // Para ranges médios
-            else -> 1.5f              // Para ranges pequenos (como contagens)
+            bucketWidth > 10f -> 0.8f
+            bucketWidth > 2f -> 1.2f
+            else -> 1.5f
         }
         
         val predictedCount = (totalCount * bucketWidth * pdf * scaleFactor).toInt().coerceAtLeast(0).coerceAtMost(max)
-        val y = TOP_PADDING_PX + m.drawHeight - m.getHeight(predictedCount, max)
+        val y = m.topPadding + m.drawHeight - m.getHeight(predictedCount, max)
 
         if (!started) {
             path.moveTo(xCenter, y); started = true
@@ -503,7 +506,7 @@ private fun DrawScope.drawNormalLine(
     drawContext.canvas.nativeCanvas.drawText(
         "Distribuição Normal",
         size.width - 200f,
-        TOP_PADDING_PX + 20f,
+        m.topPadding + 20f,
         p.label.apply {
             textAlign = Paint.Align.LEFT
             color = c.normalLine.toArgb()

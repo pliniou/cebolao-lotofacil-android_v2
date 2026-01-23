@@ -3,6 +3,10 @@ package com.cebolao.lotofacil.ui.model
 import androidx.compose.runtime.Immutable
 import com.cebolao.lotofacil.domain.model.NumberFrequency
 import com.cebolao.lotofacil.domain.model.StatisticsReport
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Immutable
 data class UiStatisticsReport(
@@ -34,5 +38,7 @@ fun StatisticsReport.toUiModel(): UiStatisticsReport = UiStatisticsReport(
     sequencesDistribution = sequencesDistribution,
     averageSum = averageSum,
     totalDrawsAnalyzed = totalDrawsAnalyzed,
-    analysisDate = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date(analysisDate))
+    analysisDate = Instant.ofEpochMilli(analysisDate)
+        .atZone(ZoneId.systemDefault())
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault()))
 )

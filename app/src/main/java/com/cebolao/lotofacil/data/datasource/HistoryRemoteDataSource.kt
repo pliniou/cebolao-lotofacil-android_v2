@@ -12,14 +12,18 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
+import java.time.ZonedDateTime
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min
+import kotlin.random.Random
 
 private const val TAG = "HistoryRemoteDataSource"
 private const val RETRY_AFTER_HEADER = "Retry-After"
@@ -28,10 +32,30 @@ private const val RATE_LIMIT_HTTP_CODE = 429
 private const val DEFAULT_MAX_RETRIES = 3
 private const val DEFAULT_INITIAL_BACKOFF_MS = 1_000L
 private const val DEFAULT_MAX_BACKOFF_MS = 30_000L
+private const val DEFAULT_JITTER_RATIO = 0.1
 
 interface HistoryRemoteDataSource {
     suspend fun getLatestDraw(): LotofacilApiResult?
     suspend fun getDrawsInRange(range: IntRange): List<Draw>
+}
+
+internal fun retryAfterHeaderToDelayMs(
+    headerValue: String?,
+    nowMs: Long = System.currentTimeMillis()
+): Long? {
+    val raw = headerValue?.trim().orEmpty()
+    if (raw.isBlank()) return null
+
+    raw.toLongOrNull()?.let { seconds ->
+        return (seconds.coerceAtLeast(0) * 1_000L)
+    }
+
+    // Retry-After can also be an HTTP-date per RFC 7231.
+    return runCatching {
+        val now = Instant.ofEpochMilli(nowMs)
+        val retryAt = ZonedDateTime.parse(raw, RFC_1123_DATE_TIME).toInstant()
+        (retryAt.toEpochMilli() - now.toEpochMilli()).coerceAtLeast(0)
+    }.getOrNull()
 }
 
 internal suspend fun <T> retryOnHttp429(
@@ -55,13 +79,19 @@ internal suspend fun <T> retryOnHttp429(
         // Last attempt: return the 429 error.
         if (attempt == maxRetries) return result
 
-        val retryAfterSeconds = exception.response()?.headers()?.get(RETRY_AFTER_HEADER)?.toLongOrNull()
-        val sleepMs = (retryAfterSeconds?.coerceAtLeast(0)?.times(1_000L)) ?: backoff
+        val retryAfter = exception.response()?.headers()?.get(RETRY_AFTER_HEADER)
+        val sleepMs = retryAfterHeaderToDelayMs(retryAfter) ?: backoff
+        val jitterWindowMs = (sleepMs * DEFAULT_JITTER_RATIO).toLong().coerceAtLeast(0L)
+        val jitterMs = if (jitterWindowMs == 0L) 0L else Random.nextLong(0L, jitterWindowMs + 1)
+        val sleepWithJitterMs = (sleepMs + jitterMs).coerceAtMost(maxBackoffMs)
 
-        logger.warning(TAG, "HTTP 429 on $tag (attempt ${attempt + 1}/${maxRetries + 1}). Backing off ${sleepMs}ms.")
+        logger.warning(
+            TAG,
+            "HTTP 429 on $tag (attempt ${attempt + 1}/${maxRetries + 1}). Backing off ${sleepWithJitterMs}ms."
+        )
 
-        delay(sleepMs)
-        if (retryAfterSeconds == null) {
+        delay(sleepWithJitterMs)
+        if (retryAfter == null) {
             backoff = (backoff * 2).coerceAtMost(maxBackoffMs)
         }
     }
@@ -123,9 +153,8 @@ class HistoryRemoteDataSourceImpl @Inject constructor(
     private fun apiResultToDraw(apiResult: LotofacilApiResult): Draw? {
         return runCatching {
             val contest = apiResult.numero
-            val numbers = apiResult.listaDezenas.mapNotNull { it.toIntOrNull() }.toSet()
-
-            if (contest <= 0 || numbers.size != 15) return null
+            val mask = stringsToMask(apiResult.listaDezenas)
+            if (contest <= 0 || java.lang.Long.bitCount(mask) != 15) return null
 
             val dateMillis = apiResult.dataApuracao
                 ?.takeIf { it.isNotBlank() }
@@ -138,7 +167,17 @@ class HistoryRemoteDataSourceImpl @Inject constructor(
                     }.getOrNull()
                 }
 
-            Draw.fromNumbers(contest, numbers, dateMillis)
+            Draw(contest, mask, dateMillis)
         }.getOrNull()
+    }
+
+    private fun stringsToMask(numbers: List<String>): Long {
+        var mask = 0L
+        for (s in numbers) {
+            val n = s.toIntOrNull() ?: continue
+            val idx = n - 1
+            if (idx in 0..63) mask = mask or (1L shl idx)
+        }
+        return mask
     }
 }

@@ -30,7 +30,7 @@ fun CebolaoLotofacilTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = rememberAdaptiveTypography(),
         shapes = Shapes,
         content = content
     )

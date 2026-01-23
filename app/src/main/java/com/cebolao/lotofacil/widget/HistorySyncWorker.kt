@@ -1,11 +1,11 @@
 package com.cebolao.lotofacil.widget
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
+import com.cebolao.lotofacil.domain.util.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -19,7 +19,8 @@ private const val MAX_ATTEMPTS = 3
 class HistorySyncWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val historyRepository: HistoryRepository
+    private val historyRepository: HistoryRepository,
+    private val logger: Logger
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result = runCatching {
@@ -27,11 +28,11 @@ class HistorySyncWorker @AssistedInject constructor(
         if (result.isSuccess) {
             Result.success()
         } else {
-            Log.e(TAG, "History sync failed (attempt ${runAttemptCount + 1})", result.exceptionOrNull())
+            logger.error(TAG, "History sync failed (attempt ${runAttemptCount + 1})", result.exceptionOrNull())
             if (shouldRetry()) Result.retry() else Result.failure()
         }
     }.getOrElse { e ->
-        Log.e(TAG, "History sync failed (attempt ${runAttemptCount + 1})", e)
+        logger.error(TAG, "History sync failed (attempt ${runAttemptCount + 1})", e)
         if (shouldRetry()) Result.retry() else Result.failure()
     }
 

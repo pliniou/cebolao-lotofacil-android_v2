@@ -14,6 +14,7 @@ import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.GameComputedMetrics
 import com.cebolao.lotofacil.domain.model.GameScore
 import com.cebolao.lotofacil.domain.model.LotofacilGame
+import com.cebolao.lotofacil.domain.model.MaskUtils
 import com.cebolao.lotofacil.domain.repository.CheckRunRepository
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
@@ -228,15 +229,13 @@ class CheckerViewModel @Inject constructor(
 
                 val computedIntensities = if (history.isNotEmpty()) {
                     val totalDraws = history.size
-                    val counts = mutableMapOf<Int, Int>()
+                    val counts = IntArray(26) // 1..25
                     history.forEach { draw ->
-                        draw.numbers.forEach { n ->
-                            counts[n] = (counts[n] ?: 0) + 1
+                        MaskUtils.forEachNumber(draw.mask) { n ->
+                            if (n in 1..25) counts[n]++
                         }
                     }
-                    numbers.associateWith { n ->
-                        ((counts[n] ?: 0).toFloat() / totalDraws).coerceIn(0f, 1f)
-                    }
+                    numbers.associateWith { n -> (counts[n].toFloat() / totalDraws).coerceIn(0f, 1f) }
                 } else {
                     numbers.associateWith { 0.5f }
                 }

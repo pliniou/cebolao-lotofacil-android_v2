@@ -1,9 +1,12 @@
 package com.cebolao.lotofacil.domain.usecase
 
 import com.cebolao.lotofacil.di.DefaultDispatcher
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.StatisticsReport
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.StatisticsAnalyzer
+import com.cebolao.lotofacil.util.toAppError
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,8 +22,10 @@ class GetAnalyzedStatsUseCase @Inject constructor(
             val history = historyRepository.getHistory()
             val report = statisticsAnalyzer.analyze(history, timeWindow)
             AppResult.Success(report)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            com.cebolao.lotofacil.util.toAppError(e).let { AppResult.Failure(it) }
+            AppResult.Failure(e.toAppError())
         }
     }
 }

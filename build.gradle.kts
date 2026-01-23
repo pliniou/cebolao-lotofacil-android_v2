@@ -1,7 +1,7 @@
 plugins {
     // Use aliases from the version catalog; these are resolved via `settings.gradle.kts`
     alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.android) apply false // Required since built-in Kotlin is disabled for KSP
+    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false

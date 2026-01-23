@@ -318,7 +318,7 @@ fun GeneratedGamesScreenContent(
                     uiState.errorMessageRes != null -> {
                         StandardAttentionCard(
                             title = stringResource(R.string.general_error_title),
-                            message = stringResource(uiState.errorMessageRes),
+                            message = stringResource(uiState.errorMessageRes!!),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(

@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -56,6 +57,7 @@ class HistoryRepositoryImpl @Inject constructor(
 
     private val drawCache = DrawLruCache(maxSize = 100)
     private val latestApiResultRef = AtomicReference<LatestApiResult?>()
+    private val historyCacheRef = AtomicReference<List<Draw>?>(null)
 
     private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
     override val syncStatus: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
@@ -66,17 +68,22 @@ class HistoryRepositoryImpl @Inject constructor(
 
     override fun observeHistory(): Flow<List<Draw>> =
         localDataSource.observeLocalHistory()
-            .map { normalizeHistory(it) }
+            .onEach { historyCacheRef.set(it) }
 
     override fun observeLastDraw(): Flow<Draw?> =
         localDataSource.observeLastDraw()
 
     override suspend fun getHistory(): List<Draw> {
-        val draws = normalizeHistory(localDataSource.getLocalHistory())
+        historyCacheRef.get()?.let { cached ->
+            if (cached.isNotEmpty()) return cached
+        }
+
+        val draws = localDataSource.getLocalHistory()
 
         if (draws.isNotEmpty()) {
             val toCache = draws.take(100)
             drawCache.putAll(toCache)
+            historyCacheRef.set(draws)
         }
 
         return draws
@@ -170,6 +177,7 @@ class HistoryRepositoryImpl @Inject constructor(
 
         if (!shouldSync) {
             logger.info(TAG, "Sync not needed, skipping")
+            _syncStatus.value = SyncStatus.Success
             return Result.success(Unit)
         }
 
@@ -181,6 +189,7 @@ class HistoryRepositoryImpl @Inject constructor(
             cacheLatestApiResult(latestResult)
 
             drawCache.clear()
+            historyCacheRef.set(null)
             logger.debug(TAG, "Cache cleared after sync")
 
             _syncStatus.value = SyncStatus.Success
@@ -199,16 +208,6 @@ class HistoryRepositoryImpl @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         }
-    }
-
-    private fun normalizeHistory(draws: List<Draw>): List<Draw> {
-        if (draws.isEmpty()) return emptyList()
-        val sorted = draws.sortedByDescending { it.contestNumber }
-        val deduped = sorted.distinctBy { it.contestNumber }
-        if (deduped.size != sorted.size) {
-            logger.warning(TAG, "Historico continha duplicados; normalizado para ${deduped.size} registros")
-        }
-        return deduped
     }
 
     private fun getFreshApiResult(now: Long = System.currentTimeMillis()): LotofacilApiResult? =

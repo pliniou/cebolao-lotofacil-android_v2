@@ -114,14 +114,40 @@
 
     <string-array name="motivational_quotes">
         <item>When in doubt, trust statistics. But don\'t let luck know.</item>
-        <item>Playing is dreaming. Filtering is strategy.</item>
+        <item>Playing is a dream. Filtering is strategy.</item>
         <item>Balance is the new "guess".</item>
-        <item>If it works, it was strategy. If it fails… bad luck.</item>
-        <item>Probability is not a guarantee. But it helps avoid mistakes.</item>
+        <item>If it worked, it was strategy. If it failed… it was bad luck.</item>
+        <item>Probability is not a guarantee. But it helps not to do nonsense.</item>
         <item>Filters don\'t guarantee victory, but avoid statistical shame.</item>
         <item>Play with strategy. Lose with style.</item>
-        <item>Mathematics doesn\'t fail. Your choices might.</item>
+        <item>If you want to predict the future, start by studying the past. Or not.</item>
+        <item>Math doesn\'t fail. Your choices might.</item>
+        <item>This app won\'t make you a millionaire, but at least you understand why.</item>
+        <item>Played random? Congratulations, you are a random() function.</item>
+        <item>Probability is the art of promising nothing and delivering even less.</item>
+        <item>Historical data: because making an informed mistake is better than blindly.</item>
         <item>The only certainty: the House always wins.</item>
+        <item>Generate games: 2 seconds. Win: unlikely. Hotel: Trivago.</item>
+        <item>Luck favors the prepared. Statistics favors the informed.</item>
+        <item>Your game was generated with filters. Luck is still on you.</item>
+        <item>Normal distribution: because even chance has patterns.</item>
+        <item>Hot numbers don\'t heat up wallets. But they are interesting.</item>
+        <item>Frequency analysis: turning anxiety into data.</item>
+        <item>This app is 50% statistics, 50% sarcasm. No miracles.</item>
+        <item>If you win, remember me. If you lose, blame randomness.</item>
+        <item>Playing without a filter is like driving without GPS: possible, but risky.</item>
+        <item>Consecutive sequences? Only on the keyboard.</item>
+        <item>Balanced evens and odds: the democracy of numbers.</item>
+        <item>Smart generation: when "guesswork" becomes "analysis".</item>
+        <item>Frame, center, quadrants… looks like a game, but it\'s number geography.</item>
+        <item>Fibonacci in the lottery. Would Leonardo da Vinci approve? Probably not.</item>
+        <item>Multiples of 3: because even numbers need organization.</item>
+        <item>Checking old games: therapy for the statistical optimist.</item>
+        <item>If statistics solved it, mathematicians would be millionaires. They aren\'t. But they try.</item>
+        <item>Algorithm doesn\'t choose for you. It just avoids numerical ridicule.</item>
+        <item>Your combination was validated. Your luck was not.</item>
+        <item>Pretty charts don\'t pay bills. But they help dream better.</item>
+        <item>Normal distribution: where average is good, but no one wants to be average.</item>
     </string-array>
 
     <!-- Generator / Presets -->
@@ -388,17 +414,7 @@
     <string name="games_tab_new">New</string>
 
     <!-- Share -->
-    <string name="share_game_text_format" tools:ignore="PluralsCandidate">🎲 My Lotofácil game:
-%1$s
-
-📊 Stats:
-Sum: %2$d | Evens: %3$d
-Primes: %4$d | Frame: %5$d
-Center: %6$d | Fib: %7$d
-Mult. 3: %8$d | Repet: %9$d
-Seq: %10$d
-
-Generated with Cebolão Lotofácil</string>
+    <string name="share_game_text_format" tools:ignore="PluralsCandidate">My Lotofácil game:\n%1$s\n\nStats:\nSum: %2$d | Evens: %3$d\nPrimes: %4$d | Frame: %5$d\nCenter: %6$d | Fib: %7$d\nMult. 3: %8$d | Repet: %9$d\nSeq: %10$d\n\nGenerated with Cebolão Lotofácil</string>
     <string name="share_error_message">Error sharing game</string>
 
     <!-- General -->

@@ -317,6 +317,12 @@ class GameGenerator @Inject constructor(
         }
     }
 
+    /**
+     * Solves the constraints using a Backtracking algorithm with Forward Checking (Look-ahead).
+     *
+     * It efficiently prunes the search space by maintaining count of available properties (evens, primes, etc.)
+     * in the remaining numbers ('Suffix Sum' arrays).
+     */
     private class BacktrackingSolver(
         filters: List<FilterState>,
         private val lastDrawNumbers: Set<Int>,
@@ -325,24 +331,37 @@ class GameGenerator @Inject constructor(
         private val onRejection: (FilterType) -> Unit
     ) {
 
+        // Filter bounds (e.g., Sum must be between 180 and 220)
         private val sumBounds: IntRange? = filters.boundFor(FilterType.SOMA_DEZENAS)
         private val evensBounds: IntRange? = filters.boundFor(FilterType.PARES)
         private val primesBounds: IntRange? = filters.boundFor(FilterType.PRIMOS)
         private val fibonacciBounds: IntRange? = filters.boundFor(FilterType.FIBONACCI)
         private val frameBounds: IntRange? = filters.boundFor(FilterType.MOLDURA)
         private val repeatedBounds: IntRange? = filters.boundFor(FilterType.REPETIDAS_CONCURSO_ANTERIOR)
+        private val mult3Bounds: IntRange? = filters.boundFor(FilterType.MULTIPLES_OF_3)
+        private val centerBounds: IntRange? = filters.boundFor(FilterType.CENTER)
+        
+        // General rules for final verification
         private val rules: List<FilterRule> = filters.mapNotNull { it.toRule() }
+        
+        // State
         private val currentSelection = IntArray(GameConstants.GAME_SIZE)
         private val candidates = GameConstants.ALL_NUMBERS.toIntArray()
         private var lastSolution: LotofacilGame? = null
+        
+        // Pre-computed Look-ahead arrays (Suffix Sums)
+        // *_After[n] tells us how many numbers with that property exist in the range (n, 25]
         private val maxN = GameConstants.MAX_NUMBER
         private val evensAfter = IntArray(maxN + 1)
         private val primesAfter = IntArray(maxN + 1)
         private val fibAfter = IntArray(maxN + 1)
         private val frameAfter = IntArray(maxN + 1)
         private val repeatedAfter = IntArray(maxN + 1)
+        private val multiples3After = IntArray(maxN + 1)
+        private val centerAfter = IntArray(maxN + 1)
 
         init {
+            // Fill look-ahead arrays (Reverse iteration)
             for (n in maxN downTo 0) {
                 val next = n + 1
                 if (next > maxN) {
@@ -351,19 +370,25 @@ class GameGenerator @Inject constructor(
                     fibAfter[n] = 0
                     frameAfter[n] = 0
                     repeatedAfter[n] = 0
+                    multiples3After[n] = 0
+                    centerAfter[n] = 0
                 } else {
                     evensAfter[n] = evensAfter[next] + if (next % 2 == 0) 1 else 0
                     primesAfter[n] = primesAfter[next] + if (GameConstants.PRIMOS.contains(next)) 1 else 0
                     fibAfter[n] = fibAfter[next] + if (GameConstants.FIBONACCI.contains(next)) 1 else 0
                     frameAfter[n] = frameAfter[next] + if (GameConstants.MOLDURA.contains(next)) 1 else 0
                     repeatedAfter[n] = repeatedAfter[next] + if (lastDrawNumbers.contains(next)) 1 else 0
+                    multiples3After[n] = multiples3After[next] + if (next % 3 == 0) 1 else 0
+                    centerAfter[n] = centerAfter[next] + if (GameConstants.MIOLO.contains(next)) 1 else 0
                 }
             }
         }
 
         suspend fun findValidGame(): LotofacilGame? {
             lastSolution = null
-            shuffleInPlace(candidates, rnd)
+            shuffleInPlace(candidates, rnd) // Randomize search order to get different results
+            
+            // Reset selection
             for (i in currentSelection.indices) currentSelection[i] = 0
 
             val ok = solve(
@@ -374,11 +399,19 @@ class GameGenerator @Inject constructor(
                 currentFib = 0,
                 currentFrame = 0,
                 currentRepeated = 0,
+                currentMult3 = 0,
+                currentCenter = 0,
                 lastNum = 0
             )
             return if (ok) lastSolution else null
         }
 
+        /**
+         * Recursive backtracking function.
+         * 
+         * @param index The current position in the game array we are filling (0..14)
+         * @param lastNum The number selected in the previous position (to ensure strict ascending order)
+         */
         private suspend fun solve(
             index: Int,
             currentSum: Int,
@@ -387,11 +420,14 @@ class GameGenerator @Inject constructor(
             currentFib: Int,
             currentFrame: Int,
             currentRepeated: Int,
+            currentMult3: Int,
+            currentCenter: Int,
             lastNum: Int
         ): Boolean {
-            // Check for cancellation in heavy recursive search
+            // PERIODIC CHECK: Ensure we can cancel this heavy computation if the User leaves the screen
             currentCoroutineContext().ensureActive()
 
+            // BASE CASE: All 15 numbers selected
             if (index == GameConstants.GAME_SIZE) {
                 return validateCompleteGame(
                     sum = currentSum,
@@ -399,14 +435,20 @@ class GameGenerator @Inject constructor(
                     primes = currentPrimes,
                     fib = currentFib,
                     frame = currentFrame,
-                    repeated = currentRepeated
+                    repeated = currentRepeated,
+                    mult3 = currentMult3,
+                    center = currentCenter
                 )
             }
 
+            // PRUNING: Basic count feasibility (Do we have enough numbers left?)
             if (!isBasicFeasible(index, lastNum)) return false
-            if (!areBoundsFeasible(currentSum, currentEvens, currentPrimes, currentFib, currentFrame, currentRepeated, index, lastNum)) return false
+            
+            // PRUNING: Forward Checking (Can we still satisfy the filters with remaining numbers?)
+            if (!areBoundsFeasible(currentSum, currentEvens, currentPrimes, currentFib, currentFrame, currentRepeated, currentMult3, currentCenter, index, lastNum)) return false
 
-            return tryNumberSelection(index, currentSum, currentEvens, currentPrimes, currentFib, currentFrame, currentRepeated, lastNum)
+            // RECURSION: Try next numbers
+            return tryNumberSelection(index, currentSum, currentEvens, currentPrimes, currentFib, currentFrame, currentRepeated, currentMult3, currentCenter, lastNum)
         }
 
         private fun isBasicFeasible(index: Int, lastNum: Int): Boolean {
@@ -415,6 +457,10 @@ class GameGenerator @Inject constructor(
             return availableCount >= remainingCount
         }
 
+        /**
+         * Checks if it is mathematically possible to satisfy all bounds given the current partial state.
+         * Uses the pre-computed Suffix Sum arrays (*_After) to know the maximum possible increase for each property.
+         */
         private fun areBoundsFeasible(
             currentSum: Int,
             currentEvens: Int,
@@ -422,18 +468,28 @@ class GameGenerator @Inject constructor(
             currentFib: Int,
             currentFrame: Int,
             currentRepeated: Int,
+            currentMult3: Int,
+            currentCenter: Int,
             index: Int,
             lastNum: Int
         ): Boolean {
             val remainingCount = GameConstants.GAME_SIZE - index
-            val availableCount = maxN - lastNum
+            val availableCount = maxN - lastNum // Total numbers available to pick from
 
+            // Check Sum Constraints
             if (!isSumFeasible(currentSum, lastNum, remainingCount)) return false
+            
+            // Check Count Constraints (e.g. Evens, Primes)
+            // Logic: current + max_remaining >= min_required  AND  current + min_remaining <= max_allowed
+            // For boolean properties, max_remaining = matches_available, min_remaining = 0 (if we pick none) or forced by count
+            
             if (!isCountFeasibleForType(currentEvens, evensBounds, remainingCount, evensAfter[lastNum], availableCount - evensAfter[lastNum])) return false
             if (!isCountFeasibleForType(currentPrimes, primesBounds, remainingCount, primesAfter[lastNum], availableCount - primesAfter[lastNum])) return false
             if (!isCountFeasibleForType(currentFib, fibonacciBounds, remainingCount, fibAfter[lastNum], availableCount - fibAfter[lastNum])) return false
             if (!isCountFeasibleForType(currentFrame, frameBounds, remainingCount, frameAfter[lastNum], availableCount - frameAfter[lastNum])) return false
             if (!isCountFeasibleForType(currentRepeated, repeatedBounds, remainingCount, repeatedAfter[lastNum], availableCount - repeatedAfter[lastNum])) return false
+            if (!isCountFeasibleForType(currentMult3, mult3Bounds, remainingCount, multiples3After[lastNum], availableCount - multiples3After[lastNum])) return false
+            if (!isCountFeasibleForType(currentCenter, centerBounds, remainingCount, centerAfter[lastNum], availableCount - centerAfter[lastNum])) return false
 
             return true
         }
@@ -441,8 +497,11 @@ class GameGenerator @Inject constructor(
         private fun isSumFeasible(currentSum: Int, lastNum: Int, remainingCount: Int): Boolean {
             if (sumBounds == null) return true
 
+            // Min possible sum: picking the smallest available numbers i.e., lastNum+1, lastNum+2...
             val minPossibleSum = currentSum + minSumAfter(lastNum, remainingCount)
+            // Max possible sum: picking the largest available numbers i.e., 25, 24, 23...
             val maxPossibleSum = currentSum + maxSumAfter(lastNum, remainingCount)
+            
             return minPossibleSum <= sumBounds.last && maxPossibleSum >= sumBounds.first
         }
 
@@ -450,8 +509,8 @@ class GameGenerator @Inject constructor(
             current: Int,
             bounds: IntRange?,
             remainingCount: Int,
-            availableMatch: Int,
-            availableNonMatch: Int
+            availableMatch: Int,     // How many remaining numbers HAVE this property
+            availableNonMatch: Int   // How many remaining numbers DO NOT HAVE this property
         ): Boolean {
             if (bounds == null) return true
             return isCountFeasible(current, bounds, remainingCount, availableMatch, availableNonMatch)
@@ -465,12 +524,16 @@ class GameGenerator @Inject constructor(
             currentFib: Int,
             currentFrame: Int,
             currentRepeated: Int,
+            currentMult3: Int,
+            currentCenter: Int,
             lastNum: Int
         ): Boolean {
+            // Iterate through candidates
             for (i in candidates.indices) {
                 val num = candidates[i]
-                if (num <= lastNum) continue
+                if (num <= lastNum) continue // Ensure ascending order
 
+                // Optimistic assignment (try this number)
                 currentSelection[index] = num
 
                 if (solve(
@@ -481,11 +544,15 @@ class GameGenerator @Inject constructor(
                         currentFib = currentFib + if (GameConstants.FIBONACCI.contains(num)) 1 else 0,
                         currentFrame = currentFrame + if (GameConstants.MOLDURA.contains(num)) 1 else 0,
                         currentRepeated = currentRepeated + if (lastDrawNumbers.contains(num)) 1 else 0,
+                        currentMult3 = currentMult3 + if (num % 3 == 0) 1 else 0,
+                        currentCenter = currentCenter + if (GameConstants.MIOLO.contains(num)) 1 else 0,
                         lastNum = num
                     )
                 ) {
-                    return true
+                    return true // Solution found!
                 }
+                
+                // Backtrack: Reset selection (though strictly not needed as we overwrite, but good for debug)
                 currentSelection[index] = 0
             }
 
@@ -493,16 +560,13 @@ class GameGenerator @Inject constructor(
         }
 
         private fun validateCompleteGame(
-            sum: Int, evens: Int, primes: Int, fib: Int, frame: Int, repeated: Int
+            sum: Int, evens: Int, primes: Int, fib: Int, frame: Int, repeated: Int, mult3: Int, center: Int
         ): Boolean {
             onAttempt()
 
             val gameSet = currentSelection.toSet()
             
-            // Optimization: Only create the full LotofacilGame object AFTER preliminary filter check
-            // if we have filters that require full game object calculation like sequences.
-            // For LotoFacil, sequences are cheap but creating the object has some overhead in a deep solver.
-            
+            // Final check: Construct full game and check complex rules (like sequences)
             val game = LotofacilGame.fromNumbers(gameSet)
 
             val metrics = GameComputedMetrics(
@@ -513,8 +577,8 @@ class GameGenerator @Inject constructor(
                 frame = frame,
                 repeated = repeated,
                 sequences = game.sequences,
-                multiplesOf3 = game.multiplesOf3,
-                center = game.center
+                multiplesOf3 = mult3,
+                center = center
             )
             
             val failedRule = rules.firstOrNull { !it.matches(metrics) }
@@ -530,7 +594,7 @@ class GameGenerator @Inject constructor(
         private fun minSumAfter(lastNum: Int, count: Int): Int {
             val start = lastNum + 1
             val end = start + count - 1
-            if (start > maxN || end > maxN) return Int.MAX_VALUE / 4
+            if (start > maxN || end > maxN) return Int.MAX_VALUE / 4 // Overflow protection
             return (count * (start + end)) / 2
         }
 
@@ -548,14 +612,20 @@ class GameGenerator @Inject constructor(
             availableMatch: Int,
             availableNonMatch: Int
         ): Boolean {
-            if (current > bounds.last) return false
+            if (current > bounds.last) return false // Already exceeded max
 
+            // Max possible we can reach: current + take ALL remaining matches (capped by remaining slots)
             val maxAdditional = min(remainingCount, availableMatch)
+            val maxTotal = current + maxAdditional
+            if (maxTotal < bounds.first) return false // Impossible to reach min
+
+            // Min possible we can be forced to have: current + (remaining slots - non_matches)
+            // i.e., we are forced to take a match if we run out of non-matches
             val minAdditional = max(0, remainingCount - availableNonMatch)
             val minTotal = current + minAdditional
-            val maxTotal = current + maxAdditional
+            if (minTotal > bounds.last) return false // Forced to exceed max
 
-            return maxTotal >= bounds.first && minTotal <= bounds.last
+            return true
         }
 
         private fun List<FilterState>.boundFor(type: FilterType): IntRange? {

@@ -1,13 +1,12 @@
 package com.cebolao.lotofacil.util
 
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
- * Extension function to launch a coroutine with error handling.
- * This is a utility function to replace the missing launchCatching function.
+ * Launches a coroutine and routes non-cancellation failures to [onError].
  */
 fun CoroutineScope.launchCatching(
     onError: (Throwable) -> Unit = {},
@@ -16,6 +15,8 @@ fun CoroutineScope.launchCatching(
     return launch {
         try {
             block()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Throwable) {
             onError(e)
         }

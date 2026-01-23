@@ -243,45 +243,59 @@ class FiltersViewModel @Inject constructor(
             // Debouncer for UI updates
             var lastProgressUpdate = 0L
 
-            generateGamesUseCase(quantity, filters).collect { progress ->
-                val type = progress.progressType
-                when (type) {
-                    is GenerationProgressType.Step -> {
-                        val now = System.currentTimeMillis()
-                        // Update progress roughly every 100ms or so to keep UI responsive without overhead
-                        if (now - lastProgressUpdate > 100) {
-                            val msgRes = when(type.step) {
-                                GenerationStep.RANDOM_START -> R.string.game_generator_random_start
-                                GenerationStep.HEURISTIC_START -> R.string.game_generator_heuristic_start
-                                GenerationStep.RANDOM_FALLBACK -> R.string.game_generator_random_fallback
+            generateGamesUseCase(quantity, filters).collect { result ->
+                when (result) {
+                    is AppResult.Failure -> {
+                        _generationState.value = GenerationUiState.Error(R.string.filters_generation_error)
+                    }
+                    is AppResult.Success -> {
+                        val progress = result.value
+                        val type = progress.progressType
+                        when (type) {
+                            is GenerationProgressType.Step -> {
+                                val now = System.currentTimeMillis()
+                                // Update progress roughly every 100ms or so to keep UI responsive without overhead
+                                if (now - lastProgressUpdate > 100) {
+                                    val msgRes = when (type.step) {
+                                        GenerationStep.RANDOM_START -> R.string.game_generator_random_start
+                                        GenerationStep.HEURISTIC_START -> R.string.game_generator_heuristic_start
+                                        GenerationStep.RANDOM_FALLBACK -> R.string.game_generator_random_fallback
+                                    }
+                                    _generationState.value = GenerationUiState.Loading(progress.current, quantity, msgRes)
+                                    lastProgressUpdate = now
+                                }
                             }
-                            _generationState.value = GenerationUiState.Loading(progress.current, quantity, msgRes)
-                            lastProgressUpdate = now
+
+                            is GenerationProgressType.Finished -> {
+                                val games = type.games
+
+                                // Save games
+                                when (val saveResult = saveGeneratedGamesUseCase(games)) {
+                                    is AppResult.Success -> {
+                                        _generationState.value = GenerationUiState.Success(games.size)
+                                        _events.trySend(NavigationEvent.NavigateToGeneratedGames)
+                                    }
+
+                                    is AppResult.Failure -> {
+                                        _generationState.value = GenerationUiState.Error(R.string.filters_save_error)
+                                    }
+                                }
+                            }
+
+                            is GenerationProgressType.Failed -> {
+                                val msg = when (type.reason) {
+                                    GenerationFailureReason.FILTERS_TOO_STRICT -> R.string.game_generator_failure_filters_strict
+                                    GenerationFailureReason.NO_HISTORY -> R.string.game_generator_failure_no_history
+                                    else -> R.string.game_generator_failure_generic
+                                }
+                                _generationState.value = GenerationUiState.Error(msg)
+                            }
+
+                            else -> {
+                                /* Started, Attempt - ignore for UI state */
+                            }
                         }
                     }
-                    is GenerationProgressType.Finished -> {
-                        val games = type.games
-                        
-                        // Save games
-                        when (val saveResult = saveGeneratedGamesUseCase(games)) {
-                             is AppResult.Success -> {
-                                 _generationState.value = GenerationUiState.Success(games.size)
-                                 _events.trySend(NavigationEvent.NavigateToGeneratedGames)
-                             }
-                             is AppResult.Failure -> {
-                                 _generationState.value = GenerationUiState.Error(R.string.filters_save_error)
-                             }
-                        }
-                    }
-                    is GenerationProgressType.Failed -> {
-                         val msg = when(type.reason) {
-                             GenerationFailureReason.FILTERS_TOO_STRICT -> R.string.game_generator_failure_filters_strict
-                             GenerationFailureReason.NO_HISTORY -> R.string.game_generator_failure_no_history
-                             else -> R.string.game_generator_failure_generic
-                         }
-                         _generationState.value = GenerationUiState.Error(msg)
-                    }
-                    else -> { /* Started, Attempt - ignore for UI state */ }
                 }
             }
         }

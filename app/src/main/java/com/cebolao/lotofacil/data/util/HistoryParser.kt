@@ -2,7 +2,9 @@ package com.cebolao.lotofacil.data.util
 
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.Draw
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 private const val DELIMITER_SEMICOLON = ';'
@@ -15,17 +17,13 @@ private const val FIRST_BALL_INDEX = 2
  * Parses lines from RESULTADOS_LOTOFACIL.csv
  * Format:
  * Concurso;Data Sorteio;Bola1..Bola15;...;Acumulado 15 acertos;...
+ * 
+ * Uses java.time for efficient and safe date parsing.
  */
 object HistoryParser {
 
-    /**
-     * SimpleDateFormat não é thread-safe.
-     * Usamos ThreadLocal e safe-call ao acessar `get()` (pode ser inferido como nullable em tipos plataforma).
-     */
-    private val dateFormat: ThreadLocal<SimpleDateFormat> =
-        ThreadLocal.withInitial {
-            SimpleDateFormat("dd/MM/yyyy", Locale.forLanguageTag("pt-BR"))
-        }
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("pt-BR"))
+    private val zoneId = ZoneId.systemDefault()
 
     fun parseLine(line: String): Draw? {
         val raw = line.trim()
@@ -52,7 +50,10 @@ object HistoryParser {
 
     private fun parseDateMillis(dateStr: String): Long? {
         if (dateStr.isBlank()) return null
-        return runCatching { dateFormat.get()?.parse(dateStr)?.time }.getOrNull()
+        return runCatching {
+            val localDate = LocalDate.parse(dateStr, dateFormatter)
+            localDate.atStartOfDay(zoneId).toInstant().toEpochMilli()
+        }.getOrNull()
     }
 
     private fun isValidDraw(numbers: Set<Int>): Boolean {

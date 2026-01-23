@@ -1,6 +1,8 @@
+@file:Suppress("DEPRECATION", "UnstableApiUsage")
+
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android) // Required since built-in Kotlin is disabled for KSP
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -27,6 +29,7 @@ android {
     defaultConfig {
         applicationId = "com.cebolao.lotofacil"
         minSdk = 26
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 2
         versionName = "1.1"
@@ -35,9 +38,20 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    signingConfigs {
+        create("release") {
+            // User: Provide your keystore details here for release builds
+            // storeFile = file("path/to/your/keystore.jks")
+            // storePassword = "your_store_password"
+            // keyAlias = "your_key_alias"
+            // keyPassword = "your_key_password"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

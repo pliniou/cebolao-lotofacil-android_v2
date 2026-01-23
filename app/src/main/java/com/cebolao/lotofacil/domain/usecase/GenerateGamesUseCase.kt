@@ -23,8 +23,11 @@ class GenerateGamesUseCase @Inject constructor(
         config: GeneratorConfig = GeneratorConfig.BALANCED,
         seed: Long? = null
     ): Flow<AppResult<GenerationProgress>> {
-        return gameGenerator.generate(quantity, filters, config, seed)
-            .map<AppResult<GenerationProgress>> { progress -> AppResult.Success(progress) }
+        val progressFlow: Flow<GenerationProgress> =
+            gameGenerator.generate(quantity, filters, config, seed)
+
+        return progressFlow
+            .map { progress -> AppResult.Success(progress) as AppResult<GenerationProgress> }
             .catch { throwable -> emit(AppResult.Failure(AppError.Unknown(throwable))) }
     }
 }

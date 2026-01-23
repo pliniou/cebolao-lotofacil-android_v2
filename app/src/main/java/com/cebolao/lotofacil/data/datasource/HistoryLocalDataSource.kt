@@ -112,24 +112,36 @@ class HistoryLocalDataSourceImpl @Inject constructor(
     private suspend fun populateFromAssets() = withContext(ioDispatcher) {
         try {
             logger.info(TAG, "Populating database from assets...")
-            val draws = context.assets.open(ASSET_FILENAME).use { inputStream ->
-                inputStream.bufferedReader().useLines { lines ->
-                    lines
-                        .drop(1) // Drop Header
-                        .filter { it.isNotBlank() }
-                        .mapNotNull { HistoryParser.parseLine(it) }
-                        .toList()
-                }
-            }
-            
-            val entities = draws.map { it.toEntity() }
-            
+
+            var inserted = 0
+            val batchSize = 500
+
             appDatabase.withTransaction {
-                entities.chunked(500).forEach { chunk ->
-                    drawDao.insertAll(chunk)
+                context.assets.open(ASSET_FILENAME).bufferedReader().useLines { lines ->
+                    val buffer = ArrayList<com.cebolao.lotofacil.data.local.db.DrawEntity>(batchSize)
+
+                    lines
+                        .drop(1) // Drop header
+                        .filter { it.isNotBlank() }
+                        .forEach { line ->
+                            val draw = HistoryParser.parseLine(line) ?: return@forEach
+                            buffer.add(draw.toEntity())
+
+                            if (buffer.size >= batchSize) {
+                                drawDao.insertAll(buffer)
+                                inserted += buffer.size
+                                buffer.clear()
+                            }
+                        }
+
+                    if (buffer.isNotEmpty()) {
+                        drawDao.insertAll(buffer)
+                        inserted += buffer.size
+                    }
                 }
             }
-            logger.info(TAG, "Populated ${entities.size} draws from assets.")
+
+            logger.info(TAG, "Populated $inserted draws from assets.")
         } catch (e: IOException) {
             logger.error(TAG, "Error populating from assets", e)
         } catch (e: Exception) {
