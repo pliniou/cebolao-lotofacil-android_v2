@@ -80,7 +80,7 @@ fun FilterCard(
                         Box(contentAlignment = Alignment.Center) {
                            Icon(
                                imageVector = state.type.filterIcon,
-                               contentDescription = null,
+                               contentDescription = stringResource(state.type.titleRes),
                                tint = if (state.isEnabled) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                                modifier = Modifier.size(Dimen.IconSmall)
                            )
@@ -229,7 +229,7 @@ private fun RangeIndicator(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = text,
             modifier = Modifier.size(Dimen.IconSmall),
             tint = color
         )

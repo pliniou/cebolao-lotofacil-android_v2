@@ -4,7 +4,6 @@ import com.cebolao.lotofacil.domain.GameConstants
 import kotlinx.serialization.Serializable
 
 @Serializable
-@ConsistentCopyVisibility
 data class LotofacilGame internal constructor(
     private val _mask: Long,
     val isPinned: Boolean = false,

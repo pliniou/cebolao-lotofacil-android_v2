@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,11 +61,19 @@ fun RecursiveStatsCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
             
-            stats.forEach { stat ->
-                StatItemRow(
-                    item = stat,
-                    nestingLevel = nestingLevel
-                )
+            if (stats.size > 20) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+                ) {
+                    items(stats, key = { it.label + it.value }) { stat ->
+                        StatItemRow(item = stat, nestingLevel = nestingLevel)
+                    }
+                }
+            } else {
+                stats.forEach { stat ->
+                    StatItemRow(item = stat, nestingLevel = nestingLevel)
+                }
             }
         }
     }

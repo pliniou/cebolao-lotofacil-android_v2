@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -49,9 +50,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.cebolao.lotofacil.navigation.navigate
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.navigation.FiltersRoute
@@ -258,7 +260,7 @@ fun GeneratedGamesScreenContent(
             {
                 Icon(
                     imageVector = AppIcons.List,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.games_title),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -595,24 +597,51 @@ private fun GameAnalysisSheetContent(
                     outlined = true,
                     title = stringResource(R.string.games_analysis_stats_title)
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
-                        analysisState.result.simpleStats.forEach { (k, v) ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = k,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = v,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                    if (analysisState.result.simpleStats.size > 8) {
+                        androidx.compose.foundation.lazy.LazyColumn {
+                            items(analysisState.result.simpleStats.size) { idx ->
+                                val pair = analysisState.result.simpleStats[idx]
+                                val (k, v) = pair
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    androidx.compose.material3.Text(
+                                        k,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    androidx.compose.material3.Text(
+                                        v,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
+                            analysisState.result.simpleStats.forEach { pair ->
+                                val (k, v) = pair
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        k,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        v,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         }
                     }

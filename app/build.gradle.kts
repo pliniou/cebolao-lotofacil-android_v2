@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -15,6 +13,7 @@ kotlin {
             listOf(
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+                "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
                 "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
             )
         )
@@ -31,7 +30,7 @@ android {
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 2
-        versionName = "1.1"
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -74,7 +73,7 @@ android {
 
     @Suppress("UnstableApiUsage")
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeBom.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 
     packaging {
@@ -93,6 +92,20 @@ android {
 }
 
 dependencies {
+    constraints {
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-bom") {
+            version { strictly(libs.versions.kotlinxSerialization.get()) }
+        }
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core") {
+            version { strictly(libs.versions.kotlinxSerialization.get()) }
+            because("Keep serialization artifacts aligned with Kotlin ${libs.versions.kotlin.get()}")
+        }
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+            version { strictly(libs.versions.kotlinxSerialization.get()) }
+            because("Keep serialization artifacts aligned with Kotlin ${libs.versions.kotlin.get()}")
+        }
+    }
+
     // Core platform libs
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(libs.androidx.core.ktx)
@@ -110,6 +123,8 @@ dependencies {
     // Compose BOM and UI toolkit
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
+    // Explicit foundation to access newer APIs like pullRefresh
+    implementation("androidx.compose.foundation:foundation")
 
     // Coroutines & Serialization
     implementation(libs.kotlinx.coroutines.android)
@@ -140,6 +155,9 @@ dependencies {
 
     // Profiling & performance
     implementation(libs.androidx.profileinstaller)
+
+    // Pull-to-refresh (Accompanist)
+    implementation(libs.accompanist.swiperefresh)
 
     // Testing
     testImplementation(libs.junit)

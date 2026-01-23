@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,19 +58,20 @@ fun NumberGrid(
         verticalArrangement = Arrangement.spacedBy(Dimen.BallSpacing),
         maxItemsInEachRow = GameConstants.GRID_COLUMNS
     ) {
+        val currentOnNumberClick = rememberUpdatedState(onNumberClick)
         allNumbers.forEach { number ->
             key(number) {
                 val isSelected = number in selectedNumbers
                 val clickable = !isFull || isSelected
 
-                val heatmapColor = heatmapColors?.get(number)
+                val heatmapColor = remember(number, heatmapColors) { heatmapColors?.get(number) }
 
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .defaultMinSize(minWidth = minSize, minHeight = minSize)
                         .clip(CircleShape)
-                        .clickable(enabled = clickable) { onNumberClick(number) }
+                        .clickable(enabled = clickable) { currentOnNumberClick.value(number) }
                 ) {
                     NumberBall(
                         number = number,

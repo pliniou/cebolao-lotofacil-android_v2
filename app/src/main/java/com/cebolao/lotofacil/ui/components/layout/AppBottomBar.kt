@@ -23,11 +23,10 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.cebolao.lotofacil.navigation.bottomNavItems
+import com.cebolao.lotofacil.navigation.*
 import com.cebolao.lotofacil.ui.theme.Motion
 import com.cebolao.lotofacil.ui.theme.FontFamilyBody
 import com.cebolao.lotofacil.ui.theme.GlassSurfaceDark

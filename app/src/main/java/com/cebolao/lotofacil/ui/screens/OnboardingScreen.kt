@@ -201,9 +201,9 @@ private fun OnboardingContent(page: Page) {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painterResource(page.img),
-            null,
-            Modifier
+            painter = painterResource(page.img),
+            contentDescription = stringResource(page.title),
+            modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.35f)
                 .padding(bottom = Dimen.Spacing16),

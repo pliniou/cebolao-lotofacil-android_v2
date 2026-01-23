@@ -30,7 +30,7 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = routeNameFor(startDestination),
         modifier = modifier,
         enterTransition = {
             slideInHorizontally(
@@ -57,15 +57,15 @@ fun AppNavHost(
             ) + fadeOut(Motion.Tween.fast())
         }
     ) {
-        composable<OnboardingRoute> {
+        composable(route = routePatternFor<OnboardingRoute>()) {
             OnboardingScreen {
                 mainViewModel.onEvent(MainUiEvent.CompleteOnboarding)
                 navController.navigate(HomeRoute) {
-                    popUpTo<OnboardingRoute> { inclusive = true }
+                    popUpTo(routeName<OnboardingRoute>()) { inclusive = true }
                 }
             }
         }
-        composable<HomeRoute> { 
+        composable(route = routePatternFor<HomeRoute>()) { 
             val hostState = androidx.compose.runtime.remember { androidx.compose.material3.SnackbarHostState() }
             val lazyState = androidx.compose.foundation.lazy.rememberLazyListState()
             
@@ -75,13 +75,13 @@ fun AppNavHost(
                 snackbarHostState = hostState
             ) 
         }
-        composable<ResultsRoute> {
+        composable(route = routePatternFor<ResultsRoute>()) {
             ResultsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
-        composable<FiltersRoute> { FiltersScreen(navController) }
-        composable<GeneratedGamesRoute> {
+        composable(route = routePatternFor<FiltersRoute>()) { FiltersScreen(navController) }
+        composable(route = routePatternFor<GeneratedGamesRoute>()) {
             val canPop = navController.previousBackStackEntry != null
             GeneratedGamesScreen(
                 navController = navController,
@@ -90,7 +90,7 @@ fun AppNavHost(
                 } else null
             )
         }
-        composable<CheckerRoute> {
+        composable(route = routePatternFor<CheckerRoute>(), arguments = checkerNavArgs()) {
             // The typed `CheckerRoute` supplies a `numbers` list.  The `CheckerViewModel` retrieves
             // these arguments from its `SavedStateHandle` via `toRoute<CheckerRoute>()`.  We avoid
             // passing the list into the composable directly to keep the navigation layer free of
@@ -99,6 +99,6 @@ fun AppNavHost(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
-        composable<AboutRoute> { AboutScreen() }
+        composable(route = routePatternFor<AboutRoute>()) { AboutScreen() }
     }
 }

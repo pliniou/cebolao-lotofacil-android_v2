@@ -101,10 +101,7 @@ fun FilterPresetSelector(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f),
-            containerColor = scheme.surfaceContainer, // M3 container color
-            tonalElevation = Dimen.Elevation.None, // Flat design
-            shadowElevation = Dimen.Elevation.Level2 // Keeping shadow for dropdown to separate from background
+            modifier = Modifier.fillMaxWidth(0.9f)
         ) {
             presets.forEach { preset ->
                 val isSelected = preset.id == selectedPreset?.id

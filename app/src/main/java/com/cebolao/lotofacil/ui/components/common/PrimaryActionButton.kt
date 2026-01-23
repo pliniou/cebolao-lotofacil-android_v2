@@ -118,7 +118,7 @@ fun PrimaryActionButton(
                     if (icon != null) {
                         Icon(
                             imageVector = icon,
-                            contentDescription = null,
+                            contentDescription = text,
                             modifier = Modifier.size(Dimen.IconSmall)
                         )
                         Spacer(modifier = Modifier.width(Dimen.Spacing8))

@@ -15,7 +15,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.foundation.layout.Box
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,9 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.cebolao.lotofacil.navigation.navigate
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.navigation.navigateToChecker
 import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
@@ -98,12 +101,12 @@ fun HomeScreenContent(
             uiState.isSyncing || uiState.screenState is HomeScreenState.Loading
         }
 
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
+        val successState = uiState.screenState as? HomeScreenState.Success
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing),
             onRefresh = { onEvent(HomeUiEvent.ForceSync) },
             modifier = Modifier.fillMaxSize()
         ) {
-            val successState = uiState.screenState as? HomeScreenState.Success
             StandardPageLayout(
                 scaffoldPadding = innerPadding,
                 listState = listState
@@ -208,7 +211,9 @@ fun HomeScreenContent(
                     }
                 }
             }
+
         }
+
     }
 }
 

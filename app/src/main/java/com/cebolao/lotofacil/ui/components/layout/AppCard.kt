@@ -88,26 +88,30 @@ fun AppCard(
         label = "cardScale"
     )
 
-    // Background
-    val effectiveBackground = when {
-        color != Color.Unspecified -> color
-        effectiveVariant == CardVariant.Glass -> if (isDark) GlassSurfaceDark else GlassSurfaceLight
-        effectiveVariant == CardVariant.Outlined -> Color.Transparent
-        nestingLevel == 0 -> scheme.surface
-        else -> scheme.surfaceContainer
+    // Background (memoized)
+    val effectiveBackground = remember(color, effectiveVariant, isDark, scheme.surface, scheme.surfaceContainer) {
+        when {
+            color != Color.Unspecified -> color
+            effectiveVariant == CardVariant.Glass -> if (isDark) GlassSurfaceDark else GlassSurfaceLight
+            effectiveVariant == CardVariant.Outlined -> Color.Transparent
+            nestingLevel == 0 -> scheme.surface
+            else -> scheme.surfaceContainer
+        }
     }
 
-    // Border
-    val border = if (hasBorder || effectiveVariant == CardVariant.Outlined) {
-        BorderStroke(
-            width = Dimen.Border.Thin,
-            color = if (effectiveVariant == CardVariant.Glass) {
-                scheme.outlineVariant.copy(alpha = 0.2f)
-            } else {
-                scheme.outlineVariant // Using the new semantic outline variant
-            }
-        )
-    } else null
+    // Border (memoized)
+    val border = remember(hasBorder, effectiveVariant, scheme.outlineVariant) {
+        if (hasBorder || effectiveVariant == CardVariant.Outlined) {
+            BorderStroke(
+                width = Dimen.Border.Thin,
+                color = if (effectiveVariant == CardVariant.Glass) {
+                    scheme.outlineVariant.copy(alpha = 0.2f)
+                } else {
+                    scheme.outlineVariant // Using the new semantic outline variant
+                }
+            )
+        } else null
+    }
 
     val cardElevation = CardDefaults.cardElevation(
         defaultElevation = Dimen.Elevation.None,
@@ -126,7 +130,7 @@ fun AppCard(
 
     CompositionLocalProvider(LocalCardNesting provides nestingLevel + 1) {
         val cardContent: @Composable ColumnScope.() -> Unit = {
-            val scope = remember(nestingLevel, this) {
+            val scope = remember(nestingLevel) {
                 object : CardScope, ColumnScope by this {
                     override val nestingLevel: Int = nestingLevel
                 }

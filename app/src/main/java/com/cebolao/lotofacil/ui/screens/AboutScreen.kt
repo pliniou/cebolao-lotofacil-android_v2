@@ -44,7 +44,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.data.repository.THEME_MODE_DARK
@@ -490,6 +490,7 @@ private fun AboutItemRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(enabled = isClickable) { onClick() }
+            .semantics { if (isClickable) role = Role.Button }
             .padding(horizontal = Dimen.CardContentPadding, vertical = Dimen.SpacingShort),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)

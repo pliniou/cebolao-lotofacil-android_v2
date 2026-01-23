@@ -1,13 +1,21 @@
 package com.cebolao.lotofacil.data.repository
 
+import android.content.Context
 import com.cebolao.lotofacil.data.cache.DrawLruCache
-import com.cebolao.lotofacil.data.datasource.HistoryLocalDataSource
+import com.cebolao.lotofacil.data.local.db.AppDatabase
+import com.cebolao.lotofacil.data.local.db.DrawDao
+import com.cebolao.lotofacil.data.local.db.DrawDetailsDao
+import com.cebolao.lotofacil.data.local.db.DrawDetailsEntity
 import com.cebolao.lotofacil.data.mapper.toDraw
 import com.cebolao.lotofacil.data.mapper.toDrawDetails
 import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
+import com.cebolao.lotofacil.data.mapper.toEntity
+import com.cebolao.lotofacil.data.network.ApiService
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
+import com.cebolao.lotofacil.data.util.HistoryParser
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.cebolao.lotofacil.domain.exception.SyncException
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
@@ -27,13 +35,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.room.withTransaction
 
 private const val TAG = "HistoryRepository"
 private const val API_RESULT_FRESHNESS_MS = 10 * 60 * 1000L
@@ -48,7 +60,11 @@ private data class LatestApiResult(
 
 @Singleton
 class HistoryRepositoryImpl @Inject constructor(
-    private val localDataSource: HistoryLocalDataSource,
+    @ApplicationContext private val context: Context,
+    private val appDatabase: AppDatabase,
+    private val drawDao: DrawDao,
+    private val drawDetailsDao: DrawDetailsDao,
+    private val apiService: ApiService,
     private val syncManager: SyncManager,
     private val logger: Logger,
     @param:ApplicationScope private val scope: CoroutineScope,
@@ -67,18 +83,23 @@ class HistoryRepositoryImpl @Inject constructor(
     private var runningSyncJob: Job? = null
 
     override fun observeHistory(): Flow<List<Draw>> =
-        localDataSource.observeLocalHistory()
+        drawDao.getAllDraws()
+            .onStart { runBlocking { ensureInitialized() } }
+            .map { entities: List<com.cebolao.lotofacil.data.local.db.DrawEntity> -> entities.map { it.toDraw() } }
             .onEach { historyCacheRef.set(it) }
 
     override fun observeLastDraw(): Flow<Draw?> =
-        localDataSource.observeLastDraw()
+        drawDao.getLastDraw()
+            .onStart { runBlocking { ensureInitialized() } }
+            .map { entity: com.cebolao.lotofacil.data.local.db.DrawEntity? -> entity?.toDraw() }
 
     override suspend fun getHistory(): List<Draw> {
         historyCacheRef.get()?.let { cached ->
             if (cached.isNotEmpty()) return cached
         }
 
-        val draws = localDataSource.getLocalHistory()
+        ensureInitialized()
+        val draws = drawDao.getAllDrawsSnapshot().map { it.toDraw() }
 
         if (draws.isNotEmpty()) {
             val toCache = draws.take(100)
@@ -90,12 +111,13 @@ class HistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastDraw(): Draw? {
+        ensureInitialized()
         getFreshApiResult()?.toDraw()?.let { fromApi ->
             drawCache.put(fromApi.contestNumber, fromApi)
             return fromApi
         }
 
-        val lastDraw = localDataSource.getLastDraw()
+        val lastDraw = drawDao.getLastDrawSnapshot()?.toDraw()
         if (lastDraw != null) {
             drawCache.put(lastDraw.contestNumber, lastDraw)
             return lastDraw
@@ -111,16 +133,17 @@ class HistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastDrawDetails(): DrawDetails? {
-        val lastDraw = localDataSource.getLastDraw() ?: return null
+        ensureInitialized()
+        val lastDraw = drawDao.getLastDrawSnapshot()?.toDraw() ?: return null
 
-        val cachedDetails = localDataSource.getDrawDetails(lastDraw.contestNumber)
+        val cachedDetails = drawDetailsDao.getDrawDetails(lastDraw.contestNumber)
         if (cachedDetails != null) {
             return cachedDetails.toDrawDetails(lastDraw)
         }
 
         return getFreshApiResult()?.let { result ->
             val entity = result.toDrawDetailsEntity()
-            localDataSource.saveDrawDetails(entity)
+            drawDetailsDao.insertDetails(entity)
             entity.toDrawDetails(lastDraw)
         }
     }
@@ -217,5 +240,66 @@ class HistoryRepositoryImpl @Inject constructor(
         latestApiResultRef.set(
             result?.let { LatestApiResult(payload = it, timestampMs = System.currentTimeMillis()) }
         )
+    }
+
+    // Database initialization logic
+    private val initMutex = Mutex()
+    private var isInitialized = false
+
+    companion object {
+        private const val ASSET_FILENAME = "RESULTADOS_LOTOFACIL.csv"
+    }
+
+    private suspend fun ensureInitialized() {
+        if (isInitialized) return
+        initMutex.withLock {
+            if (isInitialized) return
+            withContext(ioDispatcher) {
+                if (drawDao.count() == 0) {
+                    populateFromAssets()
+                }
+            }
+            isInitialized = true
+        }
+    }
+
+    private suspend fun populateFromAssets() = withContext(ioDispatcher) {
+        try {
+            logger.info(TAG, "Populating database from assets...")
+
+            var inserted = 0
+            val batchSize = 500
+
+            appDatabase.withTransaction {
+                context.assets.open(ASSET_FILENAME).bufferedReader().useLines { lines ->
+                    val buffer = ArrayList<com.cebolao.lotofacil.data.local.db.DrawEntity>(batchSize)
+
+                    lines
+                        .drop(1) // Drop header
+                        .filter { it.isNotBlank() }
+                        .forEach { line ->
+                            val draw = HistoryParser.parseLine(line) ?: return@forEach
+                            buffer.add(draw.toEntity())
+
+                            if (buffer.size >= batchSize) {
+                                drawDao.insertAll(buffer)
+                                inserted += buffer.size
+                                buffer.clear()
+                            }
+                        }
+
+                    if (buffer.isNotEmpty()) {
+                        drawDao.insertAll(buffer)
+                        inserted += buffer.size
+                    }
+                }
+            }
+
+            logger.info(TAG, "Populated $inserted draws from assets.")
+        } catch (e: IOException) {
+            logger.error(TAG, "Error populating from assets", e)
+        } catch (e: Exception) {
+            logger.error(TAG, "Database error populating from assets", e)
+        }
     }
 }

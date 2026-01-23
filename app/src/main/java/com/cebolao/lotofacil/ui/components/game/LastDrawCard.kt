@@ -207,7 +207,8 @@ private fun ModernNumberGrid(numbers: Set<Int>) {
         verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4),
         maxItemsInEachRow = 5
     ) {
-        numbers.sorted().forEach { number ->
+        val sortedNumbers = remember(numbers) { numbers.sorted() }
+        sortedNumbers.forEach { number ->
             NumberBall(
                 number = number,
                 sizeVariant = NumberBallSize.Medium,

@@ -4,7 +4,7 @@ package com.cebolao.lotofacil.presentation.viewmodel
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import com.cebolao.lotofacil.navigation.toRoute
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.DefaultDispatcher

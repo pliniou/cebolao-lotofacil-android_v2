@@ -27,7 +27,7 @@ import kotlinx.collections.immutable.toImmutableList
  */
 @Composable
 fun <T> trackedDerivedState(
-    calculation: () -> T
+    calculation: @DisallowComposableCalls () -> T
 ): State<T> = remember {
     derivedStateOf(calculation)
 }
@@ -80,7 +80,7 @@ data class SelectionState(
 @Composable
 inline fun <T> rememberStable(
     vararg keys: Any?,
-    crossinline calculation: () -> T
+    crossinline calculation: @DisallowComposableCalls () -> T
 ): T = remember(*keys) { calculation() }
 
 /**
@@ -172,7 +172,7 @@ data class StableTriple<out A, out B, out C>(
 @Composable
 inline fun <T> rememberByContent(
     content: Any?,
-    crossinline calculation: () -> T
+    crossinline calculation: @DisallowComposableCalls () -> T
 ): T = remember(content.hashCode()) { calculation() }
 
 /**

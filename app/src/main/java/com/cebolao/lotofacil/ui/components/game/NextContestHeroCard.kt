@@ -48,7 +48,7 @@ fun NextContestHeroCard(
             containerColor = containerColor,
             contentColor = userContentColor
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimen.ElevationMedium)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimen.Elevation.None)
     ) {
         Column(
             modifier = Modifier
