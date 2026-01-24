@@ -13,6 +13,8 @@ import com.cebolao.lotofacil.domain.service.GenerationStep
 import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
+import com.cebolao.lotofacil.presentation.util.UiEvent
+import com.cebolao.lotofacil.presentation.util.UiState
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -85,7 +87,7 @@ data class FiltersScreenState(
     val showResetDialog: Boolean = false,
     val filterInfoToShow: FilterType? = null,
     val showStrictConfirmation: Boolean = false
-)
+) : UiState
 
 /**
  * ViewModel for the Filters/Generator screen.
@@ -114,9 +116,11 @@ class FiltersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            when (val result = getLastDrawUseCase()) {
-                is AppResult.Success -> _lastDraw.value = result.value?.numbers
-                is AppResult.Failure -> _lastDraw.value = null
+            getLastDrawUseCase().collect { result ->
+                _lastDraw.value = when (result) {
+                    is AppResult.Success -> result.value.numbers
+                    is AppResult.Failure -> null
+                }
             }
         }
     }
@@ -342,7 +346,7 @@ class FiltersViewModel @Inject constructor(
     }
 }
 
-sealed interface FiltersUiEvent {
+sealed interface FiltersUiEvent : UiEvent {
     data class ToggleFilter(val type: FilterType, val enabled: Boolean) : FiltersUiEvent
     data class AdjustRange(val type: FilterType, val range: ClosedFloatingPointRange<Float>) : FiltersUiEvent
     data class ApplyPreset(val preset: FilterPreset) : FiltersUiEvent

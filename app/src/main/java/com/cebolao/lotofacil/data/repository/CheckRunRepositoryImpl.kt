@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.data.repository
 
+import android.util.Log
 import com.cebolao.lotofacil.data.local.db.CheckRunDao
 import com.cebolao.lotofacil.data.local.db.CheckRunEntity
 import com.cebolao.lotofacil.di.IoDispatcher
@@ -7,7 +8,6 @@ import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.DrawWindow
 import com.cebolao.lotofacil.domain.model.FinancialProjection
 import com.cebolao.lotofacil.domain.repository.CheckRunRepository
-import com.cebolao.lotofacil.domain.util.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,7 +24,6 @@ private const val TAG = "CheckRunRepository"
 class CheckRunRepositoryImpl @Inject constructor(
     private val checkRunDao: CheckRunDao,
     private val json: Json,
-    private val logger: Logger,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CheckRunRepository {
 
@@ -80,7 +79,7 @@ class CheckRunRepositoryImpl @Inject constructor(
                 sourceHash = sourceHash
             )
         } catch (_: Exception) {
-            logger.warning(TAG, "Failed to decode CheckRunEntity id=$id", null)
+            Log.w(TAG, "Failed to decode CheckRunEntity id=$id")
             null
         }
     }

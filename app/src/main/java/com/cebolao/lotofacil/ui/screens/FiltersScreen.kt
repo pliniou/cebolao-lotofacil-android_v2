@@ -32,14 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.cebolao.lotofacil.navigation.navigate
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterPreset
 import com.cebolao.lotofacil.domain.model.FilterPresets
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
-import com.cebolao.lotofacil.navigation.GeneratedGamesRoute
+import com.cebolao.lotofacil.navigation.AppRoute
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersScreenState
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersViewModel
@@ -87,7 +86,7 @@ fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltView
         viewModel.events.collectLatest { event ->
             when (event) {
                 is NavigationEvent.NavigateToGeneratedGames -> {
-                    navCtrl.navigate(GeneratedGamesRoute) {
+                    navCtrl.navigate(AppRoute.GeneratedGames) {
                         popUpTo(navCtrl.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true

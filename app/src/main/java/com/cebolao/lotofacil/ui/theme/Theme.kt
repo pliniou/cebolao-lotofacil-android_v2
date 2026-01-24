@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 @Composable
 fun CebolaoLotofacilTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    accentPalette: AccentPalette = AccentPalette.AZUL, // Default to AZUL
+    accentPalette: AccentPalette = DefaultAccentPalette,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -38,9 +38,8 @@ fun CebolaoLotofacilTheme(
 
 /**
  * Represents the available accent colour palettes.
- * Replaces the legacy Enum with a Sealed Class for extensibility while maintaining compatibility.
  */
-sealed class AccentPalette(
+data class AccentPalette(
     val name: String,
     val primary: Color,
     val primaryContainer: Color,
@@ -48,74 +47,81 @@ sealed class AccentPalette(
     val secondaryContainer: Color,
     val tertiary: Color,
     val tertiaryContainer: Color
-) {
-    object AZUL : AccentPalette(
-        name = "AZUL",
-        primary = BrandAzul,
-        primaryContainer = BrandAzul.copy(alpha = 0.1f),
-        secondary = BrandRoxo,
-        secondaryContainer = BrandRoxo.copy(alpha = 0.1f),
-        tertiary = BrandAmarelo,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
-    )
+)
 
-    object ROXO : AccentPalette(
-        name = "ROXO",
-        primary = BrandRoxo,
-        primaryContainer = BrandRoxo.copy(alpha = 0.1f),
-        secondary = BrandRosa, // Default secondary
-        secondaryContainer = BrandRosa.copy(alpha = 0.1f),
-        tertiary = BrandAmarelo,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
-    )
+val AccentAzul = AccentPalette(
+    name = "AZUL",
+    primary = BrandAzul,
+    primaryContainer = BrandAzul.copy(alpha = 0.1f),
+    secondary = BrandRoxo,
+    secondaryContainer = BrandRoxo.copy(alpha = 0.1f),
+    tertiary = BrandAmarelo,
+    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+)
 
-    object VERDE : AccentPalette(
-        name = "VERDE",
-        primary = BrandVerde,
-        primaryContainer = BrandVerde.copy(alpha = 0.1f),
-        secondary = BrandRosa,
-        secondaryContainer = BrandRosa.copy(alpha = 0.1f),
-        tertiary = BrandAmarelo,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
-    )
+val AccentRoxo = AccentPalette(
+    name = "ROXO",
+    primary = BrandRoxo,
+    primaryContainer = BrandRoxo.copy(alpha = 0.1f),
+    secondary = BrandRosa,
+    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    tertiary = BrandAmarelo,
+    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+)
 
-    object AMARELO : AccentPalette(
-        name = "AMARELO",
-        primary = BrandAmarelo,
-        primaryContainer = BrandAmarelo.copy(alpha = 0.1f),
-        secondary = BrandRosa,
-        secondaryContainer = BrandRosa.copy(alpha = 0.1f),
-        tertiary = BrandAmarelo, // Tertiary same as primary? Or maybe fallback.
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
-    )
+val AccentVerde = AccentPalette(
+    name = "VERDE",
+    primary = BrandVerde,
+    primaryContainer = BrandVerde.copy(alpha = 0.1f),
+    secondary = BrandRosa,
+    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    tertiary = BrandAmarelo,
+    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+)
 
-    object ROSA : AccentPalette(
-        name = "ROSA",
-        primary = BrandRosa,
-        primaryContainer = BrandRosa.copy(alpha = 0.1f),
-        secondary = BrandAzul, // Special case
-        secondaryContainer = BrandAzul.copy(alpha = 0.1f),
-        tertiary = BrandAmarelo,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
-    )
+val AccentAmarelo = AccentPalette(
+    name = "AMARELO",
+    primary = BrandAmarelo,
+    primaryContainer = BrandAmarelo.copy(alpha = 0.1f),
+    secondary = BrandRosa,
+    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    tertiary = BrandAmarelo,
+    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+)
 
-    object LARANJA : AccentPalette(
-        name = "LARANJA",
-        primary = BrandLaranja,
-        primaryContainer = BrandLaranja.copy(alpha = 0.1f),
-        secondary = BrandRosa,
-        secondaryContainer = BrandRosa.copy(alpha = 0.1f),
-        tertiary = BrandAmarelo,
-        tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
-    )
+val AccentRosa = AccentPalette(
+    name = "ROSA",
+    primary = BrandRosa,
+    primaryContainer = BrandRosa.copy(alpha = 0.1f),
+    secondary = BrandAzul,
+    secondaryContainer = BrandAzul.copy(alpha = 0.1f),
+    tertiary = BrandAmarelo,
+    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+)
 
-    companion object {
-        val entries = listOf(AZUL, ROXO, VERDE, AMARELO, ROSA, LARANJA)
-        val Default = AZUL
-        // Helper for legacy enum-like lookups
-        fun valueOf(name: String): AccentPalette = entries.find { it.name == name } ?: Default
-    }
-}
+val AccentLaranja = AccentPalette(
+    name = "LARANJA",
+    primary = BrandLaranja,
+    primaryContainer = BrandLaranja.copy(alpha = 0.1f),
+    secondary = BrandRosa,
+    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    tertiary = BrandAmarelo,
+    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+)
+
+val AccentPalettes = listOf(
+    AccentAzul,
+    AccentRoxo,
+    AccentVerde,
+    AccentAmarelo,
+    AccentRosa,
+    AccentLaranja
+)
+
+val DefaultAccentPalette = AccentAzul
+
+fun accentPaletteByName(name: String): AccentPalette =
+    AccentPalettes.find { it.name == name } ?: DefaultAccentPalette
 
 
 private fun lightColorScheme(palette: AccentPalette): ColorScheme = androidx.compose.material3.lightColorScheme(

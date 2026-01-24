@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.domain.usecase
 
+import android.util.Log
 import com.cebolao.lotofacil.di.DefaultDispatcher
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.AppError
@@ -13,8 +14,6 @@ import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameCheckEngine
 import com.cebolao.lotofacil.domain.service.TicketValidator
 import com.cebolao.lotofacil.domain.service.ValidationResult
-import com.cebolao.lotofacil.domain.util.Logger
-import com.cebolao.lotofacil.util.toAppError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +28,6 @@ class CheckGameUseCase @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val gameCheckEngine: GameCheckEngine,
     private val ticketValidator: TicketValidator,
-    private val logger: Logger,
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
 
@@ -41,14 +39,22 @@ class CheckGameUseCase @Inject constructor(
                 return@flow
             }
 
-            val syncResult = historyRepository.syncHistoryIfNeeded()
-            if (syncResult.isFailure) {
-                val error = syncResult.exceptionOrNull()?.toAppError() ?: AppError.Unknown(null)
-                emit(AppResult.Failure(error))
-                return@flow
+            when (val syncResult = historyRepository.syncHistoryIfNeeded()) {
+                is AppResult.Failure -> {
+                    emit(syncResult)
+                    return@flow
+                }
+                is AppResult.Success -> Unit
             }
 
-            val history = historyRepository.getHistory()
+            val history = when (val historyResult = historyRepository.getHistory()) {
+                is AppResult.Failure -> {
+                    emit(historyResult)
+                    return@flow
+                }
+                is AppResult.Success -> historyResult.value
+            }
+
             if (history.isEmpty()) {
                 emit(AppResult.Failure(AppError.Validation("Historico vazio")))
                 return@flow
@@ -89,8 +95,8 @@ class CheckGameUseCase @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logger.error(TAG, "Check failed", e)
-            emit(AppResult.Failure(e.toAppError()))
+            Log.e(TAG, "Check failed", e)
+            emit(AppResult.Failure(AppError.Unknown(e)))
         }
     }.flowOn(defaultDispatcher)
 

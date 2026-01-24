@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.cebolao.lotofacil.data.cache.DrawLruCache
 import com.cebolao.lotofacil.data.local.db.AppDatabase
 import com.cebolao.lotofacil.data.local.db.DrawDao
@@ -17,11 +18,11 @@ import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.cebolao.lotofacil.domain.exception.SyncException
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.repository.SyncStatus
-import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.util.toAppError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -66,7 +67,6 @@ class HistoryRepositoryImpl @Inject constructor(
     private val drawDetailsDao: DrawDetailsDao,
     private val apiService: ApiService,
     private val syncManager: SyncManager,
-    private val logger: Logger,
     @param:ApplicationScope private val scope: CoroutineScope,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : HistoryRepository {
@@ -79,7 +79,7 @@ class HistoryRepositoryImpl @Inject constructor(
     override val syncStatus: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
 
     private val syncMutex = Mutex()
-    private var syncDeferred: Deferred<Result<Unit>>? = null
+    private var syncDeferred: Deferred<AppResult<Unit>>? = null
     private var runningSyncJob: Job? = null
 
     override fun observeHistory(): Flow<List<Draw>> =
@@ -93,59 +93,71 @@ class HistoryRepositoryImpl @Inject constructor(
             .onStart { runBlocking { ensureInitialized() } }
             .map { entity: com.cebolao.lotofacil.data.local.db.DrawEntity? -> entity?.toDraw() }
 
-    override suspend fun getHistory(): List<Draw> {
+    override suspend fun getHistory(): AppResult<List<Draw>> {
         historyCacheRef.get()?.let { cached ->
-            if (cached.isNotEmpty()) return cached
+            if (cached.isNotEmpty()) return AppResult.Success(cached)
         }
 
-        ensureInitialized()
-        val draws = drawDao.getAllDrawsSnapshot().map { it.toDraw() }
+        return runCatching {
+            ensureInitialized()
+            val draws = drawDao.getAllDrawsSnapshot().map { it.toDraw() }
 
-        if (draws.isNotEmpty()) {
-            val toCache = draws.take(100)
-            drawCache.putAll(toCache)
-            historyCacheRef.set(draws)
+            if (draws.isNotEmpty()) {
+                val toCache = draws.take(100)
+                drawCache.putAll(toCache)
+                historyCacheRef.set(draws)
+            }
+
+            AppResult.Success(draws)
+        }.getOrElse { e ->
+            Log.e(TAG, "Failed to load history", e)
+            AppResult.Failure(e.toAppError())
         }
-
-        return draws
     }
 
-    override suspend fun getLastDraw(): Draw? {
+    override suspend fun getLastDraw(): AppResult<Draw?> = runCatching {
         ensureInitialized()
         getFreshApiResult()?.toDraw()?.let { fromApi ->
             drawCache.put(fromApi.contestNumber, fromApi)
-            return fromApi
+            return@runCatching AppResult.Success(fromApi)
         }
 
         val lastDraw = drawDao.getLastDrawSnapshot()?.toDraw()
         if (lastDraw != null) {
             drawCache.put(lastDraw.contestNumber, lastDraw)
-            return lastDraw
+            return@runCatching AppResult.Success(lastDraw)
         }
 
         val lastFromCache = drawCache.getAll().maxByOrNull { it.contestNumber }
         if (lastFromCache != null) {
-            logger.debug(TAG, "Returning last draw from cache: ${lastFromCache.contestNumber}")
-            return lastFromCache
+            Log.d(TAG, "Returning last draw from cache: ${lastFromCache.contestNumber}")
+            return@runCatching AppResult.Success(lastFromCache)
         }
 
-        return null
+        AppResult.Success(null)
+    }.getOrElse { e ->
+        Log.e(TAG, "Failed to load last draw", e)
+        AppResult.Failure(e.toAppError())
     }
 
-    override suspend fun getLastDrawDetails(): DrawDetails? {
+    override suspend fun getLastDrawDetails(): AppResult<DrawDetails?> = runCatching {
         ensureInitialized()
-        val lastDraw = drawDao.getLastDrawSnapshot()?.toDraw() ?: return null
+        val lastDraw = drawDao.getLastDrawSnapshot()?.toDraw() ?: return@runCatching AppResult.Success(null)
 
         val cachedDetails = drawDetailsDao.getDrawDetails(lastDraw.contestNumber)
         if (cachedDetails != null) {
-            return cachedDetails.toDrawDetails(lastDraw)
+            return@runCatching AppResult.Success(cachedDetails.toDrawDetails(lastDraw))
         }
 
-        return getFreshApiResult()?.let { result ->
+        val details = getFreshApiResult()?.let { result ->
             val entity = result.toDrawDetailsEntity()
             drawDetailsDao.insertDetails(entity)
             entity.toDrawDetails(lastDraw)
         }
+        AppResult.Success(details)
+    }.getOrElse { e ->
+        Log.e(TAG, "Failed to load last draw details", e)
+        AppResult.Failure(e.toAppError())
     }
 
     override fun syncHistory(): Job = synchronized(this) {
@@ -158,11 +170,11 @@ class HistoryRepositoryImpl @Inject constructor(
         return job
     }
 
-    override suspend fun syncHistoryIfNeeded(): Result<Unit> {
+    override suspend fun syncHistoryIfNeeded(): AppResult<Unit> {
         val deferred = syncMutex.withLock {
             val inFlight = syncDeferred?.takeIf { it.isActive }
             if (inFlight != null) {
-                logger.debug(TAG, "Sync already in flight, joining existing work")
+                Log.d(TAG, "Sync already in flight, joining existing work")
                 return@withLock inFlight
             }
 
@@ -185,49 +197,49 @@ class HistoryRepositoryImpl @Inject constructor(
         return deferred.await()
     }
 
-    private suspend fun runSyncIfNeeded(): Result<Unit> {
+    private suspend fun runSyncIfNeeded(): AppResult<Unit> {
         val shouldSync = try {
             syncManager.shouldSync()
         } catch (e: IOException) {
-            logger.error(TAG, "Network error checking sync status", e)
+            Log.e(TAG, "Network error checking sync status", e)
             _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            return Result.failure(e)
+            return AppResult.Failure(e.toAppError())
         } catch (e: SyncException) {
-            logger.error(TAG, "Sync service error checking sync status", e)
+            Log.e(TAG, "Sync service error checking sync status", e)
             _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            return Result.failure(e)
+            return AppResult.Failure(e.toAppError())
         }
 
         if (!shouldSync) {
-            logger.info(TAG, "Sync not needed, skipping")
+            Log.i(TAG, "Sync not needed, skipping")
             _syncStatus.value = SyncStatus.Success
-            return Result.success(Unit)
+            return AppResult.Success(Unit)
         }
 
         return try {
             _syncStatus.value = SyncStatus.Syncing
-            logger.info(TAG, "Starting history sync")
+            Log.i(TAG, "Starting history sync")
 
             val latestResult = syncManager.performIncrementalSync()
             cacheLatestApiResult(latestResult)
 
             drawCache.clear()
             historyCacheRef.set(null)
-            logger.debug(TAG, "Cache cleared after sync")
+            Log.d(TAG, "Cache cleared after sync")
 
             _syncStatus.value = SyncStatus.Success
-            logger.info(TAG, "Sync completed successfully")
-            Result.success(Unit)
+            Log.i(TAG, "Sync completed successfully")
+            AppResult.Success(Unit)
         } catch (e: IOException) {
             cacheLatestApiResult(null)
-            logger.error(TAG, "Network sync failed", e)
+            Log.e(TAG, "Network sync failed", e)
             _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            Result.failure(e)
+            AppResult.Failure(e.toAppError())
         } catch (e: SyncException) {
             cacheLatestApiResult(null)
-            logger.error(TAG, "Sync service error", e)
+            Log.e(TAG, "Sync service error", e)
             _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            Result.failure(e)
+            AppResult.Failure(e.toAppError())
         } catch (e: CancellationException) {
             throw e
         }
@@ -265,7 +277,7 @@ class HistoryRepositoryImpl @Inject constructor(
 
     private suspend fun populateFromAssets() = withContext(ioDispatcher) {
         try {
-            logger.info(TAG, "Populating database from assets...")
+            Log.i(TAG, "Populating database from assets...")
 
             var inserted = 0
             val batchSize = 500
@@ -295,11 +307,11 @@ class HistoryRepositoryImpl @Inject constructor(
                 }
             }
 
-            logger.info(TAG, "Populated $inserted draws from assets.")
+            Log.i(TAG, "Populated $inserted draws from assets.")
         } catch (e: IOException) {
-            logger.error(TAG, "Error populating from assets", e)
+            Log.e(TAG, "Error populating from assets", e)
         } catch (e: Exception) {
-            logger.error(TAG, "Database error populating from assets", e)
+            Log.e(TAG, "Database error populating from assets", e)
         }
     }
 }

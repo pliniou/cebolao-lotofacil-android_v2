@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.domain.service
 
+import android.util.Log
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.FilterRule
 import com.cebolao.lotofacil.domain.model.FilterState
@@ -9,7 +10,6 @@ import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.model.toRule
 import com.cebolao.lotofacil.di.DefaultDispatcher
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.domain.util.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -29,7 +29,6 @@ private const val TAG = "GameGenerator"
 class GameGenerator @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val metricsCalculator: GameMetricsCalculator,
-    private val logger: Logger,
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
     /**
@@ -65,7 +64,7 @@ class GameGenerator @Inject constructor(
         } catch (e: Exception) {
             // Re-throw cancellation
             if (e is kotlinx.coroutines.CancellationException) throw e
-            logger.error(TAG, "Unexpected error during game generation", e)
+            Log.e(TAG, "Unexpected error during game generation", e)
             emit(GenerationProgress.failed(GenerationFailureReason.GENERIC_ERROR))
         }
     }.flowOn(defaultDispatcher)
@@ -77,11 +76,17 @@ class GameGenerator @Inject constructor(
         config: GeneratorConfig
     ): GenerationContext {
         val activeFilters = filters.filter { it.isEnabled }
-        val historyRaw = historyRepository.getHistory()
+        val historyRaw = when (val historyResult = historyRepository.getHistory()) {
+            is com.cebolao.lotofacil.domain.model.AppResult.Success -> historyResult.value
+            is com.cebolao.lotofacil.domain.model.AppResult.Failure -> {
+                Log.w(TAG, "Failed to load history for generator")
+                emptyList()
+            }
+        }
         val history = historyRaw.map { LotofacilGame.fromNumbers(it.numbers) }.take(GameConstants.HISTORY_CHECK_SIZE)
         val lastDrawNumbers = history.firstOrNull()?.numbers ?: emptySet()
         
-        logger.info(TAG, "Starting generation: quantity=$quantity, activeFilters=${activeFilters.size}, config=$config")
+        Log.i(TAG, "Starting generation: quantity=$quantity, activeFilters=${activeFilters.size}, config=$config")
         
         return GenerationContext(
             quantity = quantity,
@@ -109,7 +114,7 @@ class GameGenerator @Inject constructor(
         
         while (context.generatedGames.size < context.quantity && currentCoroutineContext().isActive) {
             if (isTimeoutReached(lastProgressAt, config)) {
-                logger.warning(TAG, "Generation timeout reached. Generated ${context.generatedGames.size}/${context.quantity} games")
+                Log.w(TAG, "Generation timeout reached. Generated ${context.generatedGames.size}/${context.quantity} games")
                 context.strategyUsed = GenerationStep.RANDOM_FALLBACK
                 break
             }
@@ -219,7 +224,7 @@ class GameGenerator @Inject constructor(
         quantity: Int,
         seedVal: Long
     ) {
-        logger.info(TAG, "Generation completed: ${result.games.size}/$quantity games in ${result.duration}ms, attempts=${result.totalAttempts}")
+        Log.i(TAG, "Generation completed: ${result.games.size}/$quantity games in ${result.duration}ms, attempts=${result.totalAttempts}")
         
         if (result.games.isNotEmpty()) {
             val telemetry = createTelemetry(result, context, seedVal)
@@ -248,13 +253,13 @@ class GameGenerator @Inject constructor(
     private fun logTelemetryDetails(telemetry: GenerationTelemetry, rejections: Map<FilterType, Int>) {
         // Safe formatting to avoid Locale issues if any
         try {
-            logger.info(TAG, "Telemetry - Success rate: ${"%.1f".format(telemetry.successRate * 100)}%, Avg time/game: ${telemetry.avgTimePerGame}ms")
+            Log.i(TAG, "Telemetry - Success rate: ${"%.1f".format(telemetry.successRate * 100)}%, Avg time/game: ${telemetry.avgTimePerGame}ms")
         } catch (e: Exception) {
-            logger.warning(TAG, "Could not format telemetry logs", e)
+            Log.w(TAG, "Could not format telemetry logs", e)
         }
         
         telemetry.mostRestrictiveFilter?.let { filter ->
-            logger.info(TAG, "Most restrictive filter: $filter (${rejections[filter]} rejections)")
+            Log.i(TAG, "Most restrictive filter: $filter (${rejections[filter]} rejections)")
         }
     }
     
@@ -269,7 +274,7 @@ class GameGenerator @Inject constructor(
         } else {
             GenerationFailureReason.GENERIC_ERROR
         }
-        logger.error(TAG, "Failed to generate games: $reason")
+        Log.e(TAG, "Failed to generate games: $reason")
         emit(GenerationProgress.failed(reason))
     }
     

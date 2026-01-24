@@ -393,7 +393,6 @@
     <string name="games_share_chooser_title">Share Game</string>
     <string name="games_delete_confirm">Delete</string>
     <string name="game_card_action_check">Check</string>
-    <string name="game_card_action_analyze">Analyze</string>
     <string name="game_card_action_pin">Pin</string>
     <string name="game_card_action_unpin">Unpin</string>
     <string name="games_delete_dialog_message">Delete this game?</string>

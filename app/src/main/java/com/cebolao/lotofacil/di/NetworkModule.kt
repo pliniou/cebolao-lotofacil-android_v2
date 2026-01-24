@@ -1,9 +1,8 @@
 package com.cebolao.lotofacil.di
 
-import com.cebolao.lotofacil.BuildConfig
-
 import android.content.Context
 import android.os.Build
+import com.cebolao.lotofacil.BuildConfig
 import com.cebolao.lotofacil.data.network.ApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -21,17 +20,15 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
+/**
+ * Provides network dependencies. Updated for OkHttp 5.x and Retrofit 2.9.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private const val BASE_URL = "https://servicebus2.caixa.gov.br/portaldeloterias/api/"
-    private const val CACHE_DIR = "http_cache"
     private const val CACHE_SIZE_BYTES = 10L * 1024 * 1024
-    private const val TIMEOUT_CONNECT_SECONDS = 30L
-    private const val TIMEOUT_READ_SECONDS = 30L
-    private const val MEDIA_TYPE_JSON = "application/json"
-    private const val HEADER_ACCEPT = "Accept"
-    private const val HEADER_USER_AGENT = "User-Agent"
+    private const val TIMEOUT_SECONDS = 30L
 
     @Provides
     @Singleton
@@ -45,59 +42,51 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpCache(@ApplicationContext context: Context): Cache {
-        return Cache(File(context.cacheDir, CACHE_DIR), CACHE_SIZE_BYTES)
-    }
+    fun provideHttpCache(@ApplicationContext context: Context): Cache =
+        Cache(File(context.cacheDir, "http_cache"), CACHE_SIZE_BYTES)
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(
-        cache: Cache
-    ): OkHttpClient {
+    fun provideOkHttpClient(cache: Cache): OkHttpClient {
+        // Configure logging at BODY level for debug builds only
         val logging = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+            else HttpLoggingInterceptor.Level.BASIC
             redactHeader("Authorization")
-            redactHeader("Cookie")
         }
 
         return OkHttpClient.Builder()
             .cache(cache)
-            .addInterceptor { chain ->
-                val request = chain.request()
-                val userAgent =
-                    "CebolaoLotofacil/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT})"
-
-                val enriched = request.newBuilder()
-                    .header(HEADER_ACCEPT, MEDIA_TYPE_JSON)
-                    .header(HEADER_USER_AGENT, userAgent)
+            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .callTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .addNetworkInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("Accept", "application/json")
+                    .header(
+                        "User-Agent",
+                        "CebolaoLotofacil/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT})"
+                    )
                     .build()
-
-                chain.proceed(enriched)
+                chain.proceed(request)
             }
             .addInterceptor(logging)
-            .connectTimeout(TIMEOUT_CONNECT_SECONDS, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
-            .writeTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
-            .callTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit {
-        return Retrofit.Builder()
+    fun provideRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit =
+        Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE_JSON.toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
-    }
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+    fun provideApiService(retrofit: Retrofit): ApiService =
+        retrofit.create(ApiService::class.java)
 }

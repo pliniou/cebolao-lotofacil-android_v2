@@ -18,8 +18,8 @@ import com.cebolao.lotofacil.presentation.viewmodel.MainViewModel
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val startDestinationState by viewModel.startDestination.collectAsStateWithLifecycle()
-    val startDestination = startDestinationState.destination
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val startDestination = uiState.startDestination
 
     Scaffold(
         bottomBar = { AppBottomBar(navController, navBackStackEntry?.destination) }

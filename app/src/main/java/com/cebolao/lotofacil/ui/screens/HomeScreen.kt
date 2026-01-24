@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.cebolao.lotofacil.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +18,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.Box
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.cebolao.lotofacil.navigation.navigate
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.navigation.navigateToChecker
 import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
@@ -78,7 +81,7 @@ fun HomeScreen(
             navController?.navigateToChecker(numbers)
         },
         onNavigateToResults = {
-            navController?.navigate(com.cebolao.lotofacil.navigation.ResultsRoute)
+            navController?.navigate(com.cebolao.lotofacil.navigation.AppRoute.Results)
         },
         listState = listState
     )
@@ -102,11 +105,12 @@ fun HomeScreenContent(
         }
 
         val successState = uiState.screenState as? HomeScreenState.Success
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing),
-            onRefresh = { onEvent(HomeUiEvent.ForceSync) },
-            modifier = Modifier.fillMaxSize()
-        ) {
+        val refreshState = rememberPullRefreshState(
+            refreshing = isRefreshing,
+            onRefresh = { onEvent(HomeUiEvent.ForceSync) }
+        )
+
+        Box(Modifier.fillMaxSize().pullRefresh(refreshState)) {
             StandardPageLayout(
                 scaffoldPadding = innerPadding,
                 listState = listState
@@ -211,7 +215,11 @@ fun HomeScreenContent(
                     }
                 }
             }
-
+            PullRefreshIndicator(
+                refreshing = isRefreshing,
+                state = refreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
 
     }

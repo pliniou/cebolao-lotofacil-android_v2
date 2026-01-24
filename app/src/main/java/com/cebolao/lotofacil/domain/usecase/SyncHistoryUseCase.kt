@@ -2,7 +2,6 @@ package com.cebolao.lotofacil.domain.usecase
 
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.util.toAppError
 import javax.inject.Inject
 
 /**
@@ -14,9 +13,5 @@ class SyncHistoryUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(): AppResult<Unit> {
         return historyRepository.syncHistoryIfNeeded()
-            .fold(
-                onSuccess = { AppResult.Success(it) },
-                onFailure = { AppResult.Failure(it.toAppError()) }
-            )
     }
 }

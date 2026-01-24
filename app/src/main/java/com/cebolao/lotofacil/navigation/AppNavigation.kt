@@ -12,41 +12,41 @@ import com.cebolao.lotofacil.ui.theme.AppIcons
  */
 @Stable
 sealed class Screen(
-    val routeObject: Any,
+    val route: AppRoute,
     @get:StringRes val titleRes: Int? = null,
     val selectedIcon: ImageVector? = null,
     val unselectedIcon: ImageVector? = null
 ) {
     data object Home : Screen(
-        HomeRoute,
+        AppRoute.Home,
         R.string.nav_home,
         AppIcons.Home,
         AppIcons.HomeOutlined
     )
 
     data object Filters : Screen(
-        FiltersRoute,
+        AppRoute.Filters,
         R.string.nav_filters,
         AppIcons.Tune,
         AppIcons.TuneOutlined
     )
 
     data object GeneratedGames : Screen(
-        GeneratedGamesRoute,
+        AppRoute.GeneratedGames,
         R.string.nav_games,
         AppIcons.List,
         AppIcons.ListOutlined
     )
 
     data object Checker : Screen(
-        CheckerRoute(),
+        AppRoute.Checker(),
         R.string.nav_checker,
         AppIcons.Analytics,
         AppIcons.AnalyticsOutlined
     )
 
     data object About : Screen(
-        AboutRoute,
+        AppRoute.About,
         R.string.nav_about,
         AppIcons.Info,
         AppIcons.InfoOutlined
@@ -62,13 +62,11 @@ val bottomNavItems = listOf(
 )
 
 /**
- * Navigates to the Checker screen with a preselected set of numbers.  The numbers are
- * converted to a sorted list and wrapped in a `CheckerRoute` object.  This extension
- * centralises the navigation logic so callers don't need to be aware of route objects.
+ * Navigates to the Checker screen with a preselected set of numbers.
  */
 fun NavController.navigateToChecker(numbers: Set<Int>) {
     val list = numbers.sorted()
-    navigate(CheckerRoute(list)) {
+    navigate(AppRoute.Checker(list)) {
         launchSingleTop = true
         restoreState = true
     }

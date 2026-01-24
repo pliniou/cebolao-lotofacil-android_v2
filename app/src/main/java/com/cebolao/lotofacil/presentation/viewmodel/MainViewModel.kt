@@ -1,36 +1,34 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
 import com.cebolao.lotofacil.domain.usecase.ObserveAppConfigUseCase
 import com.cebolao.lotofacil.domain.usecase.UpdateAppConfigUseCase
-import com.cebolao.lotofacil.navigation.HomeRoute
-import com.cebolao.lotofacil.navigation.OnboardingRoute
+import com.cebolao.lotofacil.navigation.AppRoute
+import com.cebolao.lotofacil.presentation.util.UiEvent
+import com.cebolao.lotofacil.presentation.util.UiState
 import com.cebolao.lotofacil.ui.theme.AccentPalette
+import com.cebolao.lotofacil.ui.theme.DefaultAccentPalette
+import com.cebolao.lotofacil.ui.theme.accentPaletteByName
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 /**
  * UI state for the main application screen.
  */
+@androidx.compose.runtime.Immutable
 data class MainUiState(
-    val isReady: Boolean = false
-)
-
-/**
- * State representing the initial navigation destination.
- */
-data class StartDestinationState(
-    val destination: Any = OnboardingRoute,
-    val isLoading: Boolean = true
-)
+    val isReady: Boolean = false,
+    val startDestination: AppRoute = AppRoute.Onboarding,
+    val themeMode: String = THEME_MODE_LIGHT,
+    val accentPalette: AccentPalette = DefaultAccentPalette
+) : UiState
 
 /**
  * ViewModel for the main application activity.
@@ -42,56 +40,30 @@ class MainViewModel @Inject constructor(
     private val updateAppConfigUseCase: UpdateAppConfigUseCase
 ) : BaseViewModel() {
 
-    private val paletteByName: Map<String, AccentPalette> =
-        AccentPalette.entries.associateBy { it.name }
-
     private val onboardingCompleted = observeAppConfigUseCase.hasCompletedOnboarding
+    private val themeMode = observeAppConfigUseCase.themeMode
+    private val accentPalette = observeAppConfigUseCase.accentPalette
 
     /**
      * StateFlow that determines the initial navigation destination based on onboarding status.
      */
-    val startDestination: StateFlow<StartDestinationState> = onboardingCompleted
-        .map { completed ->
-            val route = if (completed) HomeRoute else OnboardingRoute
-            StartDestinationState(destination = route, isLoading = false)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
-            initialValue = StartDestinationState(isLoading = true)
+    val uiState: StateFlow<MainUiState> = combine(
+        onboardingCompleted,
+        themeMode,
+        accentPalette
+    ) { completed, theme, paletteName ->
+        val route = if (completed) AppRoute.Home else AppRoute.Onboarding
+        MainUiState(
+            isReady = true,
+            startDestination = route,
+            themeMode = theme,
+            accentPalette = mapAccentPalette(paletteName)
         )
-
-    /**
-     * StateFlow indicating whether the app is ready to be displayed.
-     */
-    val uiState: StateFlow<MainUiState> = startDestination
-        .map { MainUiState(isReady = !it.isLoading) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
-            initialValue = MainUiState(isReady = false)
-        )
-
-    /**
-     * StateFlow of the current theme mode (light/dark/system).
-     */
-    val themeMode: StateFlow<String> = observeAppConfigUseCase.themeMode
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
-            initialValue = THEME_MODE_LIGHT
-        )
-
-    /**
-     * StateFlow of the current accent color palette.
-     */
-    val accentPalette: StateFlow<AccentPalette> = observeAppConfigUseCase.accentPalette
-        .map(::mapAccentPalette)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
-            initialValue = AccentPalette.AZUL
-        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS),
+        initialValue = MainUiState()
+    )
 
     /**
      * Single entry point for UI events.
@@ -113,14 +85,14 @@ class MainViewModel @Inject constructor(
     }
 
     private fun mapAccentPalette(name: String): AccentPalette {
-        return paletteByName[name] ?: AccentPalette.AZUL
+        return accentPaletteByName(name)
     }
 }
 
 /**
  * UI Events for MainViewModel.
  */
-sealed interface MainUiEvent {
+sealed interface MainUiEvent : UiEvent {
     data object CompleteOnboarding : MainUiEvent
     data class SetThemeMode(val mode: String) : MainUiEvent
     data class SetAccentPalette(val palette: AccentPalette) : MainUiEvent

@@ -9,6 +9,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.cebolao.lotofacil.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

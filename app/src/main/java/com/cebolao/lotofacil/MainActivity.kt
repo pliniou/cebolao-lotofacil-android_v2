@@ -35,10 +35,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
-            val themeMode by mainViewModel.themeMode.collectAsStateWithLifecycle()
-            val accentPalette by mainViewModel.accentPalette.collectAsStateWithLifecycle()
 
-            val darkTheme = when (themeMode) {
+            val darkTheme = when (uiState.themeMode) {
                 THEME_MODE_DARK -> true
                 THEME_MODE_LIGHT -> false
                 else -> isSystemInDarkTheme()
@@ -46,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
             CebolaoLotofacilTheme(
                 darkTheme = darkTheme,
-                accentPalette = accentPalette
+                accentPalette = uiState.accentPalette
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

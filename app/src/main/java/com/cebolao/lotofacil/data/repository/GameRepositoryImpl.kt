@@ -1,14 +1,16 @@
 package com.cebolao.lotofacil.data.repository
 
+import android.util.Log
 import com.cebolao.lotofacil.data.local.db.UserGameDao
 import com.cebolao.lotofacil.data.mapper.toLotofacilGame
 import com.cebolao.lotofacil.data.mapper.toUserGameEntity
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.repository.GameRepository
-import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
+import com.cebolao.lotofacil.util.toAppError
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -32,8 +34,7 @@ class GameRepositoryImpl @Inject constructor(
     private val userGameDao: UserGameDao,
     @param:ApplicationScope private val scope: CoroutineScope,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val json: Json,
-    private val logger: Logger
+    private val json: Json
 ) : GameRepository {
 
     private companion object {
@@ -44,7 +45,7 @@ class GameRepositoryImpl @Inject constructor(
         .getUnpinnedGames()
         .map { entities -> entities.map { it.toLotofacilGame() }.toImmutableList() }
         .catch { e ->
-            logger.error(TAG, "Failed to observe unpinned games", e)
+            Log.e(TAG, "Failed to observe unpinned games", e)
             emit(persistentListOf())
         }
         .flowOn(ioDispatcher)
@@ -54,15 +55,15 @@ class GameRepositoryImpl @Inject constructor(
         .getPinnedGames()
         .map { entities -> entities.map { it.toLotofacilGame() }.toImmutableList() }
         .catch { e ->
-            logger.error(TAG, "Failed to observe pinned games", e)
+            Log.e(TAG, "Failed to observe pinned games", e)
             emit(persistentListOf())
         }
         .flowOn(ioDispatcher)
         .stateIn(scope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), persistentListOf())
 
-    override suspend fun addGeneratedGames(newGames: List<LotofacilGame>) {
-        if (newGames.isEmpty()) return
-        withContext(ioDispatcher) {
+    override suspend fun addGeneratedGames(newGames: List<LotofacilGame>): AppResult<Unit> {
+        if (newGames.isEmpty()) return AppResult.Success(Unit)
+        return withContext(ioDispatcher) {
             runCatching {
                 val inputMasks = newGames.map { it.mask }
                 val existingMasks = userGameDao.getExistingMasks(inputMasks).toSet()
@@ -73,53 +74,67 @@ class GameRepositoryImpl @Inject constructor(
                     }
                     userGameDao.insertAll(entities)
                 }
-            }.onFailure { e ->
-                logger.error(TAG, "Failed to insert generated games", e)
+                AppResult.Success(Unit)
+            }.getOrElse { e ->
+                Log.e(TAG, "Failed to insert generated games", e)
+                AppResult.Failure(e.toAppError())
             }
         }
     }
 
-    override suspend fun clearUnpinnedGames() {
-        withContext(ioDispatcher) {
-            runCatching { userGameDao.deleteAllUnpinned() }
-                .onFailure { e -> logger.error(TAG, "Failed to clear unpinned games", e) }
+    override suspend fun clearUnpinnedGames(): AppResult<Unit> = withContext(ioDispatcher) {
+        runCatching {
+            userGameDao.deleteAllUnpinned()
+            AppResult.Success(Unit)
+        }.getOrElse { e ->
+            Log.e(TAG, "Failed to clear unpinned games", e)
+            AppResult.Failure(e.toAppError())
         }
     }
 
-    override suspend fun getGame(mask: Long): LotofacilGame? = withContext(ioDispatcher) {
-        runCatching { userGameDao.getGameByMask(mask)?.toLotofacilGame() }
-            .onFailure { e -> logger.error(TAG, "Failed to fetch game mask=$mask", e) }
-            .getOrNull()
+    override suspend fun getGame(mask: Long): AppResult<LotofacilGame?> = withContext(ioDispatcher) {
+        runCatching { AppResult.Success(userGameDao.getGameByMask(mask)?.toLotofacilGame()) }
+            .getOrElse { e ->
+                Log.e(TAG, "Failed to fetch game mask=$mask", e)
+                AppResult.Failure(e.toAppError())
+            }
     }
 
-    override suspend fun saveGame(game: LotofacilGame) {
+    override suspend fun saveGame(game: LotofacilGame): AppResult<Unit> = withContext(ioDispatcher) {
+        runCatching {
+            val existing = userGameDao.getGameByMask(game.mask)
+            if (existing != null) {
+                val updated = existing.copy(pinned = game.isPinned)
+                userGameDao.update(updated)
+            } else {
+                userGameDao.insert(game.toUserGameEntity(source = "manual", json = json))
+            }
+            AppResult.Success(Unit)
+        }.getOrElse { e ->
+            Log.e(TAG, "Failed to save game mask=${game.mask}", e)
+            AppResult.Failure(e.toAppError())
+        }
+    }
+
+    override suspend fun deleteGame(gameToDelete: LotofacilGame): AppResult<Unit> =
         withContext(ioDispatcher) {
             runCatching {
-                val existing = userGameDao.getGameByMask(game.mask)
-                if (existing != null) {
-                    val updated = existing.copy(pinned = game.isPinned)
-                    userGameDao.update(updated)
-                } else {
-                    userGameDao.insert(game.toUserGameEntity(source = "manual", json = json))
-                }
-            }.onFailure { e -> logger.error(TAG, "Failed to save game mask=${game.mask}", e) }
+                userGameDao.deleteByMask(gameToDelete.mask)
+                AppResult.Success(Unit)
+            }.getOrElse { e ->
+                Log.e(TAG, "Failed to delete game mask=${gameToDelete.mask}", e)
+                AppResult.Failure(e.toAppError())
+            }
         }
-    }
 
-    override suspend fun deleteGame(gameToDelete: LotofacilGame) {
-        withContext(ioDispatcher) {
-            runCatching { userGameDao.deleteByMask(gameToDelete.mask) }
-                .onFailure { e -> logger.error(TAG, "Failed to delete game mask=${gameToDelete.mask}", e) }
-        }
-    }
-
-    override suspend fun exportGames(): String = withContext(ioDispatcher) {
+    override suspend fun exportGames(): AppResult<String> = withContext(ioDispatcher) {
         runCatching {
             val allEntities = userGameDao.getAllGames().first()
             val allGames = allEntities.map { it.toLotofacilGame() }
-            json.encodeToString(allGames)
-        }.onFailure { e ->
-            logger.error(TAG, "Failed to export games", e)
-        }.getOrDefault("[]")
+            AppResult.Success(json.encodeToString(allGames))
+        }.getOrElse { e ->
+            Log.e(TAG, "Failed to export games", e)
+            AppResult.Failure(e.toAppError())
+        }
     }
 }

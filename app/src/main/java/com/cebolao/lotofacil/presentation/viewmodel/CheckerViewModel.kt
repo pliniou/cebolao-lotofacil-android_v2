@@ -1,10 +1,9 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
-
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.cebolao.lotofacil.navigation.toRoute
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.DefaultDispatcher
@@ -20,24 +19,48 @@ import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
 import com.cebolao.lotofacil.domain.usecase.CheckGameUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGameUseCase
-import com.cebolao.lotofacil.domain.util.Logger
-import com.cebolao.lotofacil.navigation.CheckerRoute
-import com.cebolao.lotofacil.util.toUserMessageRes
+import androidx.navigation.toRoute
+import com.cebolao.lotofacil.navigation.AppRoute
+import com.cebolao.lotofacil.presentation.util.UiEvent
+import com.cebolao.lotofacil.presentation.util.UiState
 import com.cebolao.lotofacil.util.launchCatching
+import com.cebolao.lotofacil.util.toUserMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
+
+@androidx.compose.runtime.Immutable
+data class CheckerUiState(
+    val status: CheckerScreenStatus = CheckerScreenStatus.Idle,
+    val selectedNumbers: Set<Int> = emptySet(),
+    val isGameComplete: Boolean = false,
+    val gameScore: GameScore? = null,
+    val heatmapEnabled: Boolean = false,
+    val heatmapIntensities: Map<Int, Float> = emptyMap()
+) : UiState
+
+sealed interface CheckerScreenStatus {
+    data object Idle : CheckerScreenStatus
+    data object Loading : CheckerScreenStatus
+    data class Success(
+        val report: CheckReport,
+        val metrics: GameComputedMetrics
+    ) : CheckerScreenStatus
+
+    data class Error(@param:StringRes val messageResId: Int) : CheckerScreenStatus
+}
 
 @HiltViewModel
 class CheckerViewModel @Inject constructor(
@@ -46,7 +69,6 @@ class CheckerViewModel @Inject constructor(
     private val metricsCalculator: GameMetricsCalculator,
     private val historyRepository: HistoryRepository,
     private val checkRunRepository: CheckRunRepository,
-    private val logger: Logger,
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @param:ApplicationScope private val externalScope: CoroutineScope,
     savedStateHandle: SavedStateHandle
@@ -56,23 +78,8 @@ class CheckerViewModel @Inject constructor(
         private const val TAG = "CheckerViewModel"
     }
 
-    private val _uiState = MutableStateFlow<CheckerUiState>(CheckerUiState.Idle)
+    private val _uiState = MutableStateFlow(CheckerUiState())
     val uiState: StateFlow<CheckerUiState> = _uiState.asStateFlow()
-
-    private val _selectedNumbers = MutableStateFlow<Set<Int>>(emptySet())
-    val selectedNumbers: StateFlow<Set<Int>> = _selectedNumbers.asStateFlow()
-
-    private val _isGameComplete = MutableStateFlow(false)
-    val isGameComplete: StateFlow<Boolean> = _isGameComplete.asStateFlow()
-
-    private val _gameScore = MutableStateFlow<GameScore?>(null)
-    val gameScore: StateFlow<GameScore?> = _gameScore.asStateFlow()
-
-    private val _heatmapEnabled = MutableStateFlow(false)
-    val heatmapEnabled = _heatmapEnabled.asStateFlow()
-
-    private val _heatmapIntensities = MutableStateFlow<Map<Int, Float>>(emptyMap())
-    val heatmapIntensities = _heatmapIntensities.asStateFlow()
 
     private val _events = Channel<CheckerEffect>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -81,49 +88,59 @@ class CheckerViewModel @Inject constructor(
 
     init {
         try {
-            val route = savedStateHandle.toRoute<CheckerRoute>()
+            val route = savedStateHandle.toRoute<AppRoute.Checker>()
             if (route.numbers.isNotEmpty()) {
                 replaceNumbers(route.numbers.toSet())
             }
         } catch (e: IllegalArgumentException) {
-            // Fallback or ignore if arguments not present/parseable
-            logger.warning(TAG, "Invalid route args: ${e.message}")
+            Log.w(TAG, "Invalid route args: ${e.message}")
         } catch (e: RuntimeException) {
-            // Fallback or ignore if arguments not present/parseable
-            logger.warning(TAG, "Runtime error parsing route args: ${e.message}")
+            Log.w(TAG, "Runtime error parsing route args: ${e.message}")
         }
     }
 
     fun onEvent(event: CheckerUiEvent) {
         when (event) {
             is CheckerUiEvent.ToggleNumber -> toggleNumber(event.number)
-            is CheckerUiEvent.ClearNumbers -> clearNumbers()
-            is CheckerUiEvent.CheckGame -> checkGame()
-            is CheckerUiEvent.RequestSave -> requestSaveConfirmation()
-            is CheckerUiEvent.ConfirmSave -> confirmSaveGame()
+            CheckerUiEvent.ClearNumbers -> clearNumbers()
+            CheckerUiEvent.CheckGame -> checkGame()
+            CheckerUiEvent.RequestSave -> requestSaveConfirmation()
+            CheckerUiEvent.ConfirmSave -> confirmSaveGame()
         }
     }
 
     private fun toggleNumber(n: Int) {
-        val next = _selectedNumbers.value.toMutableSet().apply {
+        val next = _uiState.value.selectedNumbers.toMutableSet().apply {
             if (contains(n)) remove(n) else add(n)
         }.coerceToMax(GameConstants.GAME_SIZE)
 
-        _selectedNumbers.value = next
-        _isGameComplete.value = next.size == GameConstants.GAME_SIZE
-        resetAnalysis()
-        _uiState.value = CheckerUiState.Idle
+        _uiState.update {
+            it.copy(
+                selectedNumbers = next,
+                isGameComplete = next.size == GameConstants.GAME_SIZE,
+                status = CheckerScreenStatus.Idle,
+                gameScore = null,
+                heatmapEnabled = false,
+                heatmapIntensities = emptyMap()
+            )
+        }
     }
 
     private fun clearNumbers() {
-        _selectedNumbers.value = emptySet()
-        _isGameComplete.value = false
-        resetAnalysis()
-        _uiState.value = CheckerUiState.Idle
+        _uiState.update {
+            it.copy(
+                selectedNumbers = emptySet(),
+                isGameComplete = false,
+                status = CheckerScreenStatus.Idle,
+                gameScore = null,
+                heatmapEnabled = false,
+                heatmapIntensities = emptyMap()
+            )
+        }
     }
 
     private fun saveGame() {
-        val numbers = _selectedNumbers.value
+        val numbers = _uiState.value.selectedNumbers
         if (numbers.size != GameConstants.GAME_SIZE) {
             sendMessage(R.string.checker_incomplete_selection)
             return
@@ -136,8 +153,7 @@ class CheckerViewModel @Inject constructor(
                     _events.trySend(CheckerEffect.ShowMessage(R.string.checker_game_saved))
                 }
                 is AppResult.Failure -> {
-                    val error = result.error
-                    logger.error(TAG, "Failed to save game: $error", null)
+                    Log.e(TAG, "Failed to save game: ${result.error}")
                     _events.trySend(CheckerEffect.ShowMessage(R.string.checker_save_fail_message))
                 }
             }
@@ -145,7 +161,7 @@ class CheckerViewModel @Inject constructor(
     }
 
     private fun requestSaveConfirmation() {
-        if (_selectedNumbers.value.size != GameConstants.GAME_SIZE) {
+        if (_uiState.value.selectedNumbers.size != GameConstants.GAME_SIZE) {
             sendMessage(R.string.checker_incomplete_selection)
             return
         }
@@ -153,40 +169,43 @@ class CheckerViewModel @Inject constructor(
     }
 
     private fun checkGame() {
-        val numbers = _selectedNumbers.value
+        val numbers = _uiState.value.selectedNumbers
         if (numbers.size != GameConstants.GAME_SIZE) {
             sendMessage(R.string.checker_incomplete_selection)
             return
         }
         resetAnalysis()
         viewModelScope.launchCatching(
-             onError = { _uiState.value = CheckerUiState.Error(R.string.error_check_game_failed) }
+            onError = { _uiState.update { it.copy(status = CheckerScreenStatus.Error(R.string.error_check_game_failed)) } }
         ) {
-            _uiState.value = CheckerUiState.Loading
-            when (val result = checkGameUseCase(numbers.toSet()).first()) {
+            _uiState.update { it.copy(status = CheckerScreenStatus.Loading) }
+            when (val result = checkGameUseCase(numbers).first()) {
                 is AppResult.Success -> {
                     val report = result.value
-                    val lastDraw = historyRepository.getLastDraw()
+                    val lastDraw = when (val lastDrawResult = historyRepository.getLastDraw()) {
+                        is AppResult.Success -> lastDrawResult.value
+                        is AppResult.Failure -> null
+                    }
                     val metrics = metricsCalculator.calculate(
                         LotofacilGame.fromNumbers(numbers),
                         lastDraw?.numbers
                     )
                     computeAnalysis(numbers)
-                    _uiState.value = CheckerUiState.Success(report, metrics)
+                    _uiState.update { it.copy(status = CheckerScreenStatus.Success(report, metrics)) }
 
                     externalScope.launch {
                         try {
                             checkRunRepository.saveCheckRun(report)
                         } catch (e: IOException) {
-                            logger.warning(TAG, "Network error saving check run telemetry: ${e.message}")
+                            Log.w(TAG, "Network error saving check run telemetry: ${e.message}")
                         } catch (e: Exception) {
-                            logger.warning(TAG, "Database error saving check run telemetry: ${e.message}")
+                            Log.w(TAG, "Database error saving check run telemetry: ${e.message}")
                         }
                     }
                 }
                 is AppResult.Failure -> {
                     val msg = result.error.toUserMessageRes()
-                    _uiState.value = CheckerUiState.Error(msg)
+                    _uiState.update { it.copy(status = CheckerScreenStatus.Error(msg)) }
                 }
             }
         }
@@ -197,17 +216,22 @@ class CheckerViewModel @Inject constructor(
     }
 
     private fun replaceNumbers(newNumbers: Set<Int>) {
-        _selectedNumbers.value = newNumbers.coerceToMax(GameConstants.GAME_SIZE)
-        _isGameComplete.value = _selectedNumbers.value.size == GameConstants.GAME_SIZE
-        resetAnalysis()
-        _uiState.value = CheckerUiState.Idle
+        val next = newNumbers.coerceToMax(GameConstants.GAME_SIZE)
+        _uiState.update {
+            it.copy(
+                selectedNumbers = next,
+                isGameComplete = next.size == GameConstants.GAME_SIZE,
+                status = CheckerScreenStatus.Idle,
+                gameScore = null,
+                heatmapEnabled = false,
+                heatmapIntensities = emptyMap()
+            )
+        }
     }
 
     private fun resetAnalysis() {
         recomputeJob?.cancel()
-        _gameScore.value = null
-        _heatmapEnabled.value = false
-        _heatmapIntensities.value = emptyMap()
+        _uiState.update { it.copy(gameScore = null, heatmapEnabled = false, heatmapIntensities = emptyMap()) }
     }
 
     private fun computeAnalysis(numbers: Set<Int>) {
@@ -219,7 +243,10 @@ class CheckerViewModel @Inject constructor(
         recomputeJob?.cancel()
         recomputeJob = viewModelScope.launchCatching {
             val (score, intensities) = withContext(defaultDispatcher) {
-                val history = historyRepository.getHistory()
+                val history = when (val historyResult = historyRepository.getHistory()) {
+                    is AppResult.Success -> historyResult.value
+                    is AppResult.Failure -> emptyList()
+                }
                 val lastDraw = history.firstOrNull()
 
                 val computedScore = metricsCalculator.analyze(
@@ -243,11 +270,16 @@ class CheckerViewModel @Inject constructor(
                 computedScore to computedIntensities
             }
 
-            _gameScore.value = score
-            _heatmapIntensities.value = intensities
-            _heatmapEnabled.value = true
+            _uiState.update {
+                it.copy(
+                    gameScore = score,
+                    heatmapIntensities = intensities,
+                    heatmapEnabled = true
+                )
+            }
         }
     }
+
     private fun sendMessage(@StringRes messageResId: Int) {
         _events.trySend(CheckerEffect.ShowMessage(messageResId))
     }
@@ -263,7 +295,7 @@ class CheckerViewModel @Inject constructor(
     }
 }
 
-sealed interface CheckerUiEvent {
+sealed interface CheckerUiEvent : UiEvent {
     data class ToggleNumber(val number: Int) : CheckerUiEvent
     data object ClearNumbers : CheckerUiEvent
     data object CheckGame : CheckerUiEvent
@@ -278,15 +310,4 @@ sealed interface CheckerUiEvent {
 sealed interface CheckerEffect {
     data class ShowMessage(@get:StringRes val messageResId: Int) : CheckerEffect
     data object RequestSaveConfirmation : CheckerEffect
-}
-
-@androidx.compose.runtime.Immutable
-sealed interface CheckerUiState {
-    data object Idle : CheckerUiState
-    data object Loading : CheckerUiState
-    data class Success(
-        val report: CheckReport,
-        val metrics: GameComputedMetrics
-    ) : CheckerUiState
-    data class Error(@param:StringRes val messageResId: Int) : CheckerUiState
 }

@@ -12,6 +12,8 @@ import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
 import com.cebolao.lotofacil.domain.usecase.AnalyzeGameUseCase
 import com.cebolao.lotofacil.domain.usecase.ToggleGamePinUseCase
+import com.cebolao.lotofacil.presentation.util.UiEvent
+import com.cebolao.lotofacil.presentation.util.UiState
 import com.cebolao.lotofacil.ui.model.UiGameAnalysisResult
 import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.model.toDomain
@@ -54,8 +56,10 @@ data class GameScreenUiState(
     val summary: GameSummary = GameSummary(),
     val analysisState: GameAnalysisUiState = GameAnalysisUiState.Idle,
     val isLoading: Boolean = false,
+    val unpinnedGames: List<UiLotofacilGame> = emptyList(),
+    val pinnedGames: List<UiLotofacilGame> = emptyList(),
     @param:StringRes val errorMessageRes: Int? = null
-)
+) : UiState
 
 /**
  * Represents the state of a game analysis operation.
@@ -104,14 +108,6 @@ class GameViewModel @Inject constructor(
         .map { games: List<LotofacilGame> -> games.map { game: LotofacilGame -> game.toUiModelGame() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), emptyList())
 
-    val unpinnedGames = gamesFlow.map { games ->
-        games.filter { !it.isPinned }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), emptyList())
-
-    val pinnedGames = gamesFlow.map { games ->
-        games.filter { it.isPinned }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), emptyList())
-
     val uiState: StateFlow<GameScreenUiState> = combine(
         _gameToDelete,
         _analysisState,
@@ -121,6 +117,8 @@ class GameViewModel @Inject constructor(
     ) { gameToDelete, analysisState, games, isLoading, errorMessageRes ->
         val pinnedCount = games.count { it.isPinned }
         val totalCost = GameConstants.GAME_COST.multiply(BigDecimal(games.size))
+        val unpinned = games.filter { !it.isPinned }
+        val pinned = games.filter { it.isPinned }
         
         GameScreenUiState(
             gameToDelete = gameToDelete,
@@ -131,6 +129,8 @@ class GameViewModel @Inject constructor(
             ),
             analysisState = analysisState,
             isLoading = isLoading,
+            unpinnedGames = unpinned,
+            pinnedGames = pinned,
             errorMessageRes = errorMessageRes
         )
     }.stateIn(
@@ -205,8 +205,15 @@ class GameViewModel @Inject constructor(
             }
         ) {
             try {
-                gameRepository.deleteGame(game.toDomain())
-                _events.trySend(GameEffect.ShowSnackbar(R.string.games_delete_success))
+                when (gameRepository.deleteGame(game.toDomain())) {
+                    is AppResult.Success -> {
+                        _events.trySend(GameEffect.ShowSnackbar(R.string.games_delete_success))
+                    }
+                    is AppResult.Failure -> {
+                        _events.trySend(GameEffect.ShowSnackbar(R.string.error_delete_game_failed))
+                        _uiError.value = R.string.error_delete_game_failed
+                    }
+                }
             } finally {
                 _gameToDelete.value = null
             }
@@ -221,8 +228,13 @@ class GameViewModel @Inject constructor(
                 _uiError.value = R.string.error_clear_games_failed
             }
         ) {
-            gameRepository.clearUnpinnedGames()
-            _events.trySend(GameEffect.ShowSnackbar(R.string.games_clear_success))
+            when (gameRepository.clearUnpinnedGames()) {
+                is AppResult.Success -> _events.trySend(GameEffect.ShowSnackbar(R.string.games_clear_success))
+                is AppResult.Failure -> {
+                    _events.trySend(GameEffect.ShowSnackbar(R.string.error_clear_games_failed))
+                    _uiError.value = R.string.error_clear_games_failed
+                }
+            }
         }
     }
 
@@ -260,7 +272,10 @@ class GameViewModel @Inject constructor(
             }
         ) {
             val sortedNumbers = game.numbers.sorted()
-            val lastDraw = historyRepository.getLastDraw()
+            val lastDraw = when (val result = historyRepository.getLastDraw()) {
+                is AppResult.Success -> result.value
+                is AppResult.Failure -> null
+            }
             val metrics = metricsCalculator.calculate(game.toDomain(), lastDraw?.numbers)
 
             _events.trySend(GameEffect.ShareGame(numbers = sortedNumbers, metrics = metrics))
@@ -274,7 +289,7 @@ class GameViewModel @Inject constructor(
     }
 }
 
-sealed interface GameUiEvent {
+sealed interface GameUiEvent : UiEvent {
     data class TogglePin(val game: UiLotofacilGame) : GameUiEvent
     data class RequestDelete(val game: UiLotofacilGame) : GameUiEvent
     data object ConfirmDelete : GameUiEvent

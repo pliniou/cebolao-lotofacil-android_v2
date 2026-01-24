@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.domain.repository
 
 import com.cebolao.lotofacil.domain.model.AppError
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
 import kotlinx.coroutines.Job
@@ -28,7 +29,7 @@ interface HistoryRepository {
     /**
      * Executa sincronização do histórico caso necessário e retorna o resultado.
      */
-    suspend fun syncHistoryIfNeeded(): Result<Unit>
+    suspend fun syncHistoryIfNeeded(): AppResult<Unit>
 
     /**
      * Observa toda a lista de concursos.
@@ -43,15 +44,15 @@ interface HistoryRepository {
     /**
      * Retorna a lista completa de concursos disponíveis localmente.
      */
-    suspend fun getHistory(): List<Draw>
+    suspend fun getHistory(): AppResult<List<Draw>>
 
     /**
      * Retorna o último concurso ou null.
      */
-    suspend fun getLastDraw(): Draw?
+    suspend fun getLastDraw(): AppResult<Draw?>
 
     /**
      * Retorna detalhes do último concurso, quando disponível.
      */
-    suspend fun getLastDrawDetails(): DrawDetails?
+    suspend fun getLastDrawDetails(): AppResult<DrawDetails?>
 }

@@ -9,19 +9,23 @@ import com.cebolao.lotofacil.domain.model.HomeScreenData
 import com.cebolao.lotofacil.domain.model.NextDrawInfo
 import com.cebolao.lotofacil.domain.model.StatisticPattern
 import com.cebolao.lotofacil.domain.repository.SyncStatus
+import com.cebolao.lotofacil.domain.usecase.CheckLastGameUseCase
 import com.cebolao.lotofacil.domain.usecase.GetAnalyzedStatsUseCase
 import com.cebolao.lotofacil.domain.usecase.GetGameSimpleStatsUseCase
-import com.cebolao.lotofacil.domain.usecase.GetHomeScreenDataUseCase
+import com.cebolao.lotofacil.domain.usecase.GetLastDrawDetailsUseCase
+import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.ObserveSyncStatusUseCase
 import com.cebolao.lotofacil.domain.usecase.SyncHistoryUseCase
 import com.cebolao.lotofacil.mapper.toSimpleStats
+import com.cebolao.lotofacil.presentation.util.Async
+import com.cebolao.lotofacil.presentation.util.UiEvent
+import com.cebolao.lotofacil.presentation.util.UiState
 import com.cebolao.lotofacil.ui.model.UiDraw
 import com.cebolao.lotofacil.ui.model.UiDrawDetails
 import com.cebolao.lotofacil.ui.model.UiStatisticsReport
 import com.cebolao.lotofacil.ui.model.toUiModel
 import com.cebolao.lotofacil.util.Formatters
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
-import com.cebolao.lotofacil.util.toAppError
 import com.cebolao.lotofacil.util.toUserMessageRes
 import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +42,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.cebolao.lotofacil.presentation.util.Async
 
 /**
  * Represents the different states of the home screen.
@@ -75,7 +78,7 @@ data class HomeUiState(
     val selectedPattern: StatisticPattern = StatisticPattern.SUM,
     val selectedTimeWindow: Int = 0,
     val syncMessageRes: Int? = null
-)
+) : UiState
 
 /**
  * ViewModel for the Home screen.
@@ -85,7 +88,9 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     observeSyncStatusUseCase: ObserveSyncStatusUseCase,
     private val syncHistoryUseCase: SyncHistoryUseCase,
-    getHomeScreenDataUseCase: GetHomeScreenDataUseCase,
+    getLastDrawUseCase: GetLastDrawUseCase,
+    private val getLastDrawDetailsUseCase: GetLastDrawDetailsUseCase,
+    private val checkLastGameUseCase: CheckLastGameUseCase,
     private val getAnalyzedStatsUseCase: GetAnalyzedStatsUseCase,
     private val getGameSimpleStatsUseCase: GetGameSimpleStatsUseCase
 ) : BaseViewModel() {
@@ -98,7 +103,41 @@ class HomeViewModel @Inject constructor(
     val syncStatus: StateFlow<SyncStatus> = observeSyncStatusUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), SyncStatus.Idle)
 
-    private val homeDataFlow: StateFlow<AppResult<HomeScreenData>?> = getHomeScreenDataUseCase()
+    private val lastDrawFlow = getLastDrawUseCase()
+
+    private val homeDataFlow: StateFlow<AppResult<HomeScreenData>?> = lastDrawFlow
+        .flatMapLatest { lastDrawResult ->
+            flow {
+                when (lastDrawResult) {
+                    is AppResult.Failure -> emit(lastDrawResult)
+                    is AppResult.Success -> {
+                        val lastDraw = lastDrawResult.value
+                        val details = when (val detailsResult = getLastDrawDetailsUseCase()) {
+                            is AppResult.Failure -> {
+                                emit(detailsResult)
+                                return@flow
+                            }
+                            is AppResult.Success -> detailsResult.value
+                        }
+
+                        val checkResult = when (val checkResult = checkLastGameUseCase(lastDraw.numbers.toList())) {
+                            is AppResult.Success -> checkResult.value
+                            is AppResult.Failure -> null
+                        }
+
+                        emit(
+                            AppResult.Success(
+                                HomeScreenData(
+                                    lastDraw = lastDraw,
+                                    details = details,
+                                    lastDrawCheckResult = checkResult
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), null)
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -189,7 +228,7 @@ class HomeViewModel @Inject constructor(
      */
     private fun processSuccess(data: HomeScreenData): HomeScreenState.Success {
         val simpleStats =
-            data.lastDraw?.let { getGameSimpleStatsUseCase(it).toSimpleStats() } 
+            data.lastDraw?.let { getGameSimpleStatsUseCase(it).toSimpleStats() }
                 ?: persistentListOf()
 
         return HomeScreenState.Success(
@@ -203,7 +242,7 @@ class HomeViewModel @Inject constructor(
 
     private fun mapNextDrawInfo(details: com.cebolao.lotofacil.domain.model.DrawDetails?): NextDrawInfo? {
         if (details == null) return null
-        
+
         val contestNumber = details.nextContestNumber
         val contestDate = details.nextContestDate
 
@@ -260,7 +299,7 @@ class HomeViewModel @Inject constructor(
 /**
  * UI Events for HomeViewModel.
  */
-sealed interface HomeUiEvent {
+sealed interface HomeUiEvent : UiEvent {
     data object ForceSync : HomeUiEvent
     data object OnMessageShown : HomeUiEvent
     data class OnTimeWindowSelected(val window: Int) : HomeUiEvent

@@ -1,10 +1,12 @@
 package com.cebolao.lotofacil.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -33,9 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,25 +49,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.toCheckResult
-import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.presentation.viewmodel.CheckerEffect
+import com.cebolao.lotofacil.presentation.viewmodel.CheckerScreenStatus
+import com.cebolao.lotofacil.presentation.viewmodel.CheckerUiEvent
+import com.cebolao.lotofacil.presentation.viewmodel.CheckerUiState
+import com.cebolao.lotofacil.presentation.viewmodel.CheckerViewModel
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
-import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.common.LoadingCard
+import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
-import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
-import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberGrid
+import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
+import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard
 import com.cebolao.lotofacil.ui.components.stats.GameQualityCard
 import com.cebolao.lotofacil.ui.components.stats.SimpleStatsCard
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Shapes
-import com.cebolao.lotofacil.presentation.viewmodel.CheckerUiState
-import com.cebolao.lotofacil.presentation.viewmodel.CheckerViewModel
-import com.cebolao.lotofacil.presentation.viewmodel.CheckerUiEvent
-import com.cebolao.lotofacil.presentation.viewmodel.CheckerEffect
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -75,13 +77,6 @@ fun CheckerScreen(
     onNavigateBack: (() -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedNumbers by viewModel.selectedNumbers.collectAsStateWithLifecycle()
-    val isGameComplete by viewModel.isGameComplete.collectAsStateWithLifecycle()
-    val gameScore by viewModel.gameScore.collectAsStateWithLifecycle()
-    
-    // Heatmap states
-    val isHeatmapEnabled by viewModel.heatmapEnabled.collectAsStateWithLifecycle()
-    val heatmapIntensities by viewModel.heatmapIntensities.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
@@ -104,11 +99,6 @@ fun CheckerScreen(
 
     CheckerScreenContent(
         uiState = uiState,
-        selectedNumbers = selectedNumbers,
-        isGameComplete = isGameComplete,
-        gameScore = gameScore,
-        isHeatmapEnabled = isHeatmapEnabled,
-        heatmapIntensities = heatmapIntensities,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
         onEvent = viewModel::onEvent,
@@ -125,11 +115,6 @@ fun CheckerScreen(
 @Composable
 fun CheckerScreenContent(
     uiState: CheckerUiState,
-    selectedNumbers: Set<Int>,
-    isGameComplete: Boolean,
-    gameScore: com.cebolao.lotofacil.domain.model.GameScore?,
-    isHeatmapEnabled: Boolean,
-    heatmapIntensities: Map<Int, Float>,
     snackbarHostState: SnackbarHostState,
     onNavigateBack: (() -> Unit)?,
     onEvent: (CheckerUiEvent) -> Unit,
@@ -165,13 +150,13 @@ fun CheckerScreenContent(
         )
     }
 
-    val shouldShowHeatmap = isHeatmapEnabled && uiState is CheckerUiState.Success
+    val shouldShowHeatmap = uiState.heatmapEnabled && uiState.status is CheckerScreenStatus.Success
     val scheme = MaterialTheme.colorScheme
-    
-    val heatmapColors by remember(shouldShowHeatmap, heatmapIntensities, scheme) {
+
+    val heatmapColors by remember(shouldShowHeatmap, uiState.heatmapIntensities, scheme) {
         derivedStateOf {
             if (shouldShowHeatmap) {
-                heatmapIntensities.mapValues { (_, intensity) ->
+                uiState.heatmapIntensities.mapValues { (_, intensity) ->
                     getHeatmapColor(
                         intensity = intensity,
                         cold = scheme.primary,
@@ -184,8 +169,6 @@ fun CheckerScreenContent(
             }
         }
     }
-
-
 
     AppScreen(
         title = stringResource(R.string.checker_title),
@@ -204,7 +187,7 @@ fun CheckerScreenContent(
         actions = {
             IconButton(
                 onClick = { showClearDialog = true },
-                enabled = selectedNumbers.isNotEmpty()
+                enabled = uiState.selectedNumbers.isNotEmpty()
             ) {
                 Icon(
                     imageVector = AppIcons.Delete,
@@ -213,7 +196,7 @@ fun CheckerScreenContent(
             }
         },
         bottomBar = {
-            if (isGameComplete) {
+            if (uiState.isGameComplete) {
                 CheckerBottomBar(
                     onSave = { onEvent(CheckerUiEvent.RequestSave) },
                     onCheck = { onEvent(CheckerUiEvent.CheckGame) }
@@ -233,8 +216,7 @@ fun CheckerScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
                 ) {
-                    val scheme = MaterialTheme.colorScheme
-                    val isComplete = selectedNumbers.size == GameConstants.GAME_SIZE
+                    val isComplete = uiState.selectedNumbers.size == GameConstants.GAME_SIZE
 
                     Surface(
                         color = if (isComplete) scheme.primaryContainer else scheme.surfaceVariant,
@@ -245,7 +227,7 @@ fun CheckerScreenContent(
                         border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant)
                     ) {
                         Text(
-                            text = "${selectedNumbers.size}/${GameConstants.GAME_SIZE}",
+                            text = "${uiState.selectedNumbers.size}/${GameConstants.GAME_SIZE}",
                             modifier = Modifier.padding(
                                 horizontal = Dimen.Spacing16,
                                 vertical = Dimen.Spacing8
@@ -269,7 +251,7 @@ fun CheckerScreenContent(
             // Grid centralizado
             item(key = "grid") {
                 NumberGrid(
-                    selectedNumbers = selectedNumbers,
+                    selectedNumbers = uiState.selectedNumbers,
                     onNumberClick = { onEvent(CheckerUiEvent.ToggleNumber(it)) },
                     maxSelection = GameConstants.GAME_SIZE,
                     sizeVariant = NumberBallSize.Medium,
@@ -282,9 +264,9 @@ fun CheckerScreenContent(
                 )
             }
 
-            // Card de instruções (Idle)
+            // Card de instrucoes (Idle)
             // Show only if no game score and no results (pure idle)
-            if (uiState is CheckerUiState.Idle && gameScore == null) {
+            if (uiState.status is CheckerScreenStatus.Idle && uiState.gameScore == null) {
                 item(key = "instructions") {
                     InstructionsCard()
                 }
@@ -292,7 +274,7 @@ fun CheckerScreenContent(
 
             // Resultados
             item(key = "results") {
-                CheckerResultSection(uiState, gameScore)
+                CheckerResultSection(uiState.status, uiState.gameScore)
             }
         }
     }
@@ -376,7 +358,7 @@ private fun CheckerBottomBar(
                     Text(stringResource(R.string.general_save))
                 }
 
-                // Ação primária: tonal (flat e moderno)
+                // Acao primaria: tonal (flat e moderno)
                 FilledTonalButton(
                     onClick = onCheck,
                     modifier = Modifier
@@ -399,15 +381,15 @@ private fun CheckerBottomBar(
 
 @Composable
 private fun CheckerResultSection(
-    state: CheckerUiState,
+    status: CheckerScreenStatus,
     gameScore: com.cebolao.lotofacil.domain.model.GameScore?
 ) {
     Column(
         modifier = Modifier.padding(top = Dimen.ItemSpacing),
         verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
     ) {
-        when (state) {
-            is CheckerUiState.Success -> {
+        when (status) {
+            is CheckerScreenStatus.Success -> {
                 Text(
                     text = stringResource(R.string.checker_performance_analysis),
                     style = MaterialTheme.typography.titleMedium,
@@ -423,18 +405,18 @@ private fun CheckerResultSection(
                 }
                 // New Financial Card
                 FinancialPerformanceCard(
-                    report = state.report,
+                    report = status.report,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
-                CheckResultCard(state.report.toCheckResult())
+
+                CheckResultCard(status.report.toCheckResult())
                 SimpleStatsCard(
-                    gameMetrics = state.metrics,
+                    gameMetrics = status.metrics,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            is CheckerUiState.Loading -> {
+            is CheckerScreenStatus.Loading -> {
                 LoadingCard(
                     modifier = Modifier.fillMaxWidth(),
                     title = stringResource(R.string.general_loading),
@@ -442,15 +424,15 @@ private fun CheckerResultSection(
                 )
             }
 
-            is CheckerUiState.Error -> {
+            is CheckerScreenStatus.Error -> {
                 StandardAttentionCard(
                     title = stringResource(R.string.general_error_title),
-                    message = stringResource(state.messageResId),
+                    message = stringResource(status.messageResId),
                     icon = AppIcons.Error
                 )
             }
 
-            CheckerUiState.Idle -> Unit
+            CheckerScreenStatus.Idle -> Unit
         }
     }
 }

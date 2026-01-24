@@ -1,6 +1,4 @@
 package com.cebolao.lotofacil.data.datasource
-
-import com.cebolao.lotofacil.domain.util.NoOpLogger
 import okhttp3.Headers
 import okhttp3.Protocol
 import okhttp3.Request
@@ -34,13 +32,11 @@ class RetryOnHttp429Test {
 
     @Test
     fun `retryOnHttp429 retries and eventually succeeds`() {
-        val logger = NoOpLogger()
         val tooManyRequests = http429(retryAfter = "0")
 
         var attempts = 0
         val result = kotlinx.coroutines.runBlocking {
             retryOnHttp429(
-                logger = logger,
                 tag = "test",
                 maxRetries = 3,
                 initialBackoffMs = 0,

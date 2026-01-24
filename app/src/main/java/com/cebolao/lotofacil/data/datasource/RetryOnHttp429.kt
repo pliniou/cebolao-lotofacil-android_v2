@@ -1,11 +1,19 @@
 package com.cebolao.lotofacil.data.datasource
 
-import com.cebolao.lotofacil.domain.util.Logger
+import android.util.Log
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.ZoneOffset
+
+private fun safeLog(tag: String, message: String) {
+    try {
+        Log.w(tag, message)
+    } catch (_: Throwable) {
+        println("[$tag] $message")
+    }
+}
 
 fun retryAfterHeaderToDelayMs(header: String?, nowMs: Long = System.currentTimeMillis()): Long {
     if (header == null) return 0L
@@ -30,7 +38,6 @@ fun retryAfterHeaderToDelayMs(header: String?, nowMs: Long = System.currentTimeM
 }
 
 suspend fun <T> retryOnHttp429(
-    logger: Logger,
     tag: String,
     maxRetries: Int = 3,
     initialBackoffMs: Long = 1000,
@@ -59,7 +66,7 @@ suspend fun <T> retryOnHttp429(
                 
                 val finalDelay = if (delayMs > 0) delayMs else currentBackoff
                 
-                logger.warning(tag, "HTTP 429 Too Many Requests. Retrying in ${finalDelay}ms (attempt $attempts/$maxRetries)")
+                safeLog(tag, "HTTP 429 Too Many Requests. Retrying in ${finalDelay}ms (attempt $attempts/$maxRetries)")
                 delay(finalDelay)
 
                 // Exponential backoff for next time if we fallback to it? 

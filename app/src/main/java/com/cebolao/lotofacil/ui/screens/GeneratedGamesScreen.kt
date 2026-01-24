@@ -53,10 +53,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.cebolao.lotofacil.navigation.navigate
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.navigation.FiltersRoute
+import com.cebolao.lotofacil.navigation.AppRoute
 import com.cebolao.lotofacil.navigation.navigateToChecker
 import com.cebolao.lotofacil.presentation.viewmodel.GameAnalysisUiState
 import com.cebolao.lotofacil.presentation.viewmodel.GameEffect
@@ -84,8 +83,6 @@ fun GeneratedGamesScreen(
     viewModel: GameViewModel = hiltViewModel(),
     onNavigateBack: (() -> Unit)? = null
 ) {
-    val unpinned by viewModel.unpinnedGames.collectAsStateWithLifecycle()
-    val pinned by viewModel.pinnedGames.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -137,7 +134,7 @@ fun GeneratedGamesScreen(
 
     val onGenerateRequest = remember(navController) {
         {
-            navController.navigate(FiltersRoute) {
+            navController.navigate(AppRoute.Filters) {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
@@ -148,8 +145,6 @@ fun GeneratedGamesScreen(
     }
 
     GeneratedGamesScreenContent(
-        unpinned = unpinned,
-        pinned = pinned,
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
@@ -162,8 +157,6 @@ fun GeneratedGamesScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun GeneratedGamesScreenContent(
-    unpinned: List<UiLotofacilGame>,
-    pinned: List<UiLotofacilGame>,
     uiState: GameScreenUiState,
     snackbarHostState: SnackbarHostState,
     onNavigateBack: (() -> Unit)?,
@@ -268,7 +261,7 @@ fun GeneratedGamesScreenContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         actions = {
             val isUnpinnedTab = pagerState.currentPage == 0
-            if (isUnpinnedTab && unpinned.isNotEmpty()) {
+            if (isUnpinnedTab && uiState.unpinnedGames.isNotEmpty()) {
                 IconButton(onClick = { showClearDialog = true }) {
                     Icon(
                         imageVector = AppIcons.DeleteSweep,
@@ -301,7 +294,11 @@ fun GeneratedGamesScreenContent(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                val games = if (page == 0) unpinned else pinned
+                val games by remember(uiState.unpinnedGames, uiState.pinnedGames, page) {
+                    derivedStateOf {
+                        if (page == 0) uiState.unpinnedGames else uiState.pinnedGames
+                    }
+                }
                 val isNewGamesTab = page == 0
 
                 when {

@@ -1,11 +1,12 @@
 package com.cebolao.lotofacil.widget
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.domain.util.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -19,20 +20,20 @@ private const val MAX_ATTEMPTS = 3
 class HistorySyncWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val historyRepository: HistoryRepository,
-    private val logger: Logger
+    private val historyRepository: HistoryRepository
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result = runCatching {
         val result = historyRepository.syncHistoryIfNeeded()
-        if (result.isSuccess) {
-            Result.success()
-        } else {
-            logger.error(TAG, "History sync failed (attempt ${runAttemptCount + 1})", result.exceptionOrNull())
-            if (shouldRetry()) Result.retry() else Result.failure()
+        when (result) {
+            is AppResult.Success -> Result.success()
+            is AppResult.Failure -> {
+                Log.e(TAG, "History sync failed (attempt ${runAttemptCount + 1})")
+                if (shouldRetry()) Result.retry() else Result.failure()
+            }
         }
     }.getOrElse { e ->
-        logger.error(TAG, "History sync failed (attempt ${runAttemptCount + 1})", e)
+        Log.e(TAG, "History sync failed (attempt ${runAttemptCount + 1})", e)
         if (shouldRetry()) Result.retry() else Result.failure()
     }
 

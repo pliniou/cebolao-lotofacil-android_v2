@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.cebolao.lotofacil.BuildConfig
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.data.repository.THEME_MODE_DARK
 import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
@@ -61,7 +62,14 @@ import com.cebolao.lotofacil.ui.components.layout.SectionHeader
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.stats.FormattedText
 import com.cebolao.lotofacil.ui.components.stats.StatisticsExplanationCard
+import com.cebolao.lotofacil.ui.theme.AccentAmarelo
+import com.cebolao.lotofacil.ui.theme.AccentAzul
+import com.cebolao.lotofacil.ui.theme.AccentLaranja
 import com.cebolao.lotofacil.ui.theme.AccentPalette
+import com.cebolao.lotofacil.ui.theme.AccentPalettes
+import com.cebolao.lotofacil.ui.theme.AccentRosa
+import com.cebolao.lotofacil.ui.theme.AccentRoxo
+import com.cebolao.lotofacil.ui.theme.AccentVerde
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.DarkTextPrimary
 import com.cebolao.lotofacil.ui.theme.Dimen
@@ -77,13 +85,12 @@ private const val URL_PRIVACY = ""
 fun AboutScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
-    val accentPalette by viewModel.accentPalette.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     
     AboutScreenContent(
-        themeMode = themeMode,
-        accentPalette = accentPalette,
+        themeMode = uiState.themeMode,
+        accentPalette = uiState.accentPalette,
         onEvent = viewModel::onEvent,
         listState = listState
     )
@@ -264,7 +271,7 @@ private fun ThemeSettingsCard(
             AccentPaletteSection(
                 currentAccent = currentAccent,
                 onAccentChange = { name ->
-                    AccentPalette.entries.find { it.name.equals(name, ignoreCase = true) }
+                    AccentPalettes.find { it.name.equals(name, ignoreCase = true) }
                         ?.let { onEvent(MainUiEvent.SetAccentPalette(it)) }
                 }
             )
@@ -362,7 +369,7 @@ private fun AccentPaletteSection(
         )
 
         // 6 opções em grid de 2 linhas (3 + 3), evitando apertar rótulos.
-        AccentPalette.entries
+        AccentPalettes
             .chunked(3)
             .forEach { chunk ->
                 Row(
@@ -391,12 +398,13 @@ private fun AccentColorButton(
 ) {
     val scheme = MaterialTheme.colorScheme
     val label = when (palette) {
-        AccentPalette.AZUL -> stringResource(R.string.about_accent_blue)
-        AccentPalette.ROXO -> stringResource(R.string.about_accent_purple)
-        AccentPalette.VERDE -> stringResource(R.string.about_accent_green)
-        AccentPalette.AMARELO -> stringResource(R.string.about_accent_yellow)
-        AccentPalette.ROSA -> stringResource(R.string.about_accent_pink)
-        AccentPalette.LARANJA -> stringResource(R.string.about_accent_orange)
+        AccentAzul -> stringResource(R.string.about_accent_blue)
+        AccentRoxo -> stringResource(R.string.about_accent_purple)
+        AccentVerde -> stringResource(R.string.about_accent_green)
+        AccentAmarelo -> stringResource(R.string.about_accent_yellow)
+        AccentRosa -> stringResource(R.string.about_accent_pink)
+        AccentLaranja -> stringResource(R.string.about_accent_orange)
+        else -> stringResource(R.string.about_accent_blue)
     }
     val contentDesc = stringResource(R.string.about_accessibility_select_accent, label)
 

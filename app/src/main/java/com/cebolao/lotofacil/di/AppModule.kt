@@ -2,8 +2,6 @@ package com.cebolao.lotofacil.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.cebolao.lotofacil.domain.util.Logger
-import com.cebolao.lotofacil.util.AndroidLogger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,10 +34,6 @@ object AppModule {
     @Singleton
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
         WorkManager.getInstance(context)
-
-    @Provides
-    @Singleton
-    fun provideLogger(): Logger = AndroidLogger()
 
     @DefaultDispatcher
     @Provides

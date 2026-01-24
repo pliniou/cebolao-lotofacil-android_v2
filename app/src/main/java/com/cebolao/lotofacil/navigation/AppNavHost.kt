@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.cebolao.lotofacil.presentation.viewmodel.MainUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.MainViewModel
 import com.cebolao.lotofacil.ui.screens.AboutScreen
@@ -23,14 +24,14 @@ import com.cebolao.lotofacil.ui.theme.Motion
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    startDestination: Any,
+    startDestination: AppRoute,
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel
 ) {
 
     NavHost(
         navController = navController,
-        startDestination = routeNameFor(startDestination),
+        startDestination = startDestination,
         modifier = modifier,
         enterTransition = {
             slideInHorizontally(
@@ -57,31 +58,31 @@ fun AppNavHost(
             ) + fadeOut(Motion.Tween.fast())
         }
     ) {
-        composable(route = routePatternFor<OnboardingRoute>()) {
+        composable<AppRoute.Onboarding> {
             OnboardingScreen {
                 mainViewModel.onEvent(MainUiEvent.CompleteOnboarding)
-                navController.navigate(HomeRoute) {
-                    popUpTo(routeName<OnboardingRoute>()) { inclusive = true }
+                navController.navigate(AppRoute.Home) {
+                    popUpTo(AppRoute.Onboarding) { inclusive = true }
                 }
             }
         }
-        composable(route = routePatternFor<HomeRoute>()) { 
+        composable<AppRoute.Home> {
             val hostState = androidx.compose.runtime.remember { androidx.compose.material3.SnackbarHostState() }
             val lazyState = androidx.compose.foundation.lazy.rememberLazyListState()
-            
+
             HomeScreen(
                 navController = navController,
                 listState = lazyState,
                 snackbarHostState = hostState
-            ) 
+            )
         }
-        composable(route = routePatternFor<ResultsRoute>()) {
+        composable<AppRoute.Results> {
             ResultsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
-        composable(route = routePatternFor<FiltersRoute>()) { FiltersScreen(navController) }
-        composable(route = routePatternFor<GeneratedGamesRoute>()) {
+        composable<AppRoute.Filters> { FiltersScreen(navController) }
+        composable<AppRoute.GeneratedGames> {
             val canPop = navController.previousBackStackEntry != null
             GeneratedGamesScreen(
                 navController = navController,
@@ -90,15 +91,13 @@ fun AppNavHost(
                 } else null
             )
         }
-        composable(route = routePatternFor<CheckerRoute>(), arguments = checkerNavArgs()) {
-            // The typed `CheckerRoute` supplies a `numbers` list.  The `CheckerViewModel` retrieves
-            // these arguments from its `SavedStateHandle` via `toRoute<CheckerRoute>()`.  We avoid
-            // passing the list into the composable directly to keep the navigation layer free of
-            // presentation-layer logic.
+        composable<AppRoute.Checker> { backStackEntry ->
+            @Suppress("UNUSED_VARIABLE")
+            val route = backStackEntry.toRoute<AppRoute.Checker>()
             CheckerScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
-        composable(route = routePatternFor<AboutRoute>()) { AboutScreen() }
+        composable<AppRoute.About> { AboutScreen() }
     }
 }

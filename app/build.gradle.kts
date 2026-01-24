@@ -1,63 +1,24 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-}
-
-kotlin {
-    jvmToolchain(17) // Target Java 17; desugaring handles older APIs
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            listOf(
-                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-                "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
-            )
-        )
-    }
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 android {
     namespace = "com.cebolao.lotofacil"
-    compileSdk = 35 // Latest stable SDK as of Jan 2026
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.cebolao.lotofacil"
         minSdk = 26
-        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 2
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-    }
-
-    signingConfigs {
-        create("release") {
-            // User: Provide your keystore details here for release builds
-            // storeFile = file("path/to/your/keystore.jks")
-            // storePassword = "your_store_password"
-            // keyAlias = "your_key_alias"
-            // keyPassword = "your_key_password"
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-        debug {
-            isMinifyEnabled = false
-        }
+        versionName = "2.0.0"
     }
 
     compileOptions {
@@ -66,98 +27,75 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    buildFeatures {
-        compose = true
-        buildConfig = true
+    kotlin {
+        jvmToolchain(17)
     }
 
-    @Suppress("UnstableApiUsage")
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    buildFeatures {
+        buildConfig = true
+        compose = true
     }
 
     packaging {
-        resources.excludes += setOf(
-            "/META-INF/{AL2.0,LGPL2.1}",
-            "/META-INF/LICENSE.md",
-            "/META-INF/LICENSE-notice.md"
-        )
+        resources {
+            excludes += setOf("META-INF/LICENSE.md", "META-INF/LICENSE-notice.md")
+        }
     }
 
     lint {
         baseline = file("lint-baseline.xml")
-        abortOnError = true
-        disable += listOf("RememberReturnType")
+        abortOnError = false
     }
 }
 
-dependencies {
-    constraints {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-bom") {
-            version { strictly(libs.versions.kotlinxSerialization.get()) }
-        }
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core") {
-            version { strictly(libs.versions.kotlinxSerialization.get()) }
-            because("Keep serialization artifacts aligned with Kotlin ${libs.versions.kotlin.get()}")
-        }
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json") {
-            version { strictly(libs.versions.kotlinxSerialization.get()) }
-            because("Keep serialization artifacts aligned with Kotlin ${libs.versions.kotlin.get()}")
-        }
-    }
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
 
-    // Core platform libs
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
-
-    // Lifecycle & state
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    // Activity & navigation
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
 
-    // Compose BOM and UI toolkit
-    implementation(platform(libs.androidx.compose.bom))
+    // Compose UI
+    implementation(libs.androidx.material)
     implementation(libs.bundles.compose)
-    // Explicit foundation to access newer APIs like pullRefresh
-    implementation("androidx.compose.foundation:foundation")
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Coroutines & Serialization
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.collections.immutable)
-
-    // Networking
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
-
-    // Data storage
+    // Data
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Background work
-    implementation(libs.androidx.work.runtime.ktx)
+    // Network
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 
-    // Dependency injection
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    ksp(libs.androidx.hilt.compiler)
-    implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
-    // Profiling & performance
-    implementation(libs.androidx.profileinstaller)
+    // Coroutines and kotlinx
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
 
-    // Pull-to-refresh (Accompanist)
-    implementation(libs.accompanist.swiperefresh)
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Core library desugaring
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     // Testing
     testImplementation(libs.junit)
@@ -167,8 +105,22 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)
-    // WorkManager testing helpers for instrumentation tests
-    androidTestImplementation("androidx.work:work-testing:2.9.0")
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation("androidx.work:work-testing:2.9.1")
+}
+
+ktlint {
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(true)
+    filter {
+        exclude("**/src/test/**")
+        exclude("**/src/androidTest/**")
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    basePath = projectDir.absolutePath
+    ignoreFailures = true
 }

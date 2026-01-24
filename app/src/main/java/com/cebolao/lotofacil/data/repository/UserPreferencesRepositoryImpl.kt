@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -12,7 +13,6 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.cebolao.lotofacil.di.IoDispatcher
 import com.cebolao.lotofacil.domain.repository.UserPreferencesRepository
-import com.cebolao.lotofacil.domain.util.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +33,6 @@ const val THEME_MODE_DARK = "dark"
 @Singleton
 class UserPreferencesRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val logger: Logger,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserPreferencesRepository {
 
@@ -56,7 +55,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         try {
             dataStore.data.first()[Keys.HISTORY] ?: emptySet()
         } catch (e: IOException) {
-            logger.error(TAG, "Error fetching history from DataStore", e)
+            Log.e(TAG, "Error fetching history from DataStore", e)
             emptySet()
         }
     }
@@ -74,7 +73,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     private fun <T> getValue(key: Preferences.Key<T>, default: T): Flow<T> = dataStore.data
         .catch { e ->
             if (e is IOException) {
-                logger.error(TAG, "Error reading prefs", e)
+                Log.e(TAG, "Error reading prefs", e)
                 emit(emptyPreferences())
             } else {
                 throw e
@@ -90,7 +89,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         try {
             dataStore.edit(action)
         } catch (e: IOException) {
-            logger.error(TAG, "DataStore write error", e)
+            Log.e(TAG, "DataStore write error", e)
         }
     }
 }

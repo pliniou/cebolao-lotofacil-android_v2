@@ -1,16 +1,15 @@
 package com.cebolao.lotofacil.data.repository
 
+import android.util.Log
 import com.cebolao.lotofacil.data.local.db.DrawDao
 import com.cebolao.lotofacil.data.network.ApiService
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.di.IoDispatcher
-import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.domain.exception.SyncException
 import com.cebolao.lotofacil.data.mapper.toEntity
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,7 +26,6 @@ import javax.inject.Singleton
 class SyncManager @Inject constructor(
     private val drawDao: DrawDao,
     private val apiService: ApiService,
-    private val logger: Logger,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     private companion object {
@@ -55,17 +53,17 @@ class SyncManager @Inject constructor(
 
                 val remoteMax = remoteResult.numero
 
-                logger.debug(TAG, "Sync check: local=$currentMax, remote=$remoteMax")
+                Log.d(TAG, "Sync check: local=$currentMax, remote=$remoteMax")
 
                 // No new data available
                 if (remoteMax <= currentMax) {
-                    logger.info(TAG, "Already up to date")
+                    Log.i(TAG, "Already up to date")
                     return@withContext remoteResult
                 }
 
                 // Calculate range to fetch
                 val totalRange = (currentMax + 1)..remoteMax
-                logger.info(TAG, "Syncing ${totalRange.count()} new contests")
+                Log.i(TAG, "Syncing ${totalRange.count()} new contests")
 
                 // Fetch in chunks to avoid overwhelming network/database
                 val chunks = totalRange.chunked(CHUNK_SIZE)
@@ -74,24 +72,24 @@ class SyncManager @Inject constructor(
                     if (chunk.isEmpty()) continue
 
                     val chunkRange = chunk.first()..chunk.last()
-                    logger.debug(TAG, "Fetching chunk ${index + 1}/${chunks.size}: $chunkRange")
+                    Log.d(TAG, "Fetching chunk ${index + 1}/${chunks.size}: $chunkRange")
 
                     val newDraws = fetchDrawsInRange(chunkRange)
 
                     if (newDraws.isNotEmpty()) {
                         drawDao.insertAll(newDraws.map { it.toEntity() })
-                        logger.debug(TAG, "Saved ${newDraws.size} draws from chunk")
+                        Log.d(TAG, "Saved ${newDraws.size} draws from chunk")
                     }
                 }
 
-                logger.info(TAG, "Sync completed successfully")
+                Log.i(TAG, "Sync completed successfully")
                 remoteResult
 
             } catch (e: IOException) {
-                logger.error(TAG, "Network error during sync", e)
+                Log.e(TAG, "Network error during sync", e)
                 throw SyncException("Network sync failed", e)
             } catch (e: SerializationException) {
-                logger.error(TAG, "Invalid response format during sync", e)
+                Log.e(TAG, "Invalid response format during sync", e)
                 throw SyncException("Invalid response format", e)
             } catch (e: CancellationException) {
                 throw e // Don't catch cancellation
@@ -111,10 +109,10 @@ class SyncManager @Inject constructor(
                 val remoteMax = remoteResult.numero
                 remoteMax > currentMax
             } catch (e: IOException) {
-                logger.warning(TAG, "Network error checking sync status", e)
+                Log.w(TAG, "Network error checking sync status", e)
                 throw SyncException("Network check failed", e)
             } catch (e: SerializationException) {
-                logger.warning(TAG, "Invalid response format checking sync status", e)
+                Log.w(TAG, "Invalid response format checking sync status", e)
                 throw SyncException("Invalid response format", e)
             }
         }
@@ -193,4 +191,3 @@ class SyncManager @Inject constructor(
     private val dateFormatter = java.time.format.DateTimeFormatter
         .ofPattern("dd/MM/yyyy", java.util.Locale.forLanguageTag("pt-BR"))
 }
-

@@ -1,11 +1,11 @@
 package com.cebolao.lotofacil.domain.usecase
 
 import com.cebolao.lotofacil.di.DefaultDispatcher
+import com.cebolao.lotofacil.domain.model.AppError
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.GameAnalysisResult
 import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.util.toAppError
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -30,7 +30,11 @@ class AnalyzeGameUseCase @Inject constructor(
 
                     val lastDrawNumbers = checkReport.hits.firstOrNull()?.let { hit ->
                         val contest = hit.contestNumber
-                        historyRepository.getHistory().find { it.contestNumber == contest }?.numbers
+                        when (val historyResult = historyRepository.getHistory()) {
+                            is AppResult.Failure -> emptySet()
+                            is AppResult.Success -> historyResult.value.find { it.contestNumber == contest }?.numbers
+                                ?: emptySet()
+                        }
                     } ?: emptySet()
 
                     val matchedNumbers = game.numbers.intersect(lastDrawNumbers).toList().sorted()
@@ -51,7 +55,7 @@ class AnalyzeGameUseCase @Inject constructor(
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
-             AppResult.Failure(e.toAppError())
+             AppResult.Failure(AppError.Unknown(e))
         }
     }
 }

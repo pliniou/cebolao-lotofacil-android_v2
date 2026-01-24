@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.DimenRes
@@ -12,9 +13,9 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.repository.GameRepository
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
-import com.cebolao.lotofacil.domain.util.Logger
 import com.cebolao.lotofacil.util.DEFAULT_NUMBER_FORMAT
 import com.cebolao.lotofacil.util.Formatters
 import dagger.assisted.Assisted
@@ -28,8 +29,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val historyRepository: HistoryRepository,
-    private val gameRepository: GameRepository,
-    private val logger: Logger
+    private val gameRepository: GameRepository
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -42,17 +42,17 @@ class WidgetUpdateWorker @AssistedInject constructor(
 
         // Sync nao pode derrubar o widget; se falhar seguimos conforme WorkManager.
         val syncResult = historyRepository.syncHistoryIfNeeded()
-        if (syncResult.isSuccess) {
-            updateAllWidgets()
-        }
-
-        if (syncResult.isFailure && shouldRetry()) {
-            Result.retry()
-        } else {
-            Result.success()
+        when (syncResult) {
+            is AppResult.Success -> {
+                updateAllWidgets()
+                Result.success()
+            }
+            is AppResult.Failure -> {
+                if (shouldRetry()) Result.retry() else Result.success()
+            }
         }
     }.getOrElse { e ->
-        logger.error(TAG, "Widget update failed (attempt ${runAttemptCount + 1})", e)
+        Log.e(TAG, "Widget update failed (attempt ${runAttemptCount + 1})", e)
         if (shouldRetry()) Result.retry() else Result.failure()
     }
 
@@ -79,7 +79,10 @@ class WidgetUpdateWorker @AssistedInject constructor(
         val ids = getWidgetIds(LastDrawWidgetProvider::class.java)
         if (ids.isEmpty()) return
 
-        val lastDraw = historyRepository.getLastDraw()
+        val lastDraw = when (val result = historyRepository.getLastDraw()) {
+            is AppResult.Success -> result.value
+            is AppResult.Failure -> null
+        }
         val appWidgetManager = AppWidgetManager.getInstance(context)
 
         ids.forEach { id ->
@@ -109,7 +112,10 @@ class WidgetUpdateWorker @AssistedInject constructor(
         val ids = getWidgetIds(NextContestWidgetProvider::class.java)
         if (ids.isEmpty()) return
 
-        val details = historyRepository.getLastDrawDetails()
+        val details = when (val result = historyRepository.getLastDrawDetails()) {
+            is AppResult.Success -> result.value
+            is AppResult.Failure -> null
+        }
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val provider = NextContestWidgetProvider::class.java
 
