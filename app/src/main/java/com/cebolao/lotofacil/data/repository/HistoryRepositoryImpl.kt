@@ -2,11 +2,11 @@ package com.cebolao.lotofacil.data.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.room.withTransaction
 import com.cebolao.lotofacil.data.cache.DrawLruCache
 import com.cebolao.lotofacil.data.local.db.AppDatabase
 import com.cebolao.lotofacil.data.local.db.DrawDao
 import com.cebolao.lotofacil.data.local.db.DrawDetailsDao
-import com.cebolao.lotofacil.data.local.db.DrawDetailsEntity
 import com.cebolao.lotofacil.data.mapper.toDraw
 import com.cebolao.lotofacil.data.mapper.toDrawDetails
 import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
@@ -16,7 +16,6 @@ import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.data.util.HistoryParser
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
-import dagger.hilt.android.qualifiers.ApplicationContext
 import com.cebolao.lotofacil.domain.exception.SyncException
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.Draw
@@ -24,6 +23,7 @@ import com.cebolao.lotofacil.domain.model.DrawDetails
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.repository.SyncStatus
 import com.cebolao.lotofacil.util.toAppError
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -46,7 +45,6 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.room.withTransaction
 
 private const val TAG = "HistoryRepository"
 private const val API_RESULT_FRESHNESS_MS = 10 * 60 * 1000L
@@ -67,6 +65,7 @@ class HistoryRepositoryImpl @Inject constructor(
     private val drawDetailsDao: DrawDetailsDao,
     private val apiService: ApiService,
     private val syncManager: SyncManager,
+    private val databaseLoader: DatabaseLoader,
     @param:ApplicationScope private val scope: CoroutineScope,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : HistoryRepository {
@@ -78,19 +77,21 @@ class HistoryRepositoryImpl @Inject constructor(
     private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
     override val syncStatus: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
 
+    override val loadingState: StateFlow<DatabaseLoadingState> = databaseLoader.loadingState
+
     private val syncMutex = Mutex()
     private var syncDeferred: Deferred<AppResult<Unit>>? = null
     private var runningSyncJob: Job? = null
 
     override fun observeHistory(): Flow<List<Draw>> =
         drawDao.getAllDraws()
-            .onStart { runBlocking { ensureInitialized() } }
+            .onStart { ensureInitialized() }
             .map { entities: List<com.cebolao.lotofacil.data.local.db.DrawEntity> -> entities.map { it.toDraw() } }
             .onEach { historyCacheRef.set(it) }
 
     override fun observeLastDraw(): Flow<Draw?> =
         drawDao.getLastDraw()
-            .onStart { runBlocking { ensureInitialized() } }
+            .onStart { ensureInitialized() }
             .map { entity: com.cebolao.lotofacil.data.local.db.DrawEntity? -> entity?.toDraw() }
 
     override suspend fun getHistory(): AppResult<List<Draw>> {
@@ -254,13 +255,8 @@ class HistoryRepositoryImpl @Inject constructor(
         )
     }
 
-    // Database initialization logic
     private val initMutex = Mutex()
     private var isInitialized = false
-
-    companion object {
-        private const val ASSET_FILENAME = "RESULTADOS_LOTOFACIL.csv"
-    }
 
     private suspend fun ensureInitialized() {
         if (isInitialized) return
@@ -268,50 +264,13 @@ class HistoryRepositoryImpl @Inject constructor(
             if (isInitialized) return
             withContext(ioDispatcher) {
                 if (drawDao.count() == 0) {
-                    populateFromAssets()
-                }
-            }
-            isInitialized = true
-        }
-    }
-
-    private suspend fun populateFromAssets() = withContext(ioDispatcher) {
-        try {
-            Log.i(TAG, "Populating database from assets...")
-
-            var inserted = 0
-            val batchSize = 500
-
-            appDatabase.withTransaction {
-                context.assets.open(ASSET_FILENAME).bufferedReader().useLines { lines ->
-                    val buffer = ArrayList<com.cebolao.lotofacil.data.local.db.DrawEntity>(batchSize)
-
-                    lines
-                        .drop(1) // Drop header
-                        .filter { it.isNotBlank() }
-                        .forEach { line ->
-                            val draw = HistoryParser.parseLine(line) ?: return@forEach
-                            buffer.add(draw.toEntity())
-
-                            if (buffer.size >= batchSize) {
-                                drawDao.insertAll(buffer)
-                                inserted += buffer.size
-                                buffer.clear()
-                            }
-                        }
-
-                    if (buffer.isNotEmpty()) {
-                        drawDao.insertAll(buffer)
-                        inserted += buffer.size
+                    val result = databaseLoader.loadFromAssets()
+                    if (result.isFailure) {
+                        Log.e(TAG, "Failed to load from assets: ${result.exceptionOrNull()}")
                     }
                 }
             }
-
-            Log.i(TAG, "Populated $inserted draws from assets.")
-        } catch (e: IOException) {
-            Log.e(TAG, "Error populating from assets", e)
-        } catch (e: Exception) {
-            Log.e(TAG, "Database error populating from assets", e)
+            isInitialized = true
         }
     }
 }

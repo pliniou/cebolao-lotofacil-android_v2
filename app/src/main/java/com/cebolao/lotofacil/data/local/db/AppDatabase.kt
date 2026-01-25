@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [DrawEntity::class, CheckRunEntity::class, UserGameEntity::class, DrawDetailsEntity::class], version = 6, exportSchema = false)
+@Database(entities = [DrawEntity::class, CheckRunEntity::class, UserGameEntity::class, DrawDetailsEntity::class], version = 7, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun drawDao(): DrawDao

@@ -26,6 +26,9 @@ class ResultsViewModel @Inject constructor(
     private val historyRepository: HistoryRepository
 ) : BaseViewModel() {
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     private val syncMessage = MutableStateFlow<Int?>(null)
 
     val uiState: StateFlow<ResultsUiState> = combine(
@@ -44,13 +47,21 @@ class ResultsViewModel @Inject constructor(
     )
 
     init {
+        refreshHistory()
+    }
+
+    fun refreshHistory() {
         viewModelScope.launchCatching {
+            _isRefreshing.value = true
             when (historyRepository.syncHistoryIfNeeded()) {
-                is AppResult.Success -> Unit
+                is AppResult.Success -> {
+                    syncMessage.value = null
+                }
                 is AppResult.Failure -> {
                     syncMessage.value = com.cebolao.lotofacil.R.string.results_error_message
                 }
             }
+            _isRefreshing.value = false
         }
     }
 }

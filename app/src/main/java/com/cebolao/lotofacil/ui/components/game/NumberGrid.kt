@@ -108,7 +108,7 @@ private fun NumberGridItem(
 
     // Debug hook: count recompositions for profiling tests. SideEffect runs after each successful
     // composition/recomposition, so it provides a simple counter for how often an item is recomposed.
-    val recomposeCount = remember { androidx.compose.runtime.mutableStateOf(0) }
+    val recomposeCount = remember { androidx.compose.runtime.mutableIntStateOf(0) }
     SideEffect {
         recomposeCount.value = recomposeCount.value + 1
         onRecompose?.invoke(number, recomposeCount.value)

@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.domain.repository
 
+import com.cebolao.lotofacil.data.repository.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.model.AppError
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.Draw
@@ -20,6 +21,11 @@ interface HistoryRepository {
      * Estado atual do processo de sincronização do histórico.
      */
     val syncStatus: StateFlow<SyncStatus>
+
+    /**
+     * Estado atual do processo de carregamento do banco de dados.
+     */
+    val loadingState: StateFlow<DatabaseLoadingState>
 
     /**
      * Inicia sincronização do histórico (implementação deve ser idempotente quando possível).

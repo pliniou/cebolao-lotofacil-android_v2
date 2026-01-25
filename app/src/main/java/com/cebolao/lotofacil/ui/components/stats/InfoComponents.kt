@@ -182,7 +182,7 @@ private fun htmlToAnnotatedString(html: String): AnnotatedString {
 
 @Preview(showBackground = true)
 @Composable
-private fun TitleWithIconPreview() {
+internal fun TitleWithIconPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             TitleWithIcon(
@@ -195,7 +195,7 @@ private fun TitleWithIconPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun InfoPointPreview() {
+internal fun InfoPointPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             InfoPoint(

@@ -71,7 +71,7 @@ fun LazyListScope.filterSection(
 
 @Preview(showBackground = true)
 @Composable
-private fun FilterGroupColumnPreview() {
+internal fun FilterGroupColumnPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             FilterGroupColumn(

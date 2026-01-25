@@ -68,7 +68,7 @@ fun CustomChip(
 
 @Preview
 @Composable
-private fun CustomChipPreview() {
+internal fun CustomChipPreview() {
     MaterialTheme {
         Column(
             modifier = Modifier.padding(Dimen.Spacing16),

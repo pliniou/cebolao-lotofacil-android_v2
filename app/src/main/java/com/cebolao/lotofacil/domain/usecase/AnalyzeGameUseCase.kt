@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class AnalyzeGameUseCase @Inject constructor(
     private val checkGameUseCase: CheckGameUseCase,
-    private val getGameSimpleStatsUseCase: GetGameSimpleStatsUseCase,
+    private val calculateDrawNumericStatsUseCase: CalculateDrawNumericStatsUseCase,
     private val historyRepository: HistoryRepository,
     @param:DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
@@ -25,7 +25,7 @@ class AnalyzeGameUseCase @Inject constructor(
                 is AppResult.Success -> {
                     val checkReport = checkResult.value
                     
-                    val metrics = getGameSimpleStatsUseCase(game)
+                    val metrics = calculateDrawNumericStatsUseCase(game)
                     val score = checkReport.hits.maxOfOrNull { it.score } ?: 0
 
                     val lastDrawNumbers = checkReport.hits.firstOrNull()?.let { hit ->

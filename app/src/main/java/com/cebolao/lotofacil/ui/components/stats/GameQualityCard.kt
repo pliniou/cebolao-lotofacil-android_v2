@@ -166,7 +166,7 @@ private fun getStatusDescriptionRes(status: ScoreStatus): Int {
 
 @Preview(showBackground = true)
 @Composable
-private fun GameQualityCardPreview() {
+internal fun GameQualityCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             GameQualityCard(

@@ -137,7 +137,7 @@ private data class SimpleStatItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun FinancialPerformanceCardPreview() {
+internal fun FinancialPerformanceCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             FinancialPerformanceCard(
@@ -162,7 +162,7 @@ private fun FinancialPerformanceCardPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun SimpleStatsCardPreview() {
+internal fun SimpleStatsCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             SimpleStatsCard(

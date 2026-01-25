@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -16,6 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.cebolao.lotofacil"
         minSdk = 26
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 2
         versionName = "2.0.0"
@@ -27,10 +27,6 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlin {
-        jvmToolchain(17)
-    }
-
     buildFeatures {
         buildConfig = true
         compose = true
@@ -39,6 +35,29 @@ android {
     packaging {
         resources {
             excludes += setOf("META-INF/LICENSE.md", "META-INF/LICENSE-notice.md")
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            isMinifyEnabled = false
+        }
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
         }
     }
 
@@ -62,7 +81,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Compose UI
-    implementation(libs.androidx.material)
+
     implementation(libs.bundles.compose)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -105,7 +124,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)
-    androidTestImplementation("androidx.work:work-testing:2.9.1")
+    androidTestImplementation(libs.androidx.work.testing)
 }
 
 ktlint {
@@ -123,4 +142,13 @@ detekt {
     allRules = false
     basePath = projectDir.absolutePath
     ignoreFailures = true
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
+    }
 }

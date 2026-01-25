@@ -516,7 +516,7 @@ private fun DrawScope.drawNormalLine(
 
 @Preview(showBackground = true)
 @Composable
-private fun BarChartPreview() {
+internal fun BarChartPreview() {
     val mockData = (1..10).map { it.toString() to (it * 10) }.toImmutableList()
     MaterialTheme {
         Box(modifier = Modifier.padding(Dimen.Spacing16).background(MaterialTheme.colorScheme.surface)) {
@@ -532,7 +532,7 @@ private fun BarChartPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun LineChartPreview() {
+internal fun LineChartPreview() {
     val mockData = (1..10).map { it.toString() to (it * 5 + 20) }.toImmutableList()
     MaterialTheme {
         Box(modifier = Modifier.padding(Dimen.Spacing16).background(MaterialTheme.colorScheme.surface)) {

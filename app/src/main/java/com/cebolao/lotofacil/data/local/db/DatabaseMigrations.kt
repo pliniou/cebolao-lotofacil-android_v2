@@ -104,3 +104,27 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         )
     }
 }
+
+/**
+ * Database migration from version 6 to 7
+ * Adds additional performance indices to check_runs and draw_details tables
+ */
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Add indices to check_runs table
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS index_check_runs_createdAt ON check_runs(createdAt)"
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS index_check_runs_lotteryId ON check_runs(lotteryId)"
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS index_check_runs_ticketMask ON check_runs(ticketMask)"
+        )
+        
+        // Add index to draw_details table  
+        db.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS index_draw_details_contestNumber ON draw_details(contestNumber)"
+        )
+    }
+}

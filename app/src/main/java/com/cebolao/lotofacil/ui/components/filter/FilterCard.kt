@@ -250,7 +250,7 @@ private fun calculateRangeCoverage(state: FilterState): Float {
 
 @Preview(showBackground = true)
 @Composable
-private fun FilterCardPreview() {
+internal fun FilterCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             FilterCard(

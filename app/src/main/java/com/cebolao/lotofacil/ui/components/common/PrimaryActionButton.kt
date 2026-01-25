@@ -136,7 +136,7 @@ fun PrimaryActionButton(
 
 @Preview
 @Composable
-private fun PrimaryActionButtonPreview() {
+internal fun PrimaryActionButtonPreview() {
     MaterialTheme {
         Column(
             modifier = Modifier.padding(Dimen.Spacing16),

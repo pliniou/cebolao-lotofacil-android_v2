@@ -188,7 +188,7 @@ private fun QuantityButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun GenerationActionsPanelPreview() {
+internal fun GenerationActionsPanelPreview() {
     MaterialTheme {
         Box(modifier = Modifier.padding(Dimen.Spacing16)) {
             GenerationActionsPanel(

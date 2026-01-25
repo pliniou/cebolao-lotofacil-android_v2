@@ -79,7 +79,7 @@ fun StandardAttentionCard(
 
 @Preview
 @Composable
-private fun StandardAttentionCardPreview() {
+internal fun StandardAttentionCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StandardAttentionCard(

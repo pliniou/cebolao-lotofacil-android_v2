@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import com.cebolao.lotofacil.navigation.AppRoute
+import com.cebolao.lotofacil.navigation.Screen
 import com.cebolao.lotofacil.navigation.bottomNavItems
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.FontFamilyBody
@@ -35,14 +37,13 @@ import com.cebolao.lotofacil.ui.theme.Motion
  */
 @Composable
 fun AppBottomBar(navController: NavHostController, currentDestination: NavDestination?) {
-    // Check if the current destination is one of the bottom nav items
-    val isVisible = remember(currentDestination) {
-        bottomNavItems.any { screen ->
-            currentDestination?.hierarchySequence()?.any {
-                it.route?.startsWith(screen.route::class.qualifiedName ?: "") == true
-            } == true
-        }
+    val isOnboarding = remember(currentDestination) {
+        currentDestination?.hierarchySequence()?.any {
+            it.route?.startsWith(AppRoute.Onboarding::class.qualifiedName.orEmpty()) == true
+        } == true
     }
+
+    val isVisible = currentDestination != null && !isOnboarding
 
     val scheme = MaterialTheme.colorScheme
     val isDark = scheme.background.luminance() < 0.5f
@@ -70,10 +71,14 @@ fun AppBottomBar(navController: NavHostController, currentDestination: NavDestin
                 )
             }
         ) {
+            val isResults = currentDestination?.hierarchySequence()?.any {
+                it.route?.startsWith(AppRoute.Results::class.qualifiedName.orEmpty()) == true
+            } == true
+
             bottomNavItems.forEach { screen ->
                 val selected = currentDestination?.hierarchySequence()?.any {
                     it.route?.startsWith(screen.route::class.qualifiedName ?: "") == true
-                } == true
+                } == true || (screen is Screen.Home && isResults)
 
                 val label = screen.titleRes?.let { stringResource(it) } ?: ""
 

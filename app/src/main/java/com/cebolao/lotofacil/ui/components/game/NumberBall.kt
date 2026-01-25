@@ -200,7 +200,7 @@ internal fun resolveColors(
 
 @Preview
 @Composable
-private fun NumberBallPreview() {
+internal fun NumberBallPreview() {
     MaterialTheme {
         Row(modifier = Modifier.padding(Dimen.Spacing16)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

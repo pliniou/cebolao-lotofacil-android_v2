@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
@@ -107,7 +108,7 @@ fun ExpandableTable(
                     if (!expanded) {
                         Spacer(Modifier.width(Dimen.Spacing8))
                         Text(
-                            text = stringResource(R.string.and_more_count, data.rows.size - initialVisibleRows),
+                            text = pluralStringResource(R.plurals.and_more_count, data.rows.size - initialVisibleRows, data.rows.size - initialVisibleRows),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

@@ -27,14 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.model.NextDrawInfo
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.CardVariant
+import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.util.Formatters
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 
 private const val MORNING_START_HOUR = 5
 private const val MORNING_END_HOUR = 11
@@ -57,7 +57,8 @@ private fun getGreetingIcon(hour: Int): ImageVector {
  */
 @Composable
 fun WelcomeCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    nextDrawInfo: NextDrawInfo? = null
 ) {
     val scheme = MaterialTheme.colorScheme
 
@@ -70,16 +71,14 @@ fun WelcomeCard(
         else -> R.string.greeting_night
     }
 
-    val dateString = remember(currentDate) {
-        val locale = Locale.forLanguageTag("pt-BR")
-        DateTimeFormatter
-            .ofLocalizedDate(FormatStyle.MEDIUM)
-            .withLocale(locale)
-            .format(currentDate)
-    }
+    val dateString = remember(currentDate) { Formatters.formatDate(currentDate) }
 
     val quotes = stringArrayResource(R.array.motivational_quotes)
     val randomQuote = remember(quotes) { quotes.randomOrNull().orEmpty() }
+    val contestNumber = nextDrawInfo?.contestNumber ?: 0
+    val contestDate = nextDrawInfo?.formattedDate.orEmpty()
+    val hasNextDraw = contestNumber > 0 && contestDate.isNotBlank()
+    val isDrawToday = hasNextDraw && nextDrawInfo?.drawDate == currentDate
 
     AppCard(
         modifier = modifier.fillMaxWidth(),
@@ -135,7 +134,46 @@ fun WelcomeCard(
                         Text(
                             text = dateString,
                             style = MaterialTheme.typography.labelLarge,
-                        color = scheme.onSurfaceVariant
+                            color = scheme.onSurfaceVariant
+                        )
+                }
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = if (isDrawToday) scheme.primaryContainer else scheme.surfaceContainerHigh,
+                contentColor = if (isDrawToday) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Dimen.Spacing8),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+                ) {
+                    Icon(
+                        imageVector = if (isDrawToday) AppIcons.Check else AppIcons.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(Dimen.IconSmall)
+                    )
+                    Text(
+                        text = when {
+                            !hasNextDraw -> stringResource(R.string.welcome_draw_info_unavailable)
+                            isDrawToday -> stringResource(
+                                R.string.welcome_draw_today_format,
+                                contestNumber,
+                                contestDate
+                            )
+                            else -> stringResource(
+                                R.string.welcome_next_draw_format,
+                                contestNumber,
+                                contestDate
+                            )
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = if (isDrawToday) FontWeight.SemiBold else FontWeight.Medium,
+                        color = if (isDrawToday) scheme.onPrimaryContainer else scheme.onSurfaceVariant
                     )
                 }
             }

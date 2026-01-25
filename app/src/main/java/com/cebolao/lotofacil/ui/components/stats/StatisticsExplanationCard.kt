@@ -267,7 +267,7 @@ private fun FilterExplainerList() {
 
 @Preview
 @Composable
-private fun StatisticsExplanationCardPreview() {
+internal fun StatisticsExplanationCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StatisticsExplanationCard()

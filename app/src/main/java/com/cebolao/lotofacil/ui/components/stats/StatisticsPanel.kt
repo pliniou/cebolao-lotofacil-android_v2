@@ -375,7 +375,7 @@ private fun StatItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun StatisticsPanelPreview() {
+internal fun StatisticsPanelPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StatisticsPanel(

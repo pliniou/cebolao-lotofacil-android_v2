@@ -92,8 +92,7 @@ fun AppNavHost(
             )
         }
         composable<AppRoute.Checker> { backStackEntry ->
-            @Suppress("UNUSED_VARIABLE")
-            val route = backStackEntry.toRoute<AppRoute.Checker>()
+// route not needed here, handled by ViewModel via SavedStateHandle
             CheckerScreen(
                 onNavigateBack = { navController.popBackStack() }
             )

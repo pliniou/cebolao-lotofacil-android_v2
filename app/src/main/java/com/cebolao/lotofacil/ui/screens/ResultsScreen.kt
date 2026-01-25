@@ -1,15 +1,20 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.cebolao.lotofacil.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -17,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.Draw
@@ -31,9 +36,8 @@ import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
-import java.text.DateFormat
-import java.util.Date
-import java.util.Locale
+import com.cebolao.lotofacil.util.Formatters
+import java.time.format.FormatStyle
 
 @Composable
 fun ResultsScreen(
@@ -41,6 +45,7 @@ fun ResultsScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     AppScreen(
         title = stringResource(R.string.results_title),
@@ -53,34 +58,40 @@ fun ResultsScreen(
             }
         }
     ) { innerPadding ->
-        StandardPageLayout(scaffoldPadding = innerPadding) {
-            when (val state = uiState) {
-                is ResultsUiState.Loading -> {
-                    item {
-                        LoadingCard(
-                            title = stringResource(R.string.results_title),
-                            description = stringResource(R.string.loading_details_fallback)
-                        )
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = viewModel::refreshHistory,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            StandardPageLayout(scaffoldPadding = innerPadding) {
+                when (val state = uiState) {
+                    is ResultsUiState.Loading -> {
+                        item {
+                            LoadingCard(
+                                title = stringResource(R.string.results_title),
+                                description = stringResource(R.string.loading_details_fallback)
+                            )
+                        }
                     }
-                }
 
-                is ResultsUiState.Error -> {
-                    item {
-                        StandardAttentionCard(
-                            title = stringResource(R.string.general_error_title),
-                            message = stringResource(R.string.results_error_message),
-                            icon = AppIcons.Error
-                        )
+                    is ResultsUiState.Error -> {
+                        item {
+                            StandardAttentionCard(
+                                title = stringResource(R.string.general_error_title),
+                                message = stringResource(R.string.results_error_message),
+                                icon = AppIcons.Error
+                            )
+                        }
                     }
-                }
 
-                is ResultsUiState.Success -> {
-                    items(
-                        items = state.draws.sortedByDescending { it.contestNumber },
-                        key = { it.contestNumber },
-                        contentType = { "draw_item" }
-                    ) { draw ->
-                        DrawListItem(draw = draw)
+                    is ResultsUiState.Success -> {
+                        items(
+                            items = state.draws.sortedByDescending { it.contestNumber },
+                            key = { it.contestNumber },
+                            contentType = { "draw_item" }
+                        ) { draw ->
+                            DrawListItem(draw = draw)
+                        }
                     }
                 }
             }
@@ -91,7 +102,7 @@ fun ResultsScreen(
 @Composable
 fun DrawListItem(draw: Draw) {
     val contestLabel = stringResource(R.string.results_contest_number_format, draw.contestNumber)
-    val dateText = rememberDrawDate(draw.date ?: 0L)
+    val dateText = rememberDrawDate(draw.date)
     val numbers = remember(draw.numbers) { draw.numbers.sorted() }
 
     AppCard(
@@ -113,11 +124,13 @@ fun DrawListItem(draw: Draw) {
                     modifier = Modifier.weight(1f)
                 )
 
-                Text(
-                    text = dateText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                if (dateText.isNotEmpty()) {
+                    Text(
+                        text = dateText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             Row(
@@ -136,9 +149,12 @@ fun DrawListItem(draw: Draw) {
 }
 
 @Composable
-private fun rememberDrawDate(timestamp: Long): String {
+private fun rememberDrawDate(timestamp: Long?): String {
     return remember(timestamp) {
-        val formatter = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())
-        formatter.format(Date(timestamp))
+        if (timestamp == null || timestamp <= 0L) {
+            ""
+        } else {
+            Formatters.formatDateMillis(timestamp, FormatStyle.SHORT)
+        }
     }
 }

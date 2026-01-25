@@ -62,7 +62,7 @@ fun StandardInfoRow(
 
 @Preview
 @Composable
-private fun StandardInfoRowPreview() {
+internal fun StandardInfoRowPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             StandardInfoRow(

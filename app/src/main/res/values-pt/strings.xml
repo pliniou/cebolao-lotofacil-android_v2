@@ -25,7 +25,10 @@
     <string name="uf">UF</string>
     <string name="city">Cidade</string>
     <string name="count_short">Qtd</string>
-    <string name="and_more_count">e mais %1$d…</string>
+    <plurals name="and_more_count">
+        <item quantity="one">e mais %1$d…</item>
+        <item quantity="other">e mais %1$d…</item>
+    </plurals>
     <string name="action_retry">Tentar novamente</string>
     <string name="general_error_title">Algo deu errado</string>
     <string name="general_loading">Carregando…</string>
@@ -47,9 +50,9 @@
     <!-- Home Screen -->
     <string name="home_subtitle">Sua sorte, suas estatísticas</string>
     <string name="results_title">Todos os Resultados</string>
-    <string name="results_error_message">Nao foi possivel carregar os resultados.</string>
+    <string name="results_error_message">Não foi possível carregar os resultados.</string>
     <string name="results_contest_number_format">Concurso %1$d</string>
-    <string name="home_next_contest">Próximo Concurso %1$d</string>
+    <string name="home_next_contest">Próximo Concurso %1$d - %2$s</string>
     <string name="home_statistics_center">Central de Estatísticas</string>
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sincronizar dados</string>
     <string name="home_sync_success_message">Base de dados atualizada. Agora a culpa não é da defasagem.</string>
@@ -111,6 +114,9 @@
     <string name="greeting_afternoon">Boa tarde!</string>
     <string name="greeting_night">Boa noite!</string>
     <string name="welcome_message_format">%1$s</string>
+    <string name="welcome_draw_today_format">Sorteio hoje: concurso %1$d - %2$s</string>
+    <string name="welcome_next_draw_format">Próximo sorteio: concurso %1$d - %2$s</string>
+    <string name="welcome_draw_info_unavailable">Data do próximo sorteio indisponível</string>
 
     <string-array name="motivational_quotes">
         <item>Na dúvida, confie na estatística. Mas não deixe a sorte saber disso.</item>
@@ -393,10 +399,10 @@
     <string name="games_share_chooser_title">Compartilhar jogo</string>
     <string name="games_delete_confirm">Excluir</string>
     <string name="game_card_action_check">Conferir</string>
-    <string name="game_card_action_analyze">Analisar jogo</string>
-    <string name="game_card_action_pin">Fixar jogo</string>
-    <string name="game_card_action_unpin">Desfixar jogo</string>
-    <string name="games_delete_dialog_message">Deseja excluir este jogo?</string>
+    <string name="game_card_action_analyze">Analisar</string>
+    <string name="game_card_action_pin">Fixar</string>
+    <string name="game_card_action_unpin">Desafixar</string>
+    <string name="games_delete_dialog_message">Excluir este jogo?</string>
     <string name="game_card_pin_confirm_title">Jogo Fixado</string>
     <string name="game_card_unpin_confirm_title">Jogo Desfixado</string>
     <string name="game_card_pin_confirm_msg">Jogo salvo nos fixados.</string>
@@ -477,6 +483,12 @@
     <!-- Home Loading States -->
     <string name="home_updating_data" tools:keep="@string/home_updating_data">Atualizando dados…</string>
     <string name="home_pull_to_refresh_hint" tools:keep="@string/home_pull_to_refresh_hint">Puxe para baixo para sincronizar novamente.</string>
+    <string name="home_loading_initial_title">Preparando base local</string>
+    <string name="home_loading_initial_message">Carregando o histórico inicial.</string>
+    <string name="home_loading_sync_title">Sincronizando novos concursos</string>
+    <string name="home_loading_sync_message">Buscando os concursos mais recentes.</string>
+    <string name="home_loading_stats_title">Atualizando estatísticas</string>
+    <string name="home_loading_stats_message">Calculando padrões e frequências.</string>
 
     <!-- About Screen Hard-coded Strings -->
     <string name="about_source_title">Fonte dos Dados</string>

@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.theme.AppIcons
 
@@ -66,7 +67,13 @@ val bottomNavItems = listOf(
  */
 fun NavController.navigateToChecker(numbers: Set<Int>) {
     val list = numbers.sorted()
-    navigate(AppRoute.Checker(list)) {
+    // Pass numbers via SavedStateHandle to avoid creating multiple typed routes
+    // and to allow bottom-navigation style single-instance behavior with state restoration.
+    currentBackStackEntry?.savedStateHandle?.set("checker_numbers", list)
+    navigate(AppRoute.Checker()) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
         launchSingleTop = true
         restoreState = true
     }

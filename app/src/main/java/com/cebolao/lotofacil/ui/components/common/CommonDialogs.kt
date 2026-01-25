@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.ui.components.common
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -12,13 +13,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.ui.haptics.HapticFeedbackManager
+import com.cebolao.lotofacil.ui.haptics.HapticFeedbackType
+import com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.Motion
 
 @Composable
 fun AppConfirmationDialog(
@@ -27,14 +38,34 @@ fun AppConfirmationDialog(
     @StringRes confirmText: Int,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier, // Modifier moved to first optional parameter
+    modifier: Modifier = Modifier,
     icon: ImageVector = Icons.Default.Warning,
     @StringRes cancelText: Int = R.string.general_cancel,
     iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.error,
-    confirmColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary
+    confirmColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    enableHaptics: Boolean = true
 ) {
+    val haptics = rememberHapticFeedback()
+    
+    // Animate dialog appearance
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else Motion.Offset.SCALE,
+        animationSpec = Motion.Spring.gentle(),
+        label = "dialog_scale"
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = Motion.Tween.enter(),
+        label = "dialog_alpha"
+    )
+
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier
+            .scale(scale)
+            .alpha(alpha),
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.extraLarge,
         icon = {
@@ -58,7 +89,14 @@ fun AppConfirmationDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(
+                onClick = {
+                    if (enableHaptics) {
+                        haptics.performHapticFeedback(HapticFeedbackType.MEDIUM)
+                    }
+                    onConfirm()
+                }
+            ) {
                 Text(
                     text = stringResource(confirmText),
                     style = MaterialTheme.typography.labelLarge,
@@ -74,7 +112,6 @@ fun AppConfirmationDialog(
                 )
             }
         },
-        // Alinhado ao InfoDialog para consistência visual
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -83,12 +120,10 @@ fun AppConfirmationDialog(
 
 @Preview
 @Composable
-private fun AppConfirmationDialogPreview() {
+internal fun AppConfirmationDialogPreview() {
     MaterialTheme {
         Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing16)) {
-            // Note: Alerts are tricky to preview inline, but we can check compilation
-            // and structure. In a real preview environment, this might need a surface.
-             Text("Dialog Preview Placeholder")
+            Text("Dialog Preview Placeholder")
         }
     }
 }

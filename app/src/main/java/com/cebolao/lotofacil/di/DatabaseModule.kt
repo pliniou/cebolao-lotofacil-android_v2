@@ -8,6 +8,7 @@ import com.cebolao.lotofacil.data.local.db.DrawDao
 import com.cebolao.lotofacil.data.local.db.DrawDetailsDao
 import com.cebolao.lotofacil.data.local.db.MIGRATION_1_6
 import com.cebolao.lotofacil.data.local.db.MIGRATION_5_6
+import com.cebolao.lotofacil.data.local.db.MIGRATION_6_7
 import com.cebolao.lotofacil.data.local.db.UserGameDao
 import dagger.Module
 import dagger.Provides
@@ -28,7 +29,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "lotofacil.db"
         )
-        .addMigrations(MIGRATION_1_6, MIGRATION_5_6)
+        .addMigrations(MIGRATION_1_6, MIGRATION_5_6, MIGRATION_6_7)
         .build()
     }
 

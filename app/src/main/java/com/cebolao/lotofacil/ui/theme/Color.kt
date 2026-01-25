@@ -21,7 +21,7 @@ val BrandRoxo = Color(0xFF651FFF)
 val BrandVerde = Color(0xFF10B981)
 val BrandAmarelo = Color(0xFFFBBF24)
 val BrandRosa = Color(0xFFEC4899)
-val BrandLaranja = Color(0xFFF8971D)
+val BrandLaranja = Color(0xFFF97316)  // Coral - distinct from yellow
 
 // --- SEMANTIC ROLES: LIGHT MODE ---
 val LightBackground = Slate50
@@ -95,7 +95,7 @@ val BrandRosaLight = Color(0xFFF472B6)
 val BrandRosaDark = Color(0xFFDB2777)
 
 // Laranja variants
-val BrandLaranjaLight = Color(0xFFFBBF24)
+val BrandLaranjaLight = Color(0xFFFDBA74)  // Orange-300
 val BrandLaranjaDark = Color(0xFFEA580C)
 
 // --- GLASSMORPHISM TOKENS ---

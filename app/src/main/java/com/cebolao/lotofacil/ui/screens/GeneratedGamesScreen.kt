@@ -3,37 +3,19 @@ package com.cebolao.lotofacil.ui.screens
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,12 +27,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -64,16 +44,16 @@ import com.cebolao.lotofacil.presentation.viewmodel.GameUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.GameViewModel
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
 import com.cebolao.lotofacil.ui.components.common.LoadingCard
-import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
-import com.cebolao.lotofacil.ui.components.game.GameCard
+import com.cebolao.lotofacil.ui.components.game.GameAnalysisSheetContent
 import com.cebolao.lotofacil.ui.components.game.GameCardAction
-import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
-import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.components.game.GameList
+import com.cebolao.lotofacil.ui.components.game.GameSummaryCard
+import com.cebolao.lotofacil.ui.components.game.GameTabs
+import com.cebolao.lotofacil.ui.screens.AppScreen
 import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
-import com.cebolao.lotofacil.util.Formatters
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -334,313 +314,6 @@ fun GeneratedGamesScreenContent(
                             onGenerateRequest = onGenerateRequest,
                             onAction = onAction
                         )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EmptyState(
-    isNewGamesTab: Boolean,
-    onGenerateRequest: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                horizontal = Dimen.ScreenPadding,
-                vertical = Dimen.SectionSpacing
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        AppCard(
-            modifier = Modifier.fillMaxWidth(),
-            outlined = false,
-            color = MaterialTheme.colorScheme.surfaceContainer
-        ) {
-            MessageState(
-                icon = AppIcons.List,
-                title = stringResource(R.string.games_empty_state_title),
-                message = stringResource(
-                    if (isNewGamesTab) R.string.games_empty_state_description
-                    else R.string.widget_no_pinned_games
-                ),
-                actionLabel = if (isNewGamesTab) stringResource(R.string.filters_button_generate) else null,
-                onActionClick = if (isNewGamesTab) onGenerateRequest else null,
-                modifier = Modifier
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun GameTabs(
-    selectedIndex: Int,
-    onTabSelected: (Int) -> Unit
-) {
-    SecondaryTabRow(
-        selectedTabIndex = selectedIndex,
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        divider = {}
-    ) {
-        val tabs = listOf(R.string.games_tab_new, R.string.games_tab_pinned)
-        tabs.forEachIndexed { index, titleRes ->
-            Tab(
-                selected = selectedIndex == index,
-                onClick = { onTabSelected(index) },
-                text = {
-                    Text(
-                        text = stringResource(titleRes),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = if (selectedIndex == index) FontWeight.SemiBold else FontWeight.Normal
-                    )
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun GameList(
-    games: List<UiLotofacilGame>,
-    isNewGamesTab: Boolean,
-    onGenerateRequest: () -> Unit,
-    onAction: (GameCardAction, UiLotofacilGame) -> Unit
-) {
-    val gridState = rememberLazyGridState()
-    val animateCards by remember(games.size) { derivedStateOf { games.size < 40 } }
-
-    if (games.isEmpty()) {
-        EmptyState(isNewGamesTab, onGenerateRequest)
-        return
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .widthIn(max = Dimen.LayoutMaxWidth)
-                .fillMaxSize(),
-            state = gridState,
-            contentPadding = PaddingValues(
-                top = Dimen.ItemSpacing,
-                bottom = Dimen.SectionSpacing,
-                start = Dimen.ScreenPadding,
-                end = Dimen.ScreenPadding
-            ),
-            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing),
-            horizontalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
-        ) {
-            itemsIndexed(
-                items = games,
-                key = { _, game -> game.mask },
-                contentType = { _, _ -> "game_card" }
-            ) { index, game ->
-                val card: @Composable () -> Unit = {
-                    GameCard(
-                        game = game,
-                        index = index + 1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = Dimen.GameCardMinHeight),
-                        onAction = { action -> onAction(action, game) }
-                    )
-                }
-                if (animateCards) {
-                    AnimateOnEntry(delayMillis = (index * 40).toLong()) { card() }
-                } else {
-                    card()
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun GameSummaryCard(
-    summary: com.cebolao.lotofacil.presentation.viewmodel.GameSummary,
-    modifier: Modifier = Modifier
-) {
-    if (summary.totalGames <= 0) return
-
-    AppCard(
-        modifier = modifier,
-        outlined = true,
-        title = stringResource(R.string.games_summary_title)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SummaryItem(
-                label = stringResource(R.string.games_summary_total_games),
-                value = summary.totalGames.toString()
-            )
-            SummaryItem(
-                label = stringResource(R.string.games_summary_pinned_games),
-                value = summary.pinnedGames.toString()
-            )
-            SummaryItem(
-                label = stringResource(R.string.games_summary_total_cost),
-                value = Formatters.formatCurrency(summary.totalCost)
-            )
-        }
-    }
-}
-
-@Composable
-private fun SummaryItem(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-private fun GameAnalysisSheetContent(
-    analysisState: GameAnalysisUiState,
-    onDismiss: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                start = Dimen.ScreenPadding,
-                end = Dimen.ScreenPadding,
-                bottom = Dimen.SectionSpacing
-            ),
-        verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.checker_performance_analysis),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-            IconButton(onClick = onDismiss) {
-                Icon(
-                    imageVector = AppIcons.CloseOutlined,
-                    contentDescription = stringResource(R.string.general_close)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(Dimen.ItemSpacing))
-
-        when (analysisState) {
-            is GameAnalysisUiState.Idle -> Unit
-            is GameAnalysisUiState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = Dimen.SectionSpacing),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(Dimen.LoadingIndicatorSize),
-                        strokeWidth = Dimen.Border.Medium
-                    )
-                }
-            }
-            is GameAnalysisUiState.Error -> {
-                Text(
-                    text = stringResource(analysisState.messageResId),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            is GameAnalysisUiState.Success -> {
-                Text(
-                    text = analysisState.result.game.numbers.sorted().joinToString(" - ") { it.toString().padStart(2, '0') },
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-
-                com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard(
-                    report = analysisState.result.checkReport,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                AppCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    outlined = true,
-                    title = stringResource(R.string.games_analysis_stats_title)
-                ) {
-                    if (analysisState.result.simpleStats.size > 8) {
-                        androidx.compose.foundation.lazy.LazyColumn {
-                            items(analysisState.result.simpleStats.size) { idx ->
-                                val pair = analysisState.result.simpleStats[idx]
-                                val (k, v) = pair
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    androidx.compose.material3.Text(
-                                        k,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    androidx.compose.material3.Text(
-                                        v,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)) {
-                            analysisState.result.simpleStats.forEach { pair ->
-                                val (k, v) = pair
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        k,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        v,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
             }

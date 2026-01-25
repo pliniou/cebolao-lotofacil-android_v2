@@ -25,7 +25,10 @@
     <string name="uf">State</string>
     <string name="city">City</string>
     <string name="count_short">Qty</string>
-    <string name="and_more_count">and %1$d more…</string>
+    <plurals name="and_more_count">
+        <item quantity="one">and %1$d more…</item>
+        <item quantity="other">and %1$d more…</item>
+    </plurals>
     <string name="action_retry">Try again</string>
     <string name="general_error_title">Something went wrong</string>
     <string name="general_loading">Loading…</string>
@@ -49,7 +52,7 @@
     <string name="results_title">All Results</string>
     <string name="results_error_message">Could not load results.</string>
     <string name="results_contest_number_format">Draw %1$d</string>
-    <string name="home_next_contest">Next Draw %1$d</string>
+    <string name="home_next_contest">Next Draw %1$d - %2$s</string>
     <string name="home_statistics_center">Statistics Center</string>
     <string name="home_sync_button_description" tools:keep="@string/home_sync_button_description">Sync data</string>
     <string name="home_sync_success_message">Database updated.</string>
@@ -111,6 +114,9 @@
     <string name="greeting_afternoon">Good afternoon!</string>
     <string name="greeting_night">Good night!</string>
     <string name="welcome_message_format">%1$s</string>
+    <string name="welcome_draw_today_format">Draw today: draw %1$d - %2$s</string>
+    <string name="welcome_next_draw_format">Next draw: draw %1$d - %2$s</string>
+    <string name="welcome_draw_info_unavailable">Next draw date not available</string>
 
     <string-array name="motivational_quotes">
         <item>When in doubt, trust statistics. But don\'t let luck know.</item>
@@ -393,6 +399,7 @@
     <string name="games_share_chooser_title">Share Game</string>
     <string name="games_delete_confirm">Delete</string>
     <string name="game_card_action_check">Check</string>
+    <string name="game_card_action_analyze">Analyze</string>
     <string name="game_card_action_pin">Pin</string>
     <string name="game_card_action_unpin">Unpin</string>
     <string name="games_delete_dialog_message">Delete this game?</string>
@@ -476,6 +483,23 @@
     <!-- Home Loading States -->
     <string name="home_updating_data" tools:keep="@string/home_updating_data">Updating data…</string>
     <string name="home_pull_to_refresh_hint" tools:keep="@string/home_pull_to_refresh_hint">Pull to sync.</string>
+    <string name="home_loading_initial_title">Preparing local data</string>
+    <string name="home_loading_initial_message">Loading the initial draw history.</string>
+    <string name="home_loading_sync_title">Syncing new draws</string>
+    <string name="home_loading_sync_message">Fetching the latest contests.</string>
+    <string name="home_loading_stats_title">Updating statistics</string>
+    <string name="home_loading_stats_message">Calculating patterns and frequencies.</string>
+
+    <!-- Database Loading States -->
+    <string name="db_loading_checking">Checking database status…</string>
+    <string name="db_loading_reading_assets">Reading data file…</string>
+    <string name="db_loading_parsing">Processing lottery results…</string>
+    <string name="db_loading_saving">Saving to database…</string>
+    <string name="db_loading_finalizing">Finalizing…</string>
+    <string name="db_loading_progress">%1$d of %2$d draws loaded</string>
+    <string name="db_loading_complete">Database ready with %1$d draws</string>
+    <string name="db_loading_failed">Failed to load data. Please try again.</string>
+    <string name="db_loading_retry">Retry</string>
 
     <!-- About Screen Hard-coded Strings -->
     <string name="about_source_title">Data Source</string>

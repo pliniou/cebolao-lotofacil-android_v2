@@ -3,6 +3,7 @@ package com.cebolao.lotofacil.domain.model
 /**
  * Representação pura de um sorteio da Lotofácil no domínio.
  */
+@ConsistentCopyVisibility
 data class Draw internal constructor(
     val contestNumber: Int,
     private val maskValue: Long,

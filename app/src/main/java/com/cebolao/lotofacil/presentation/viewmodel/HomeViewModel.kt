@@ -3,6 +3,7 @@ package com.cebolao.lotofacil.presentation.viewmodel
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import com.cebolao.lotofacil.R
+import com.cebolao.lotofacil.domain.model.AppError
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.HomeScreenData
@@ -11,9 +12,11 @@ import com.cebolao.lotofacil.domain.model.StatisticPattern
 import com.cebolao.lotofacil.domain.repository.SyncStatus
 import com.cebolao.lotofacil.domain.usecase.CheckLastGameUseCase
 import com.cebolao.lotofacil.domain.usecase.GetAnalyzedStatsUseCase
-import com.cebolao.lotofacil.domain.usecase.GetGameSimpleStatsUseCase
+import com.cebolao.lotofacil.domain.usecase.CalculateDrawNumericStatsUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawDetailsUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
+import com.cebolao.lotofacil.data.repository.DatabaseLoadingState
+import com.cebolao.lotofacil.domain.usecase.ObserveDatabaseLoadingUseCase
 import com.cebolao.lotofacil.domain.usecase.ObserveSyncStatusUseCase
 import com.cebolao.lotofacil.domain.usecase.SyncHistoryUseCase
 import com.cebolao.lotofacil.mapper.toSimpleStats
@@ -84,24 +87,30 @@ data class HomeUiState(
  * ViewModel for the Home screen.
  * Manages home screen data, statistics, and synchronization status.
  */
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     observeSyncStatusUseCase: ObserveSyncStatusUseCase,
+    private val observeDatabaseLoadingUseCase: ObserveDatabaseLoadingUseCase,
     private val syncHistoryUseCase: SyncHistoryUseCase,
     getLastDrawUseCase: GetLastDrawUseCase,
     private val getLastDrawDetailsUseCase: GetLastDrawDetailsUseCase,
     private val checkLastGameUseCase: CheckLastGameUseCase,
     private val getAnalyzedStatsUseCase: GetAnalyzedStatsUseCase,
-    private val getGameSimpleStatsUseCase: GetGameSimpleStatsUseCase
+    private val calculateDrawNumericStatsUseCase: CalculateDrawNumericStatsUseCase
 ) : BaseViewModel() {
 
     private val _selectedTimeWindow = MutableStateFlow(0)
     private val _selectedPattern = MutableStateFlow(StatisticPattern.SUM)
     private val _syncMessageEvent = MutableStateFlow<Int?>(null)
     private val _syncError = MutableStateFlow<Int?>(null)
+    private var hasTriggeredInitialSync = false
 
     val syncStatus: StateFlow<SyncStatus> = observeSyncStatusUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), SyncStatus.Idle)
+
+    val loadingState: StateFlow<DatabaseLoadingState> = observeDatabaseLoadingUseCase()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), DatabaseLoadingState.Idle)
 
     private val lastDrawFlow = getLastDrawUseCase()
 
@@ -161,6 +170,24 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            combine(homeDataFlow, syncStatus) { homeResult, status ->
+                homeResult to status
+            }.collect { (homeResult, status) ->
+                if (!hasTriggeredInitialSync && status is SyncStatus.Idle) {
+                    val shouldSync = when (homeResult) {
+                        is AppResult.Failure -> homeResult.error is AppError.NotFound
+                        is AppResult.Success -> homeResult.value.details == null
+                        else -> false
+                    }
+                    if (shouldSync) {
+                        hasTriggeredInitialSync = true
+                        forceSync()
+                    }
+                }
+            }
+        }
+
         viewModelScope.launch {
             syncStatus
                 .map { status ->
@@ -228,7 +255,7 @@ class HomeViewModel @Inject constructor(
      */
     private fun processSuccess(data: HomeScreenData): HomeScreenState.Success {
         val simpleStats =
-            data.lastDraw?.let { getGameSimpleStatsUseCase(it).toSimpleStats() }
+            data.lastDraw?.let { calculateDrawNumericStatsUseCase(it).toSimpleStats() }
                 ?: persistentListOf()
 
         return HomeScreenState.Success(
@@ -245,13 +272,15 @@ class HomeViewModel @Inject constructor(
 
         val contestNumber = details.nextContestNumber
         val contestDate = details.nextContestDate
+        val parsedDate = contestDate?.let { Formatters.parseApiDate(it) }
 
         return if (contestNumber != null && contestNumber > 0 && !contestDate.isNullOrBlank()) {
             NextDrawInfo(
                 contestNumber = contestNumber,
                 formattedDate = contestDate,
                 formattedPrize = Formatters.formatCurrency(details.nextEstimatedPrize),
-                formattedPrizeFinalFive = Formatters.formatCurrency(details.accumulatedValue05)
+                formattedPrizeFinalFive = Formatters.formatCurrency(details.accumulatedValue05),
+                drawDate = parsedDate
             )
         } else {
             null

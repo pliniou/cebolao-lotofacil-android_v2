@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
@@ -68,6 +69,7 @@ object AppIcons {
     val Add = Icons.Filled.Add
     val Remove = Icons.Filled.Remove
     val Cancel = Icons.Filled.Cancel
+    val Refresh = Icons.Filled.Refresh
     val Send = Icons.AutoMirrored.Filled.Send
     val PinFilled = Icons.Filled.PushPin
     val PinOutlined = Icons.Outlined.PushPin

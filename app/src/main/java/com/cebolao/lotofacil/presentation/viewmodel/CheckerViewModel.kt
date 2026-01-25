@@ -71,7 +71,7 @@ class CheckerViewModel @Inject constructor(
     private val checkRunRepository: CheckRunRepository,
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @param:ApplicationScope private val externalScope: CoroutineScope,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
     companion object {
@@ -88,9 +88,22 @@ class CheckerViewModel @Inject constructor(
 
     init {
         try {
-            val route = savedStateHandle.toRoute<AppRoute.Checker>()
-            if (route.numbers.isNotEmpty()) {
-                replaceNumbers(route.numbers.toSet())
+            // First try to restore saved selected numbers (survives process death)
+            val saved = savedStateHandle.get<List<Int>>("checker_selected_numbers")
+            if (saved != null && saved.isNotEmpty()) {
+                replaceNumbers(saved.toSet())
+            } else {
+                val route = savedStateHandle.toRoute<AppRoute.Checker>()
+                if (route.numbers.isNotEmpty()) {
+                    replaceNumbers(route.numbers.toSet())
+                }
+            }
+            // If navigation passed numbers via SavedStateHandle (from bottom-tab style navigation),
+            // consume them here and remove the key so they don't persist unexpectedly.
+            val pending = savedStateHandle.get<List<Int>>("checker_numbers")
+            if (pending != null && pending.isNotEmpty()) {
+                replaceNumbers(pending.toSet())
+                savedStateHandle.remove<List<Int>>("checker_numbers")
             }
         } catch (e: IllegalArgumentException) {
             Log.w(TAG, "Invalid route args: ${e.message}")
@@ -124,6 +137,8 @@ class CheckerViewModel @Inject constructor(
                 heatmapIntensities = emptyMap()
             )
         }
+        // Persist selection so it survives process death and nav restore
+        savedStateHandle.set("checker_selected_numbers", next.sorted())
     }
 
     private fun clearNumbers() {
@@ -137,6 +152,7 @@ class CheckerViewModel @Inject constructor(
                 heatmapIntensities = emptyMap()
             )
         }
+        savedStateHandle.remove<List<Int>>("checker_selected_numbers")
     }
 
     private fun saveGame() {
@@ -227,6 +243,7 @@ class CheckerViewModel @Inject constructor(
                 heatmapIntensities = emptyMap()
             )
         }
+        savedStateHandle.set("checker_selected_numbers", next.sorted())
     }
 
     private fun resetAnalysis() {

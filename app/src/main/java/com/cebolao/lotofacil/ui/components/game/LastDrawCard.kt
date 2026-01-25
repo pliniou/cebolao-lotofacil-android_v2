@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
@@ -43,9 +41,6 @@ import com.cebolao.lotofacil.ui.model.UiDrawDetails
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.util.Formatters
-import java.text.DateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun LastDrawCard(
@@ -74,12 +69,34 @@ fun LastDrawCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.app_result_title, draw.contestNumber),
-                    style = MaterialTheme.typography.titleMedium,
+                    text = stringResource(R.string.app_result_title),
+                    style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = scheme.onSurface
+                    color = scheme.onSurfaceVariant
                 )
-                DrawDateSubtitle(draw)
+                val contestLabel = stringResource(R.string.results_contest_number_format, draw.contestNumber)
+                val dateText = remember(draw.date) {
+                    draw.date?.let { Formatters.formatDateMillis(it) }.orEmpty()
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = contestLabel,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = scheme.onSurface
+                    )
+                    if (dateText.isNotEmpty()) {
+                        Text(
+                            text = dateText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = scheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             // Numbers
@@ -177,24 +194,6 @@ fun LastDrawCard(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun DrawDateSubtitle(draw: UiDraw) {
-    val dateText = remember(draw.date) {
-        draw.date?.let { millis ->
-            val formatter = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-            formatter.format(Date(millis))
-        }.orEmpty()
-    }
-
-    if (dateText.isNotEmpty()) {
-        Text(
-            text = dateText,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
@@ -437,12 +436,12 @@ private fun EmptyDataState(onRefresh: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.width(Dimen.Spacing8))
-             IconButton(
+            IconButton(
                 onClick = onRefresh,
                 modifier = Modifier.size(Dimen.IconMedium)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Refresh,
+                    imageVector = AppIcons.Refresh,
                     contentDescription = stringResource(R.string.action_retry),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(Dimen.IconSmall)

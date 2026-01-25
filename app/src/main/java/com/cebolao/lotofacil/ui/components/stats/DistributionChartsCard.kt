@@ -91,7 +91,7 @@ fun DistributionChartsCard(
 
         AppCard(
             modifier = Modifier.fillMaxWidth(),
-            variant = CardVariant.Solid,
+            variant = CardVariant.Glass,
             outlined = true,
             title = stringResource(R.string.home_distribution_title),
             contentPadding = Dimen.Spacing16, // Aumentado para 16dp
@@ -265,7 +265,7 @@ private fun domainFor(pattern: StatisticPattern): IntRange? = when (pattern) {
 
 @Preview(showBackground = true)
 @Composable
-private fun DistributionChartsCardPreview() {
+internal fun DistributionChartsCardPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(Dimen.Spacing16)) {
             DistributionChartsCard(
