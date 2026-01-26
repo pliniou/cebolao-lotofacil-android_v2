@@ -71,7 +71,7 @@ fun TitleWithIcon(
     ) {
         when {
             iconVector != null -> {
-                // Container tonal flat (Material 3) para ícone vetorial
+                // Tonal flat container (Material 3) for vector icon
                 Surface(
                     color = scheme.secondaryContainer,
                     contentColor = scheme.onSecondaryContainer,
@@ -92,7 +92,7 @@ fun TitleWithIcon(
             }
 
             iconRes != null -> {
-                // Para drawable (possível raster), mantém renderização “como é”
+                // For drawable (possible raster), keeps rendering "as is"
                 Surface(
                     color = scheme.surfaceVariant,
                     contentColor = scheme.onSurfaceVariant,

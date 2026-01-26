@@ -5,7 +5,9 @@ import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.ZoneOffset
+import kotlinx.coroutines.CancellationException
 
 private fun safeLog(tag: String, message: String) {
     try {
@@ -30,8 +32,10 @@ fun retryAfterHeaderToDelayMs(header: String?, nowMs: Long = System.currentTimeM
             .parse(header, Instant::from)
         val delay = date.toEpochMilli() - nowMs
         return delay.coerceAtLeast(0L)
+    } catch (_: DateTimeParseException) {
+        // Expected if header is not a valid date
     } catch (e: Exception) {
-        // Fallback or ignore
+         safeLog("RetryAfter", "Failed to parse Retry-After header: ${e.message}")
     }
 
     return 0L
@@ -77,6 +81,8 @@ suspend fun <T> retryOnHttp429(
             } else {
                  return Result.failure(e)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             return Result.failure(e)
         }

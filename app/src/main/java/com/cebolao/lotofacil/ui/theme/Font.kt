@@ -33,7 +33,7 @@ val StackSans = FontFamily(
     Font(R.font.stacksansnotch_bold, FontWeight.Bold)
 )
 
-// Semantic aliases para facilitar manutenção de hierarquia tipográfica
+// Semantic aliases to facilitate typography hierarchy maintenance
 val FontFamilyDisplay = Gabarito
 val FontFamilyBody = Outfit
 val FontFamilyNumeric = StackSans

@@ -40,7 +40,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = runCatching {
         updateAllWidgets()
 
-        // Sync nao pode derrubar o widget; se falhar seguimos conforme WorkManager.
+        // Sync must not crash the widget; if it fails, follow WorkManager policy.
         val syncResult = historyRepository.syncHistoryIfNeeded()
         when (syncResult) {
             is AppResult.Success -> {
@@ -88,7 +88,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
         ids.forEach { id ->
             val provider = LastDrawWidgetProvider::class.java
 
-            // Monta as 3 variantes sempre (Android 12+ seleciona nativamente; pre-12 usa fallback)
+            // Always build all 3 variants (Android 12+ selects natively; pre-12 uses fallback)
             val small = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.SMALL), provider, id)
             val medium = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.MEDIUM), provider, id)
             val large = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.LARGE), provider, id)
@@ -156,7 +156,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
             val medium = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.MEDIUM), provider, id)
             val large = createRemoteViews(WidgetUtils.getLayoutIdFor(provider, WidgetSizeVariant.LARGE), provider, id)
 
-            // Titulo e sempre o mesmo
+            // Title is always the same
             small.setTextViewText(R.id.widget_title, context.getString(R.string.widget_pinned_game_title))
             medium.setTextViewText(R.id.widget_title, context.getString(R.string.widget_pinned_game_title))
             large.setTextViewText(R.id.widget_title, context.getString(R.string.widget_pinned_game_title))
@@ -224,10 +224,10 @@ class WidgetUpdateWorker @AssistedInject constructor(
     }
 
     /**
-     * Recursividade/Responsividade:
-     * - Para API 31+, o launcher escolhe o RemoteViews pelo tamanho real;
-     *   aqui usamos colunas por variante (consistentes).
-     * - Para < 31, usamos o tamanho real (options) para ajustar colunas.
+     * Recursion/Responsiveness:
+     * - For API 31+, the launcher picks the RemoteViews by valid size;
+     *   here we use columns per variant (consistent).
+     * - For < 31, we use real size (options) to adjust columns.
      */
     private fun columnsForVariantOrRuntime(appWidgetId: Int, variant: WidgetSizeVariant): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

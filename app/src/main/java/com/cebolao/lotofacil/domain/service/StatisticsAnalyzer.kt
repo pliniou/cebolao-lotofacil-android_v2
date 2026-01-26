@@ -23,12 +23,11 @@ private const val HIST_SIZE_CENTER = 10
 private const val HIST_SIZE_SEQ = 16
 private const val DEFAULT_LOAD_FACTOR = 0.75f
 
-@Suppress("SameParameterValue")
 @Singleton
 class StatisticsAnalyzer @Inject constructor(
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
-    // Cache LRU sincronizado (mantém compatibilidade e evita condições de corrida simples)
+    // Synchronized LRU cache (maintains compatibility and avoids simple race conditions)
     private val analysisCache = Collections.synchronizedMap(
         object : LinkedHashMap<String, StatisticsReport>(CACHE_SIZE, DEFAULT_LOAD_FACTOR, true) {
             override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, StatisticsReport>?): Boolean {
@@ -132,7 +131,7 @@ class StatisticsAnalyzer @Inject constructor(
         for (num in 1..GameConstants.MAX_NUMBER) {
             list.add(NumberFrequency(num, counts[num]))
         }
-        // Ordenação estável: desc por frequência, asc por número
+        // Stable sorting: desc by frequency, asc by number
         list.sortWith(compareByDescending<NumberFrequency> { it.frequency }.thenBy { it.number })
         return list.take(limit)
     }

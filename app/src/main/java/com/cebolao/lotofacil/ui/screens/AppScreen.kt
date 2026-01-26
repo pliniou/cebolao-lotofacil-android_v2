@@ -4,13 +4,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import com.cebolao.lotofacil.ui.components.layout.ModernBackground
 import com.cebolao.lotofacil.ui.components.layout.StandardScreenHeader
+import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
 fun AppScreen(
@@ -42,7 +46,14 @@ fun AppScreen(
             bottomBar = bottomBar,
             snackbarHost = snackbarHost
         ) { innerPadding ->
-            content(innerPadding)
+            val layoutDirection = LocalLayoutDirection.current
+            val mergedPadding = PaddingValues(
+                start = innerPadding.calculateStartPadding(layoutDirection) + Dimen.ScreenPadding,
+                end = innerPadding.calculateEndPadding(layoutDirection) + Dimen.ScreenPadding,
+                top = innerPadding.calculateTopPadding() + Dimen.Spacing12,
+                bottom = innerPadding.calculateBottomPadding() + Dimen.Spacing12
+            )
+            content(mergedPadding)
         }
     }
 }

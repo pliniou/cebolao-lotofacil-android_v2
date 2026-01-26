@@ -1,6 +1,8 @@
 package com.cebolao.lotofacil.ui.components.layout
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -15,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.cebolao.lotofacil.ui.theme.Motion
+import com.cebolao.lotofacil.ui.util.MotionPreferences
 import kotlinx.coroutines.delay
 
 /**
@@ -46,50 +49,60 @@ fun AnimateOnEntry(
     animation: EntryAnimation = EntryAnimation.SlideUp,
     content: @Composable () -> Unit
 ) {
-    // Salva o estado através de mudanças de configuração para evitar reanimação involuntária
+    // Saves state through configuration changes to avoid involuntary reanimation
     var isVisible by rememberSaveable { mutableStateOf(false) }
+    val prefersReducedMotion = MotionPreferences.rememberPrefersReducedMotion()
+    val effectiveDelay = if (prefersReducedMotion) 0L else delayMillis
 
     LaunchedEffect(Unit) {
-        if (delayMillis > 0) delay(delayMillis)
+        if (effectiveDelay > 0) delay(effectiveDelay)
         isVisible = true
     }
 
-    val enterTransition = when (animation) {
-        EntryAnimation.SlideUp -> slideInVertically(
-            initialOffsetY = { Motion.Offset.SlideUp.value.toInt() },
-            animationSpec = Motion.Spring.gentle()
-        ) + fadeIn(animationSpec = Motion.Tween.enter())
+    val enterTransition = if (prefersReducedMotion) {
+        EnterTransition.None
+    } else {
+        when (animation) {
+            EntryAnimation.SlideUp -> slideInVertically(
+                initialOffsetY = { Motion.Offset.SlideUp.value.toInt() },
+                animationSpec = Motion.Spring.gentle()
+            ) + fadeIn(animationSpec = Motion.Tween.enter())
 
-        EntryAnimation.Fade -> fadeIn(animationSpec = Motion.Tween.medium())
+            EntryAnimation.Fade -> fadeIn(animationSpec = Motion.Tween.medium())
 
-        EntryAnimation.Scale -> scaleIn(
-            initialScale = Motion.Offset.SCALE,
-            animationSpec = Motion.Spring.snappy()
-        ) + fadeIn(animationSpec = Motion.Tween.fast())
+            EntryAnimation.Scale -> scaleIn(
+                initialScale = Motion.Offset.SCALE,
+                animationSpec = Motion.Spring.snappy()
+            ) + fadeIn(animationSpec = Motion.Tween.fast())
 
-        EntryAnimation.SlideDown -> slideInVertically(
-            initialOffsetY = { -Motion.Offset.SlideDown.value.toInt() },
-            animationSpec = Motion.Spring.gentle()
-        ) + fadeIn(animationSpec = Motion.Tween.enter())
+            EntryAnimation.SlideDown -> slideInVertically(
+                initialOffsetY = { -Motion.Offset.SlideDown.value.toInt() },
+                animationSpec = Motion.Spring.gentle()
+            ) + fadeIn(animationSpec = Motion.Tween.enter())
+        }
     }
 
-    val exitTransition = when (animation) {
-        EntryAnimation.SlideUp -> slideOutVertically(
-            targetOffsetY = { Motion.Offset.SlideUp.value.toInt() },
-            animationSpec = Motion.Tween.exit()
-        ) + fadeOut(animationSpec = Motion.Tween.fast())
+    val exitTransition = if (prefersReducedMotion) {
+        ExitTransition.None
+    } else {
+        when (animation) {
+            EntryAnimation.SlideUp -> slideOutVertically(
+                targetOffsetY = { Motion.Offset.SlideUp.value.toInt() },
+                animationSpec = Motion.Tween.exit()
+            ) + fadeOut(animationSpec = Motion.Tween.fast())
 
-        EntryAnimation.Fade -> fadeOut(animationSpec = Motion.Tween.fast())
+            EntryAnimation.Fade -> fadeOut(animationSpec = Motion.Tween.fast())
 
-        EntryAnimation.Scale -> scaleOut(
-            targetScale = Motion.Offset.SCALE,
-            animationSpec = Motion.Tween.exit()
-        ) + fadeOut(animationSpec = Motion.Tween.fast())
+            EntryAnimation.Scale -> scaleOut(
+                targetScale = Motion.Offset.SCALE,
+                animationSpec = Motion.Tween.exit()
+            ) + fadeOut(animationSpec = Motion.Tween.fast())
 
-        EntryAnimation.SlideDown -> slideOutVertically(
-            targetOffsetY = { -Motion.Offset.SlideDown.value.toInt() },
-            animationSpec = Motion.Tween.exit()
-        ) + fadeOut(animationSpec = Motion.Tween.fast())
+            EntryAnimation.SlideDown -> slideOutVertically(
+                targetOffsetY = { -Motion.Offset.SlideDown.value.toInt() },
+                animationSpec = Motion.Tween.exit()
+            ) + fadeOut(animationSpec = Motion.Tween.fast())
+        }
     }
 
     AnimatedVisibility(

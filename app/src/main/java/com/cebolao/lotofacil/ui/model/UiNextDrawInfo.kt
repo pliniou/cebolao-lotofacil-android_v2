@@ -1,12 +1,8 @@
-package com.cebolao.lotofacil.domain.model
+package com.cebolao.lotofacil.ui.model
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import java.time.LocalDate
 
-@Stable
-@Immutable
-data class NextDrawInfo(
+data class UiNextDrawInfo(
     val contestNumber: Int,
     val formattedDate: String,
     val formattedPrize: String,

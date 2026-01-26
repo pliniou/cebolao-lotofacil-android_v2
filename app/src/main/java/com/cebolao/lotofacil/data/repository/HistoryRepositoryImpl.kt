@@ -13,11 +13,11 @@ import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
 import com.cebolao.lotofacil.data.mapper.toEntity
 import com.cebolao.lotofacil.data.network.ApiService
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
-import com.cebolao.lotofacil.data.util.HistoryParser
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
 import com.cebolao.lotofacil.domain.exception.SyncException
 import com.cebolao.lotofacil.domain.model.AppResult
+import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
@@ -60,10 +60,10 @@ private data class LatestApiResult(
 @Singleton
 class HistoryRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val appDatabase: AppDatabase,
+    appDatabase: AppDatabase,
     private val drawDao: DrawDao,
     private val drawDetailsDao: DrawDetailsDao,
-    private val apiService: ApiService,
+    apiService: ApiService,
     private val syncManager: SyncManager,
     private val databaseLoader: DatabaseLoader,
     @param:ApplicationScope private val scope: CoroutineScope,
@@ -262,15 +262,16 @@ class HistoryRepositoryImpl @Inject constructor(
         if (isInitialized) return
         initMutex.withLock {
             if (isInitialized) return
-            withContext(ioDispatcher) {
+            val hasData = withContext(ioDispatcher) {
                 if (drawDao.count() == 0) {
                     val result = databaseLoader.loadFromAssets()
                     if (result.isFailure) {
                         Log.e(TAG, "Failed to load from assets: ${result.exceptionOrNull()}")
                     }
                 }
+                drawDao.count() > 0
             }
-            isInitialized = true
+            isInitialized = hasData
         }
     }
 }

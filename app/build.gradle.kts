@@ -19,6 +19,11 @@ android {
         targetSdk = 35
         versionCode = 2
         versionName = "2.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     compileOptions {
@@ -34,7 +39,12 @@ android {
 
     packaging {
         resources {
-            excludes += setOf("META-INF/LICENSE.md", "META-INF/LICENSE-notice.md")
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
         }
     }
 
@@ -64,11 +74,22 @@ android {
     lint {
         baseline = file("lint-baseline.xml")
         abortOnError = false
+        checkDependencies = true
     }
 }
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.generateKotlin", "true")
+    arg("room.incremental", "true")
+}
+
+kotlin {
+    jvmToolchain(17)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+    }
 }
 
 dependencies {
@@ -142,6 +163,10 @@ detekt {
     allRules = false
     basePath = projectDir.absolutePath
     ignoreFailures = true
+    reportsDir = layout.buildDirectory.dir("reports/detekt").get().asFile
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     reports {
         xml.required.set(true)
         xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))

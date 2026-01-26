@@ -1,12 +1,10 @@
 package com.cebolao.lotofacil.domain.model
 
-import androidx.compose.runtime.Immutable
 
 /**
  * Estatísticas completas de análise por faixa de acertos.
  * Calculado usando todo o banco de dados disponível, não apenas últimos 20 concursos.
  */
-@Immutable
 data class RangeStatistics(
     val totalDraws: Int,
     val range0to5: Int,      // 0-5 acertos

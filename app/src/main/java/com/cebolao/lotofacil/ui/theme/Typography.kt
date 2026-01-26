@@ -7,6 +7,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/**
+ * App typography definitions.
+ *
+ * Font Usage Guidelines:
+ * - **Display**: Use for large, impactful headers (e.g. Onboarding, Hero sections). Font: Gabarito.
+ * - **Headline**: Use for main screen titles and section headers. Font: Outfit.
+ * - **Title**: Use for card titles and sub-sections. Font: Outfit (Medium/SemiBold).
+ * - **Body**: Use for long-form text, descriptions, and messages. Font: Outfit (Regular).
+ * - **Label**: Use for buttons, tags, and small utility text. Font: Outfit (Medium).
+ * - **Numeric**: Use EXPRESSLY for lottery numbers and statistics data. Font: StackSans.
+ */
 private fun buildAdaptiveTypography(scale: Float): Typography {
     return Typography(
         displayLarge = TextStyle(

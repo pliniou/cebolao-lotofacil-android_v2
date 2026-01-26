@@ -274,7 +274,7 @@ class FiltersViewModel @Inject constructor(
                                 val games = type.games
 
                                 // Save games
-                                when (val saveResult = saveGeneratedGamesUseCase(games)) {
+                                when (saveGeneratedGamesUseCase(games)) {
                                     is AppResult.Success -> {
                                         _generationState.value = GenerationUiState.Success(games.size)
                                         _events.trySend(NavigationEvent.NavigateToGeneratedGames)

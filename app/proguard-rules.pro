@@ -128,9 +128,9 @@
 # App-specific rules
 # ===============================
 # Keep data classes used in serialization
--keep class com.cebolao.lotofacil.data.remote.dto.** { *; }
 -keep class com.cebolao.lotofacil.domain.model.** { *; }
--keep class com.cebolao.lotofacil.data.local.entity.** { *; }
+-keep class com.cebolao.lotofacil.data.network.** { *; }
+-keep class com.cebolao.lotofacil.data.local.db.** { *; }
 
 # Keep enum classes
 -keepclassmembers enum * {

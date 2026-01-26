@@ -2,12 +2,10 @@
 
 package com.cebolao.lotofacil.ui.screens
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -42,7 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.domain.model.NextDrawInfo
+import com.cebolao.lotofacil.ui.model.UiNextDrawInfo
 import com.cebolao.lotofacil.navigation.navigateToChecker
 import com.cebolao.lotofacil.ui.components.layout.AnimateOnEntry
 import com.cebolao.lotofacil.ui.components.stats.DistributionChartsCard
@@ -52,14 +49,15 @@ import com.cebolao.lotofacil.ui.components.game.NextContestHeroCard
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.stats.StatisticsPanel
 import com.cebolao.lotofacil.ui.components.game.WelcomeCard
-import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
 import com.cebolao.lotofacil.ui.theme.staggerDelay
 import com.cebolao.lotofacil.ui.components.common.LoadingCard
 import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
-import com.cebolao.lotofacil.data.repository.DatabaseLoadingState
-import com.cebolao.lotofacil.data.repository.LoadingPhase
+import com.cebolao.lotofacil.ui.components.common.DatabaseLoadingCard
+import com.cebolao.lotofacil.ui.components.game.HomeLoadingCard
+import com.cebolao.lotofacil.ui.components.game.HomeLoadingStatus
+import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.presentation.viewmodel.HomeScreenState
 import com.cebolao.lotofacil.presentation.viewmodel.HomeUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.HomeUiState
@@ -223,9 +221,24 @@ fun HomeScreenContent(
                     }
                 }
 
+                val databaseLoadingState = uiState.databaseLoadingState
+                if (databaseLoadingState !is DatabaseLoadingState.Idle) {
+                    item(key = "database_loading") {
+                        AnimateOnEntry(
+                            delayMillis = staggerDelay(1).toLong(),
+                            animation = EntryAnimation.SlideUp
+                        ) {
+                            DatabaseLoadingCard(
+                                loadingState = databaseLoadingState,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
                 item(key = "hero") {
                     AnimateOnEntry(
-                        delayMillis = staggerDelay(1).toLong(),
+                        delayMillis = staggerDelay(2).toLong(),
                         animation = EntryAnimation.Scale
                     ) {
                         AnimatedContent(
@@ -248,7 +261,7 @@ fun HomeScreenContent(
                 (uiState.screenState as? HomeScreenState.Error)?.takeIf { !uiState.isSyncing }?.let { error ->
                     item(key = "error") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(2).toLong(),
+                            delayMillis = staggerDelay(3).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             StandardAttentionCard(
@@ -264,7 +277,7 @@ fun HomeScreenContent(
                 successState?.lastDraw?.let { draw ->
                     item(key = "last_draw") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(3).toLong(),
+                            delayMillis = staggerDelay(4).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             LastDrawSection(
@@ -282,7 +295,7 @@ fun HomeScreenContent(
                 if (stats != null) {
                     item(key = "stats_panel") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(4).toLong(),
+                            delayMillis = staggerDelay(5).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             StatisticsPanel(
@@ -297,7 +310,7 @@ fun HomeScreenContent(
 
                     item(key = "distribution_charts") {
                         AnimateOnEntry(
-                            delayMillis = staggerDelay(5).toLong(),
+                            delayMillis = staggerDelay(6).toLong(),
                             animation = EntryAnimation.SlideUp
                         ) {
                             DistributionChartsCard(
@@ -313,7 +326,7 @@ fun HomeScreenContent(
 
                 item(key = "disclaimer") {
                     AnimateOnEntry(
-                        delayMillis = staggerDelay(6).toLong(),
+                        delayMillis = staggerDelay(7).toLong(),
                         animation = EntryAnimation.Fade
                     ) {
                         StandardAttentionCard(
@@ -328,93 +341,7 @@ fun HomeScreenContent(
     }
 }
 
-private data class HomeLoadingStatus(
-    @StringRes val titleRes: Int,
-    @StringRes val messageRes: Int,
-    val progress: Float
-)
 
-private sealed interface HomeHeroState {
-    data object Loading : HomeHeroState
-    data object Empty : HomeHeroState
-    data class Data(val info: NextDrawInfo) : HomeHeroState
-}
-
-@Composable
-private fun HomeLoadingCard(
-    status: HomeLoadingStatus,
-    modifier: Modifier = Modifier
-) {
-    val scheme = MaterialTheme.colorScheme
-    val progress by animateFloatAsState(
-        targetValue = status.progress,
-        animationSpec = Motion.Tween.medium(),
-        label = "home_loading_progress"
-    )
-
-    AppCard(
-        modifier = modifier,
-        outlined = true,
-        contentPadding = Dimen.Spacing16
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-            ) {
-                Icon(
-                    imageVector = AppIcons.Refresh,
-                    contentDescription = null,
-                    tint = scheme.primary,
-                    modifier = Modifier.size(Dimen.IconSmall)
-                )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
-                ) {
-                    AnimatedContent(
-                        targetState = status.titleRes,
-                        transitionSpec = {
-                            fadeIn(animationSpec = Motion.Tween.medium()) togetherWith
-                                fadeOut(animationSpec = Motion.Tween.fast())
-                        },
-                        label = "home_loading_title"
-                    ) { titleRes ->
-                        Text(
-                            text = stringResource(titleRes),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = scheme.onSurface
-                        )
-                    }
-                    AnimatedContent(
-                        targetState = status.messageRes,
-                        transitionSpec = {
-                            fadeIn(animationSpec = Motion.Tween.medium()) togetherWith
-                                fadeOut(animationSpec = Motion.Tween.fast())
-                        },
-                        label = "home_loading_message"
-                    ) { messageRes ->
-                        Text(
-                            text = stringResource(messageRes),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = scheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            LinearProgressIndicator(
-                progress = progress,
-                color = scheme.primary,
-                trackColor = scheme.surfaceVariant,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
 
 /**
  * Section displaying the last draw with navigation to checker and results.
@@ -452,152 +379,8 @@ private fun LastDrawSection(
     }
 }
 
-@Composable
-fun DatabaseLoadingCard(
-    loadingState: DatabaseLoadingState,
-    modifier: Modifier = Modifier,
-    onRetry: () -> Unit = {}
-) {
-    val scheme = MaterialTheme.colorScheme
-
-    when (loadingState) {
-        is DatabaseLoadingState.Idle -> {
-            Spacer(modifier = modifier)
-        }
-        is DatabaseLoadingState.Loading -> {
-            val phaseTitle = when (loadingState.phase) {
-                LoadingPhase.CHECKING -> R.string.db_loading_checking
-                LoadingPhase.READING_ASSETS -> R.string.db_loading_reading_assets
-                LoadingPhase.PARSING_DATA -> R.string.db_loading_parsing
-                LoadingPhase.SAVING_TO_DATABASE -> R.string.db_loading_saving
-                LoadingPhase.FINALIZING -> R.string.db_loading_finalizing
-            }
-
-            val progress by animateFloatAsState(
-                targetValue = loadingState.progress,
-                animationSpec = Motion.Tween.medium(),
-                label = "db_loading_progress"
-            )
-
-            AppCard(
-                modifier = modifier,
-                outlined = true,
-                contentPadding = Dimen.Spacing16
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(Dimen.IconSmall),
-                            strokeWidth = Dimen.Border.Thin,
-                            color = scheme.primary
-                        )
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
-                        ) {
-                            Text(
-                                text = stringResource(phaseTitle),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = scheme.onSurface
-                            )
-                            if (loadingState.totalCount > 0) {
-                                Text(
-                                    text = stringResource(
-                                        R.string.db_loading_progress,
-                                        loadingState.loadedCount,
-                                        loadingState.totalCount
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = scheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        color = scheme.primary,
-                        trackColor = scheme.surfaceVariant,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-        is DatabaseLoadingState.Completed -> {
-            AppCard(
-                modifier = modifier,
-                outlined = true,
-                contentPadding = Dimen.Spacing16
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-                ) {
-                    Icon(
-                        imageVector = AppIcons.Check,
-                        contentDescription = null,
-                        tint = scheme.primary,
-                        modifier = Modifier.size(Dimen.IconSmall)
-                    )
-                    Text(
-                        text = stringResource(R.string.db_loading_complete, loadingState.loadedCount),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = scheme.onSurface
-                    )
-                }
-            }
-        }
-        is DatabaseLoadingState.Failed -> {
-            AppCard(
-                modifier = modifier,
-                outlined = true,
-                contentPadding = Dimen.Spacing16
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
-                    ) {
-                        Icon(
-                            imageVector = AppIcons.Error,
-                            contentDescription = null,
-                            tint = scheme.error,
-                            modifier = Modifier.size(Dimen.IconSmall)
-                        )
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing4)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.general_error_title),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = scheme.onSurface
-                            )
-                            Text(
-                                text = loadingState.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = scheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    TextButton(
-                        onClick = onRetry,
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text(text = stringResource(R.string.db_loading_retry))
-                    }
-                }
-            }
-        }
-    }
+private sealed interface HomeHeroState {
+    data object Loading : HomeHeroState
+    data object Empty : HomeHeroState
+    data class Data(val info: UiNextDrawInfo) : HomeHeroState
 }

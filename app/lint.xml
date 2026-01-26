@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <!-- Suppress upgrade/version suggestions; handled manually. -->
+    <!-- Suppress noisy upgrade nudges; dependency bumps are tracked separately. -->
     <issue id="AndroidGradlePluginVersion" severity="ignore" />
     <issue id="GradleDependency" severity="ignore" />
     <issue id="NewerVersionAvailable" severity="ignore" />
-
-    <!-- Third-party native alignment warning from test dependency (mockk). -->
-    <issue id="Aligned16KB" severity="ignore" />
 </lint>

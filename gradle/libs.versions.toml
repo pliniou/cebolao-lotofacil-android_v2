@@ -9,11 +9,11 @@ ktlintGradle = "14.0.1"
 detekt = "1.23.8"
 
 # Android Core & Compose
-coreKtx = "1.13.0"
-lifecycle = "2.8.0"
-activityCompose = "1.9.0"
+coreKtx = "1.13.1"
+lifecycle = "2.8.7"
+activityCompose = "1.9.3"
 composeBom = "2026.01.00" # Latest Compose BOM
-navigationCompose = "2.8.0"
+navigationCompose = "2.8.3"
 splashScreen = "1.0.1"
 
 # DI / Background
@@ -26,11 +26,11 @@ datastore = "1.2.0"
 room = "2.8.4"
 
 # Network
-retrofit = "2.9.0"
-okhttp = "5.0.0" # OkHttp 5 for improved HTTP/2 support
+retrofit = "2.11.0"
+okhttp = "4.12.0" # Latest stable OkHttp
 
 # KotlinX
-kotlinxSerialization = "1.7.0"
+kotlinxSerialization = "1.7.3"
 kotlinxCollections = "0.3.6"
 coroutines = "1.8.2"
 

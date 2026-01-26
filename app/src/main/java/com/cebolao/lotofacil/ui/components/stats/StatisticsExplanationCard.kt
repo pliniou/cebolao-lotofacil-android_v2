@@ -102,7 +102,7 @@ fun StatisticsExplanationCard(
                     }
                 }
 
-                // Ícone com rotação animada
+                // Icon with animated rotation
                 val rotation by animateFloatAsState(
                     targetValue = if (expanded) 180f else 0f,
                     animationSpec = Motion.Spring.gentle(),
@@ -123,7 +123,7 @@ fun StatisticsExplanationCard(
             if (expanded) {
                 AppDivider()
 
-                // Seção 1: Distribuição Normal
+                // Section 1: Normal Distribution
                 EduSectionCard(
                     title = stringResource(R.string.edu_section_normal_dist),
                     icon = Icons.Outlined.School
@@ -136,7 +136,7 @@ fun StatisticsExplanationCard(
 
                 AppDivider()
 
-                // Seção 2: Filtros (explicação geral + lista de filtros do app)
+                // Section 2: Filters (general explanation + list of app filters)
                 EduSectionCard(
                     title = stringResource(R.string.edu_section_filters),
                     icon = Icons.Outlined.Info

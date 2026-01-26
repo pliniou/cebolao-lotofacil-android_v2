@@ -16,14 +16,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.domain.model.NextDrawInfo
+import com.cebolao.lotofacil.ui.model.UiNextDrawInfo
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 @Composable
 fun NextContestHeroCard(
-    info: NextDrawInfo?,
+    info: UiNextDrawInfo?,
     modifier: Modifier = Modifier
 ) {
     if (info == null) return

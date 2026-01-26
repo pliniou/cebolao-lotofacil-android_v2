@@ -15,8 +15,7 @@ build/
 /temp_gradle_home
 .kotlin
 .vscode
-
-# Gradle Wrapper
+.gradle-tmp
 gradlew
 gradlew.bat
 gradle/wrapper/

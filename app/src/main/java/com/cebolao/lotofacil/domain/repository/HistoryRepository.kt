@@ -1,8 +1,8 @@
 package com.cebolao.lotofacil.domain.repository
 
-import com.cebolao.lotofacil.data.repository.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.model.AppError
 import com.cebolao.lotofacil.domain.model.AppResult
+import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.model.Draw
 import com.cebolao.lotofacil.domain.model.DrawDetails
 import kotlinx.coroutines.Job

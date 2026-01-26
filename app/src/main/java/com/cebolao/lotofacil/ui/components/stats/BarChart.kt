@@ -95,6 +95,8 @@ fun BarChart(
         try {
             ResourcesCompat.getFont(context, R.font.stacksansnotch_bold) ?: Typeface.DEFAULT_BOLD
         } catch (e: Exception) {
+            // Gracefully fallback to default typeface if custom font fails to load
+            @Suppress("SwallowedException")
             Typeface.DEFAULT_BOLD
         }
     }
@@ -470,7 +472,7 @@ private fun DrawScope.drawNormalLine(
     val path = Path()
     var started = false
 
-    // Calcular distribuição normal para cada ponto de dados
+    // Calculate normal distribution for each data point
     data.forEachIndexed { i, (label, _) ->
         val xCenter = m.getX(i)
         val value = label.toFloatOrNull() ?: return@forEachIndexed

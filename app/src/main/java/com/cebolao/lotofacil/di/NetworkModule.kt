@@ -20,9 +20,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-/**
- * Provides network dependencies. Updated for OkHttp 5.x and Retrofit 2.9.
- */
+/** Provides network dependencies (OkHttp 4.x + Retrofit 2.11). */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {

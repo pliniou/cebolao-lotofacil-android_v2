@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.domain.usecase
 
-import android.util.Log
 import com.cebolao.lotofacil.di.DefaultDispatcher
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.AppError
@@ -21,8 +20,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import java.security.MessageDigest
 import javax.inject.Inject
-
-private const val TAG = "CheckGameUseCase"
 
 class CheckGameUseCase @Inject constructor(
     private val historyRepository: HistoryRepository,
@@ -95,7 +92,6 @@ class CheckGameUseCase @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Log.e(TAG, "Check failed", e)
             emit(AppResult.Failure(AppError.Unknown(e)))
         }
     }.flowOn(defaultDispatcher)

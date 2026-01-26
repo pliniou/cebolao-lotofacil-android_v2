@@ -1,7 +1,7 @@
 package com.cebolao.lotofacil.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
+import com.cebolao.lotofacil.domain.model.ThemeMode
 import com.cebolao.lotofacil.domain.usecase.ObserveAppConfigUseCase
 import com.cebolao.lotofacil.domain.usecase.UpdateAppConfigUseCase
 import com.cebolao.lotofacil.navigation.AppRoute
@@ -26,7 +26,7 @@ import javax.inject.Inject
 data class MainUiState(
     val isReady: Boolean = false,
     val startDestination: AppRoute = AppRoute.Onboarding,
-    val themeMode: String = THEME_MODE_LIGHT,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val accentPalette: AccentPalette = DefaultAccentPalette
 ) : UiState
 
@@ -94,6 +94,6 @@ class MainViewModel @Inject constructor(
  */
 sealed interface MainUiEvent : UiEvent {
     data object CompleteOnboarding : MainUiEvent
-    data class SetThemeMode(val mode: String) : MainUiEvent
+    data class SetThemeMode(val mode: ThemeMode) : MainUiEvent
     data class SetAccentPalette(val palette: AccentPalette) : MainUiEvent
 }

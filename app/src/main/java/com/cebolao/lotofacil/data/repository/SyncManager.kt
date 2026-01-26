@@ -2,6 +2,7 @@ package com.cebolao.lotofacil.data.repository
 
 import android.util.Log
 import com.cebolao.lotofacil.data.local.db.DrawDao
+import com.cebolao.lotofacil.data.mapper.toValidatedDrawOrNull
 import com.cebolao.lotofacil.data.network.ApiService
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.di.IoDispatcher
@@ -10,10 +11,10 @@ import com.cebolao.lotofacil.data.mapper.toEntity
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.serialization.SerializationException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,8 +51,10 @@ class SyncManager @Inject constructor(
                 // Fetch latest draw from remote
                 val remoteResult = apiService.getLatestResult()
                     ?: throw SyncException("Unable to fetch latest draw from API")
+                val latestDraw = remoteResult.toValidatedDrawOrNull()
+                    ?: throw SyncException("Latest draw payload missing or invalid numbers")
 
-                val remoteMax = remoteResult.numero
+                val remoteMax = latestDraw.contestNumber
 
                 Log.d(TAG, "Sync check: local=$currentMax, remote=$remoteMax")
 
@@ -104,9 +107,12 @@ class SyncManager @Inject constructor(
         return withContext(ioDispatcher) {
             try {
                 val currentMax = drawDao.getLastDrawSnapshot()?.contestNumber ?: 0
-                val remoteResult = apiService.getLatestResult() ?: return@withContext true
+                val remoteResult = apiService.getLatestResult()
+                    ?: throw SyncException("Unable to fetch latest draw from API")
+                val latestDraw = remoteResult.toValidatedDrawOrNull()
+                    ?: throw SyncException("Latest draw payload missing or invalid numbers")
 
-                val remoteMax = remoteResult.numero
+                val remoteMax = latestDraw.contestNumber
                 remoteMax > currentMax
             } catch (e: IOException) {
                 Log.w(TAG, "Network error checking sync status", e)
@@ -145,49 +151,23 @@ class SyncManager @Inject constructor(
             }.awaitAll()
         }
 
-        return output.filterNotNull()
+        val draws = output.filterNotNull()
+        if (draws.size != size) {
+            throw SyncException("Incomplete draw payloads for range $range (expected $size, got ${draws.size})")
+        }
+        return draws
     }
 
     private suspend fun fetchSingleDraw(contestNumber: Int): com.cebolao.lotofacil.domain.model.Draw? {
         return withContext(ioDispatcher) {
             runCatching {
                 val apiResult = apiService.getResultByContest(contestNumber)
-                apiResultToDraw(apiResult)
+                val validated = apiResult?.toValidatedDrawOrNull()
+                if (validated == null) {
+                    Log.w(TAG, "Invalid draw payload for contest $contestNumber")
+                }
+                validated
             }.getOrNull()
         }
     }
-
-    private fun apiResultToDraw(apiResult: LotofacilApiResult): com.cebolao.lotofacil.domain.model.Draw? {
-        return runCatching {
-            val contest = apiResult.numero
-            val mask = stringsToMask(apiResult.listaDezenas)
-            if (contest <= 0 || java.lang.Long.bitCount(mask) != 15) return null
-
-            val dateMillis = apiResult.dataApuracao
-                ?.takeIf { it.isNotBlank() }
-                ?.let { dateStr ->
-                    runCatching {
-                        java.time.LocalDate.parse(dateStr, dateFormatter)
-                            .atStartOfDay(java.time.ZoneId.systemDefault())
-                            .toInstant()
-                            .toEpochMilli()
-                    }.getOrNull()
-                }
-
-            com.cebolao.lotofacil.domain.model.Draw(contest, mask, dateMillis)
-        }.getOrNull()
-    }
-
-    private fun stringsToMask(numbers: List<String>): Long {
-        var mask = 0L
-        for (s in numbers) {
-            val n = s.toIntOrNull() ?: continue
-            val idx = n - 1
-            if (idx in 0..63) mask = mask or (1L shl idx)
-        }
-        return mask
-    }
-
-    private val dateFormatter = java.time.format.DateTimeFormatter
-        .ofPattern("dd/MM/yyyy", java.util.Locale.forLanguageTag("pt-BR"))
 }

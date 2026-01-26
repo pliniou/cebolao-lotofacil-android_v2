@@ -1,12 +1,13 @@
 package com.cebolao.lotofacil.domain.repository
 
+import com.cebolao.lotofacil.domain.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
 
 interface UserPreferencesRepository {
     /**
      * Tema atual (string conforme o padrão do app).
      */
-    val themeMode: Flow<String>
+    val themeMode: Flow<ThemeMode>
 
     /**
      * Indica se o onboarding já foi concluído.
@@ -19,19 +20,9 @@ interface UserPreferencesRepository {
     val accentPalette: Flow<String>
 
     /**
-     * Histórico (strings) utilizado por funcionalidades dinâmicas do app.
-     */
-    suspend fun getHistory(): Set<String>
-
-    /**
-     * Adiciona entradas ao histórico dinâmico.
-     */
-    suspend fun addDynamicHistoryEntries(newHistoryEntries: Set<String>)
-
-    /**
      * Define o modo de tema.
      */
-    suspend fun setThemeMode(mode: String)
+    suspend fun setThemeMode(mode: ThemeMode)
 
     /**
      * Define conclusão do onboarding.

@@ -1,6 +1,6 @@
 package com.cebolao.lotofacil.domain.usecase
 
-import com.cebolao.lotofacil.data.repository.DatabaseLoadingState
+import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

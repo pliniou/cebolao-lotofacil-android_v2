@@ -36,6 +36,7 @@ class CebolaoApplication : Application(), Configuration.Provider {
             )
             .build()
 
+    // Custom exception handler for crash logging - still delegates to default handler after logging
     @SuppressLint("DefaultUncaughtExceptionDelegation")
     override fun onCreate() {
         super.onCreate()

@@ -27,6 +27,7 @@
     <string name="count_short">Qtd</string>
     <plurals name="and_more_count">
         <item quantity="one">e mais %1$d…</item>
+        <item quantity="many">e mais %1$d…</item>
         <item quantity="other">e mais %1$d…</item>
     </plurals>
     <string name="action_retry">Tentar novamente</string>
@@ -233,6 +234,7 @@
     <string name="about_theme_mode">Modo de Tema</string>
     <string name="about_theme_light">Claro</string>
     <string name="about_theme_dark">Escuro</string>
+    <string name="about_theme_system">Sistema</string>
     <string name="about_accent_color">Cor de Destaque</string>
     <string name="about_accent_blue">Azul</string>
     <string name="about_accent_purple">Roxo</string>
@@ -489,6 +491,24 @@
     <string name="home_loading_sync_message">Buscando os concursos mais recentes.</string>
     <string name="home_loading_stats_title">Atualizando estatísticas</string>
     <string name="home_loading_stats_message">Calculando padrões e frequências.</string>
+
+    <!-- Database Loading States -->
+    <string name="db_loading_checking">Verificando status do banco…</string>
+    <string name="db_loading_reading_assets">Lendo arquivo de dados…</string>
+    <string name="db_loading_parsing">Processando resultados…</string>
+    <string name="db_loading_saving">Salvando no banco…</string>
+    <string name="db_loading_finalizing">Finalizando…</string>
+    <plurals name="db_loading_progress">
+        <item quantity="one">%1$d de %2$d concurso carregado</item>
+        <item quantity="many">%1$d de %2$d concursos carregados</item>
+        <item quantity="other">%1$d de %2$d concursos carregados</item>
+    </plurals>
+    <plurals name="db_loading_complete">
+        <item quantity="one">Base pronta com %1$d concurso</item>
+        <item quantity="many">Base pronta com %1$d concursos</item>
+        <item quantity="other">Base pronta com %1$d concursos</item>
+    </plurals>
+    <string name="db_loading_retry">Tentar novamente</string>
 
     <!-- About Screen Hard-coded Strings -->
     <string name="about_source_title">Fonte dos Dados</string>

@@ -5,7 +5,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -15,21 +18,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.compose.material3.surfaceColorAtElevation
 import com.cebolao.lotofacil.navigation.AppRoute
 import com.cebolao.lotofacil.navigation.Screen
 import com.cebolao.lotofacil.navigation.bottomNavItems
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.FontFamilyBody
-import com.cebolao.lotofacil.ui.theme.GlassSurfaceDark
-import com.cebolao.lotofacil.ui.theme.GlassSurfaceLight
 import com.cebolao.lotofacil.ui.theme.Motion
 
 /**
@@ -59,18 +62,7 @@ fun AppBottomBar(navController: NavHostController, currentDestination: NavDestin
             animationSpec = Motion.Tween.exit()
         ) + fadeOut(animationSpec = Motion.Tween.fast())
     ) {
-        NavigationBar(
-            containerColor = if (isDark) GlassSurfaceDark else GlassSurfaceLight,
-            tonalElevation = Dimen.Elevation.None,
-            modifier = Modifier.drawBehind {
-                drawLine(
-                    color = scheme.outlineVariant.copy(alpha = 0.2f),
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, 0f),
-                    strokeWidth = Dimen.Border.Thin.toPx()
-                )
-            }
-        ) {
+        NavigationBarContainer(isDark = isDark) {
             val isResults = currentDestination?.hierarchySequence()?.any {
                 it.route?.startsWith(AppRoute.Results::class.qualifiedName.orEmpty()) == true
             } == true
@@ -110,22 +102,44 @@ fun AppBottomBar(navController: NavHostController, currentDestination: NavDestin
                         if (label.isNotEmpty()) {
                             Text(
                                 text = label,
-                                style = MaterialTheme.typography.labelSmall,
+                                style = MaterialTheme.typography.labelMedium,
                                 fontFamily = FontFamilyBody,
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
                             )
                         }
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = scheme.primaryContainer.copy(alpha = 0.7f),
-                        selectedIconColor = scheme.onPrimaryContainer,
-                        selectedTextColor = scheme.primary,
-                        unselectedIconColor = scheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        unselectedTextColor = scheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        indicatorColor = scheme.secondaryContainer.copy(alpha = 0.9f),
+                        selectedIconColor = scheme.onSecondaryContainer,
+                        selectedTextColor = scheme.onSurface,
+                        unselectedIconColor = scheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        unselectedTextColor = scheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun NavigationBarContainer(
+    isDark: Boolean,
+    content: @Composable RowScope.() -> Unit
+) {
+    val scheme = MaterialTheme.colorScheme
+    val barShape = MaterialTheme.shapes.large
+
+    NavigationBar(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimen.Spacing16, vertical = Dimen.Spacing8)
+            .shadow(elevation = 8.dp, shape = barShape, ambientColor = scheme.primary.copy(alpha = 0.08f), spotColor = scheme.primary.copy(alpha = 0.08f))
+            .clip(barShape),
+        containerColor = scheme.surfaceColorAtElevation(if (isDark) 8.dp else 6.dp),
+        tonalElevation = 0.dp,
+        contentColor = scheme.onSurface
+    ) {
+        content()
     }
 }
 

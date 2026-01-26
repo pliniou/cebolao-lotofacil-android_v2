@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.ui.components.stats
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,7 +41,7 @@ fun DistributionChartsCard(
     selectedPattern: StatisticPattern,
     onPatternSelected: (StatisticPattern) -> Unit,
     lastDraw: UiDraw? = null,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
 
@@ -65,7 +64,7 @@ fun DistributionChartsCard(
         }
     }
 
-    // Valor do último sorteio para destacar no gráfico
+    // Value of the last draw to highlight in the chart
     val highlightValue by remember(lastDraw, selectedPattern) {
         derivedStateOf {
             lastDraw?.let { draw ->
@@ -94,9 +93,9 @@ fun DistributionChartsCard(
             variant = CardVariant.Glass,
             outlined = true,
             title = stringResource(R.string.home_distribution_title),
-            contentPadding = Dimen.Spacing16, // Aumentado para 16dp
+            contentPadding = Dimen.Spacing16,
             headerActions = {
-                // Legenda do destaque (último concurso)
+                // Highlight legend (last draw)
                 val highlight = highlightValue
                 if (highlight != null) {
                     Canvas(modifier = Modifier.size(Dimen.IndicatorHeightSmall)) {
@@ -220,7 +219,7 @@ private fun prepareData(
     }
     if (raw.isEmpty()) return emptyList()
 
-    // Para SOMA, respeitar range e step do AppConfig
+    // For SUM, respect range and step from AppConfig
     if (pattern == StatisticPattern.SUM) {
         val buckets = (GameConstants.SUM_MIN_RANGE..GameConstants.SUM_MAX_RANGE step GameConstants.SUM_STEP)
             .associateWith { 0 }
@@ -233,7 +232,7 @@ private fun prepareData(
             .map { it.key.toString() to it.value }
     }
 
-    // Demais padrões: preencher “buracos” para suavizar leitura
+    // Other patterns: fill "gaps" to smooth reading
     val domain = domainFor(pattern)
     val minKey = raw.keys.minOrNull() ?: 0
     val maxKey = raw.keys.maxOrNull() ?: 0
@@ -251,7 +250,7 @@ private fun prepareData(
     return inRange + outOfRange
 }
 
-/** Domínios discretos “naturais” para eixos consistentes. */
+/** "Natural" discrete domains for consistent axes. */
 private fun domainFor(pattern: StatisticPattern): IntRange? = when (pattern) {
     StatisticPattern.EVENS -> 0..15
     StatisticPattern.PRIMES -> 0..15

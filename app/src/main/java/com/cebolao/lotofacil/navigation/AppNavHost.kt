@@ -20,6 +20,7 @@ import com.cebolao.lotofacil.ui.screens.HomeScreen
 import com.cebolao.lotofacil.ui.screens.OnboardingScreen
 import com.cebolao.lotofacil.ui.screens.ResultsScreen
 import com.cebolao.lotofacil.ui.theme.Motion
+import com.cebolao.lotofacil.ui.util.MotionPreferences
 
 @Composable
 fun AppNavHost(
@@ -28,6 +29,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel
 ) {
+    val reduceMotion = MotionPreferences.rememberPrefersReducedMotion()
 
     NavHost(
         navController = navController,
@@ -36,26 +38,26 @@ fun AppNavHost(
         enterTransition = {
             slideInHorizontally(
                 initialOffsetX = { (it * 0.1f).toInt() },
-                animationSpec = Motion.Tween.medium()
-            ) + fadeIn(Motion.Tween.medium())
+                animationSpec = Motion.Tween.medium(reduceMotion)
+            ) + fadeIn(Motion.Tween.medium(reduceMotion))
         },
         exitTransition = {
             slideOutHorizontally(
                 targetOffsetX = { -(it * 0.1f).toInt() },
-                animationSpec = Motion.Tween.medium()
-            ) + fadeOut(Motion.Tween.fast())
+                animationSpec = Motion.Tween.medium(reduceMotion)
+            ) + fadeOut(Motion.Tween.fast(reduceMotion))
         },
         popEnterTransition = {
             slideInHorizontally(
                 initialOffsetX = { -(it * 0.1f).toInt() },
-                animationSpec = Motion.Tween.medium()
-            ) + fadeIn(Motion.Tween.medium())
+                animationSpec = Motion.Tween.medium(reduceMotion)
+            ) + fadeIn(Motion.Tween.medium(reduceMotion))
         },
         popExitTransition = {
             slideOutHorizontally(
                 targetOffsetX = { (it * 0.1f).toInt() },
-                animationSpec = Motion.Tween.medium()
-            ) + fadeOut(Motion.Tween.fast())
+                animationSpec = Motion.Tween.medium(reduceMotion)
+            ) + fadeOut(Motion.Tween.fast(reduceMotion))
         }
     ) {
         composable<AppRoute.Onboarding> {

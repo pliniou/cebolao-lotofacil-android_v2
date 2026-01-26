@@ -72,13 +72,17 @@ object Motion {
      */
     object Tween {
         /** Tween rápido para micro-interações */
-        fun <T> fast() = tween<T>(Duration.FAST, easing = Easing.Standard)
+        fun <T> fast(reduceMotion: Boolean = false) =
+            tween<T>(if (reduceMotion) 0 else Duration.FAST, easing = Easing.Standard)
         /** Tween médio para transições padrão */
-        fun <T> medium() = tween<T>(Duration.MEDIUM, easing = Easing.Standard)
+        fun <T> medium(reduceMotion: Boolean = false) =
+            tween<T>(if (reduceMotion) 0 else Duration.MEDIUM, easing = Easing.Standard)
         /** Tween de entrada com desaceleração */
-        fun <T> enter() = tween<T>(Duration.ENTER, easing = Easing.EmphasizedDecelerate)
+        fun <T> enter(reduceMotion: Boolean = false) =
+            tween<T>(if (reduceMotion) 0 else Duration.ENTER, easing = Easing.EmphasizedDecelerate)
         /** Tween de saída com aceleração */
-        fun <T> exit() = tween<T>(Duration.EXIT, easing = Easing.EmphasizedAccelerate)
+        fun <T> exit(reduceMotion: Boolean = false) =
+            tween<T>(if (reduceMotion) 0 else Duration.EXIT, easing = Easing.EmphasizedAccelerate)
     }
     
     // --- OFFSET SPECS ---

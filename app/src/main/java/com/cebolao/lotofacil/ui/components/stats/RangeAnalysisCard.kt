@@ -35,7 +35,7 @@ fun RangeAnalysisCard(
             // Header com estatísticas gerais
             RangeStatsHeader(rangeStats)
             
-            // Distribuição por faixa
+            // Distribution by range
             RangeDistributionGrid(rangeStats)
             
             // Insights

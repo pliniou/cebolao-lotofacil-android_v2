@@ -40,6 +40,7 @@ class HapticFeedbackManager(context: Context) {
             context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
         vibratorManager?.defaultVibrator
     } else {
+        // Android \u003c 12 (API \u003c 31) uses deprecated VIBRATOR_SERVICE
         @Suppress("DEPRECATION")
         context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }

@@ -8,7 +8,7 @@ data class UiLotofacilGame(
     val numbers: Set<Int>,
     val isPinned: Boolean,
     val creationTimestamp: Long,
-    val mask: Long // Mantendo mask para identificação se necessário, ou usar hash
+    val mask: Long
 )
 
 fun LotofacilGame.toUiModel(): UiLotofacilGame = UiLotofacilGame(
@@ -18,7 +18,7 @@ fun LotofacilGame.toUiModel(): UiLotofacilGame = UiLotofacilGame(
     mask = mask
 )
 
-// Converter de volta se necessário (geralmente ações da UI retornam ID/Objeto para ViewModel que sabe lidar com Domain)
+// Convert back if needed (usually UI actions return ID/Object to ViewModel that knows how to handle Domain)
 fun UiLotofacilGame.toDomain(): LotofacilGame = LotofacilGame.fromMask(
     mask = mask,
     isPinned = isPinned,

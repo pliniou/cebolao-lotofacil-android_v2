@@ -52,61 +52,61 @@ data class AccentPalette(
 val AccentAzul = AccentPalette(
     name = "AZUL",
     primary = BrandAzul,
-    primaryContainer = BrandAzul.copy(alpha = 0.1f),
+    primaryContainer = BrandAzulLight,
     secondary = BrandRoxo,
-    secondaryContainer = BrandRoxo.copy(alpha = 0.1f),
+    secondaryContainer = BrandRoxoLight,
     tertiary = BrandAmarelo,
-    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+    tertiaryContainer = BrandAmareloLight
 )
 
 val AccentRoxo = AccentPalette(
     name = "ROXO",
     primary = BrandRoxo,
-    primaryContainer = BrandRoxo.copy(alpha = 0.1f),
+    primaryContainer = BrandRoxoLight,
     secondary = BrandRosa,
-    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    secondaryContainer = BrandRosaLight,
     tertiary = BrandAmarelo,
-    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+    tertiaryContainer = BrandAmareloLight
 )
 
 val AccentVerde = AccentPalette(
     name = "VERDE",
     primary = BrandVerde,
-    primaryContainer = BrandVerde.copy(alpha = 0.1f),
+    primaryContainer = BrandVerdeLight,
     secondary = BrandRosa,
-    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    secondaryContainer = BrandRosaLight,
     tertiary = BrandAmarelo,
-    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+    tertiaryContainer = BrandAmareloLight
 )
 
 val AccentAmarelo = AccentPalette(
     name = "AMARELO",
     primary = BrandAmarelo,
-    primaryContainer = BrandAmarelo.copy(alpha = 0.1f),
+    primaryContainer = BrandAmareloLight,
     secondary = BrandRosa,
-    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    secondaryContainer = BrandRosaLight,
     tertiary = BrandAmarelo,
-    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+    tertiaryContainer = BrandAmareloLight
 )
 
 val AccentRosa = AccentPalette(
     name = "ROSA",
     primary = BrandRosa,
-    primaryContainer = BrandRosa.copy(alpha = 0.1f),
+    primaryContainer = BrandRosaLight,
     secondary = BrandAzul,
-    secondaryContainer = BrandAzul.copy(alpha = 0.1f),
+    secondaryContainer = BrandAzulLight,
     tertiary = BrandAmarelo,
-    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+    tertiaryContainer = BrandAmareloLight
 )
 
 val AccentLaranja = AccentPalette(
     name = "LARANJA",
     primary = BrandLaranja,
-    primaryContainer = BrandLaranja.copy(alpha = 0.1f),
+    primaryContainer = BrandLaranjaLight,
     secondary = BrandRosa,
-    secondaryContainer = BrandRosa.copy(alpha = 0.1f),
+    secondaryContainer = BrandRosaLight,
     tertiary = BrandAmarelo,
-    tertiaryContainer = BrandAmarelo.copy(alpha = 0.1f)
+    tertiaryContainer = BrandAmareloLight
 )
 
 val AccentPalettes = listOf(
@@ -137,30 +137,30 @@ private fun lightColorScheme(palette: AccentPalette): ColorScheme = androidx.com
     onTertiary = Color.White,
     tertiaryContainer = palette.tertiaryContainer,
     onTertiaryContainer = Color.Black,
-    background = Color(0xFFFAFAFA),
-    onBackground = Color.Black,
-    surface = Color.White,
-    onSurface = Color.Black,
+    background = LightBackground,
+    onBackground = LightTextPrimary,
+    surface = LightSurface1,
+    onSurface = LightTextPrimary,
     error = Color(0xFFB3261E),
     onError = Color.White,
     errorContainer = Color(0xFFFFDAD4),
     onErrorContainer = Color(0xFF410E0B),
-    outline = Color(0xFF747474),
-    outlineVariant = Color(0xFFBDBDBD),
-    surfaceVariant = Color(0xFFE7E7E7),
-    onSurfaceVariant = Color(0xFF49454F),
-    surfaceTint = Color(0xFFE7E7E7),
+    outline = LightOutline,
+    outlineVariant = LightOutlineVariant,
+    surfaceVariant = LightSurface3,
+    onSurfaceVariant = LightTextSecondary,
+    surfaceTint = palette.primary,
     scrim = Color(0xFF000000),
-    inverseSurface = Color(0xFF2F2F2F),
-    inverseOnSurface = Color.White,
+    inverseSurface = LightSurface3,
+    inverseOnSurface = LightTextPrimary,
     inversePrimary = palette.primary,
-    surfaceBright = Color.White,
-    surfaceDim = Color(0xFFDADADA),
-    surfaceContainer = Color(0xFFF5F5F5),
-    surfaceContainerHigh = Color.White,
-    surfaceContainerHighest = Color.White,
-    surfaceContainerLow = Color(0xFFF5F5F5),
-    surfaceContainerLowest = Color.White
+    surfaceBright = LightSurface1,
+    surfaceDim = LightSurface3,
+    surfaceContainer = LightSurface2,
+    surfaceContainerHigh = LightSurface1,
+    surfaceContainerHighest = LightSurface3,
+    surfaceContainerLow = LightSurface2,
+    surfaceContainerLowest = LightSurface1
 )
 
 private fun darkColorScheme(palette: AccentPalette): ColorScheme = androidx.compose.material3.darkColorScheme(
@@ -176,28 +176,28 @@ private fun darkColorScheme(palette: AccentPalette): ColorScheme = androidx.comp
     onTertiary = Color.Black,
     tertiaryContainer = palette.tertiaryContainer,
     onTertiaryContainer = Color.White,
-    background = Color(0xFF121212),
-    onBackground = Color.White,
-    surface = Color(0xFF1E1E1E),
-    onSurface = Color.White,
+    background = DarkBackground,
+    onBackground = DarkTextPrimary,
+    surface = DarkSurface1,
+    onSurface = DarkTextPrimary,
     error = Color(0xFFF2B8B5),
     onError = Color(0xFF601410),
     errorContainer = Color(0xFF8C1D18),
     onErrorContainer = Color(0xFFFFDAD4),
-    outline = Color(0xFF8A8A8A),
-    outlineVariant = Color(0xFF49454F),
-    surfaceVariant = Color(0xFF49454F),
-    onSurfaceVariant = Color(0xFFCAC4D0),
-    surfaceTint = Color(0xFF1E1E1E),
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant,
+    surfaceVariant = DarkSurface3,
+    onSurfaceVariant = DarkTextSecondary,
+    surfaceTint = palette.primary,
     scrim = Color(0xFF000000),
-    inverseSurface = Color(0xFFEDEDED),
-    inverseOnSurface = Color.Black,
+    inverseSurface = LightSurface1,
+    inverseOnSurface = DarkTextPrimary,
     inversePrimary = palette.primary,
-    surfaceBright = Color(0xFF343434),
-    surfaceDim = Color(0xFF1E1E1E),
-    surfaceContainer = Color(0xFF1E1E1E),
-    surfaceContainerHigh = Color(0xFF343434),
-    surfaceContainerHighest = Color(0xFF49454F),
-    surfaceContainerLow = Color(0xFF1E1E1E),
-    surfaceContainerLowest = Color(0xFF000000)
+    surfaceBright = DarkSurface3,
+    surfaceDim = DarkSurface1,
+    surfaceContainer = DarkSurface2,
+    surfaceContainerHigh = DarkSurface2,
+    surfaceContainerHighest = DarkSurface3,
+    surfaceContainerLow = DarkSurface1,
+    surfaceContainerLowest = DarkSurface1
 )

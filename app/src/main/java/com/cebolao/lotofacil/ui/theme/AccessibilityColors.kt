@@ -73,7 +73,7 @@ object AccessibilityColors {
         minRatio: Float = WCAG_AA_NORMAL,
         preferDarker: Boolean = background.luminance() > 0.5f
     ): Color {
-        // Se já tem contraste suficiente, retorna a cor original
+        // If already has sufficient contrast, return the original color
         if (meetsContrastRequirement(color, background, minRatio)) {
             return color
         }

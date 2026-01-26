@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.domain.model.NextDrawInfo
+import com.cebolao.lotofacil.ui.model.UiNextDrawInfo
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.AppIcons
@@ -58,7 +58,7 @@ private fun getGreetingIcon(hour: Int): ImageVector {
 @Composable
 fun WelcomeCard(
     modifier: Modifier = Modifier,
-    nextDrawInfo: NextDrawInfo? = null
+    nextDrawInfo: UiNextDrawInfo? = null
 ) {
     val scheme = MaterialTheme.colorScheme
 

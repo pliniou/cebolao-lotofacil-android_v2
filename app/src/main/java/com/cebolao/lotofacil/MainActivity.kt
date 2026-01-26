@@ -3,6 +3,7 @@ package com.cebolao.lotofacil
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.cebolao.lotofacil.data.repository.THEME_MODE_DARK
-import com.cebolao.lotofacil.data.repository.THEME_MODE_LIGHT
+import com.cebolao.lotofacil.domain.model.ThemeMode
 import com.cebolao.lotofacil.ui.screens.MainScreen
 import com.cebolao.lotofacil.ui.theme.CebolaoLotofacilTheme
 import com.cebolao.lotofacil.ui.util.SplashAnimationHelper
@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val splash = installSplashScreen()
 
         setupSplashScreen(splash)
@@ -37,9 +38,9 @@ class MainActivity : ComponentActivity() {
             val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
 
             val darkTheme = when (uiState.themeMode) {
-                THEME_MODE_DARK -> true
-                THEME_MODE_LIGHT -> false
-                else -> isSystemInDarkTheme()
+                ThemeMode.DARK -> true
+                ThemeMode.LIGHT -> false
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
             }
 
             CebolaoLotofacilTheme(

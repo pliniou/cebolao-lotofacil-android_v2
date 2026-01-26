@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.domain.service
 
-import android.util.Log
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.FilterRule
 import com.cebolao.lotofacil.domain.model.FilterState
@@ -23,8 +22,6 @@ import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
-
-private const val TAG = "GameGenerator"
 
 class GameGenerator @Inject constructor(
     private val historyRepository: HistoryRepository,
@@ -64,7 +61,6 @@ class GameGenerator @Inject constructor(
         } catch (e: Exception) {
             // Re-throw cancellation
             if (e is kotlinx.coroutines.CancellationException) throw e
-            Log.e(TAG, "Unexpected error during game generation", e)
             emit(GenerationProgress.failed(GenerationFailureReason.GENERIC_ERROR))
         }
     }.flowOn(defaultDispatcher)
@@ -78,15 +74,10 @@ class GameGenerator @Inject constructor(
         val activeFilters = filters.filter { it.isEnabled }
         val historyRaw = when (val historyResult = historyRepository.getHistory()) {
             is com.cebolao.lotofacil.domain.model.AppResult.Success -> historyResult.value
-            is com.cebolao.lotofacil.domain.model.AppResult.Failure -> {
-                Log.w(TAG, "Failed to load history for generator")
-                emptyList()
-            }
+            is com.cebolao.lotofacil.domain.model.AppResult.Failure -> emptyList()
         }
         val history = historyRaw.map { LotofacilGame.fromNumbers(it.numbers) }.take(GameConstants.HISTORY_CHECK_SIZE)
         val lastDrawNumbers = history.firstOrNull()?.numbers ?: emptySet()
-        
-        Log.i(TAG, "Starting generation: quantity=$quantity, activeFilters=${activeFilters.size}, config=$config")
         
         return GenerationContext(
             quantity = quantity,
@@ -114,7 +105,6 @@ class GameGenerator @Inject constructor(
         
         while (context.generatedGames.size < context.quantity && currentCoroutineContext().isActive) {
             if (isTimeoutReached(lastProgressAt, config)) {
-                Log.w(TAG, "Generation timeout reached. Generated ${context.generatedGames.size}/${context.quantity} games")
                 context.strategyUsed = GenerationStep.RANDOM_FALLBACK
                 break
             }
@@ -224,11 +214,8 @@ class GameGenerator @Inject constructor(
         quantity: Int,
         seedVal: Long
     ) {
-        Log.i(TAG, "Generation completed: ${result.games.size}/$quantity games in ${result.duration}ms, attempts=${result.totalAttempts}")
-        
         if (result.games.isNotEmpty()) {
             val telemetry = createTelemetry(result, context, seedVal)
-            logTelemetryDetails(telemetry, context.rejections)
             emit(GenerationProgress.finished(result.games, telemetry))
         } else {
             handleGenerationFailure(context)
@@ -250,19 +237,6 @@ class GameGenerator @Inject constructor(
         )
     }
     
-    private fun logTelemetryDetails(telemetry: GenerationTelemetry, rejections: Map<FilterType, Int>) {
-        // Safe formatting to avoid Locale issues if any
-        try {
-            Log.i(TAG, "Telemetry - Success rate: ${"%.1f".format(telemetry.successRate * 100)}%, Avg time/game: ${telemetry.avgTimePerGame}ms")
-        } catch (e: Exception) {
-            Log.w(TAG, "Could not format telemetry logs", e)
-        }
-        
-        telemetry.mostRestrictiveFilter?.let { filter ->
-            Log.i(TAG, "Most restrictive filter: $filter (${rejections[filter]} rejections)")
-        }
-    }
-    
     private suspend fun FlowCollector<GenerationProgress>.handleGenerationFailure(context: GenerationContext) {
         if (context.history.isEmpty() && context.requiresLastDraw) {
             emit(GenerationProgress.failed(GenerationFailureReason.NO_HISTORY))
@@ -274,7 +248,6 @@ class GameGenerator @Inject constructor(
         } else {
             GenerationFailureReason.GENERIC_ERROR
         }
-        Log.e(TAG, "Failed to generate games: $reason")
         emit(GenerationProgress.failed(reason))
     }
     

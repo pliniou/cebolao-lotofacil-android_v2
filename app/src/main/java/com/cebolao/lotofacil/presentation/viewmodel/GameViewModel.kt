@@ -101,29 +101,31 @@ class GameViewModel @Inject constructor(
 
     private var analyzeJob: Job? = null
 
-    private val gamesFlow: StateFlow<List<UiLotofacilGame>> = combine(
+    private val _gamesState = combine(
         gameRepository.unpinnedGames,
         gameRepository.pinnedGames
-    ) { unpinned, pinned -> unpinned + pinned }
-        .map { games: List<LotofacilGame> -> games.map { game: LotofacilGame -> game.toUiModelGame() } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), emptyList())
+    ) { unpinned, pinned ->
+        Pair(
+            unpinned.map { it.toUiModelGame() },
+            pinned.map { it.toUiModelGame() }
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_IN_TIMEOUT_MS), Pair(emptyList(), emptyList()))
 
     val uiState: StateFlow<GameScreenUiState> = combine(
         _gameToDelete,
         _analysisState,
-        gamesFlow,
+        _gamesState,
         _isLoading,
         _uiError
-    ) { gameToDelete, analysisState, games, isLoading, errorMessageRes ->
-        val pinnedCount = games.count { it.isPinned }
-        val totalCost = GameConstants.GAME_COST.multiply(BigDecimal(games.size))
-        val unpinned = games.filter { !it.isPinned }
-        val pinned = games.filter { it.isPinned }
+    ) { gameToDelete, analysisState, (unpinned, pinned), isLoading, errorMessageRes ->
+        val totalGamesCount = unpinned.size + pinned.size
+        val pinnedCount = pinned.size
+        val totalCost = GameConstants.GAME_COST.multiply(BigDecimal(totalGamesCount))
         
         GameScreenUiState(
             gameToDelete = gameToDelete,
             summary = GameSummary(
-                totalGames = games.size,
+                totalGames = totalGamesCount,
                 pinnedGames = pinnedCount,
                 totalCost = totalCost
             ),
@@ -140,9 +142,9 @@ class GameViewModel @Inject constructor(
     )
 
     init {
-        // Primeiro carregamento dos jogos finaliza o estado de loading e limpa erros pendentes
+        // First load finishes loading state
         viewModelScope.launch {
-            gamesFlow.collect {
+            _gamesState.collect {
                 _isLoading.value = false
                 _uiError.value = null
             }
