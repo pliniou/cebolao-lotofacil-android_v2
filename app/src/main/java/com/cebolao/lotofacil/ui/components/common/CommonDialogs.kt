@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.ui.haptics.HapticFeedbackManager
 import com.cebolao.lotofacil.ui.haptics.HapticFeedbackType
 import com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback
 import com.cebolao.lotofacil.ui.theme.Dimen

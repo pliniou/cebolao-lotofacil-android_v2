@@ -14,7 +14,6 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import com.cebolao.lotofacil.ui.theme.Dimen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

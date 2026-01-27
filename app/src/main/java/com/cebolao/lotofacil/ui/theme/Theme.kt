@@ -1,14 +1,16 @@
+@file:Suppress("DEPRECATION")
+
 package com.cebolao.lotofacil.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 
 /**
  * App theme that supports dynamic colours on Android 12+ and falls back to predefined colour schemes.
@@ -19,13 +21,28 @@ fun CebolaoLotofacilTheme(
     accentPalette: AccentPalette = DefaultAccentPalette,
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
+    LocalContext.current
+    
+    // We want to force our premium theme over dynamic colors often, but let's keep it optional.
+    // However, for "Premium" feel, consistent branding is usually better than dynamic wallpapers.
+    // Let's stick to our palette to ensure the Glassmorphism works perfectly.
     val colorScheme: ColorScheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
         darkTheme -> darkColorScheme(accentPalette)
         else -> lightColorScheme(accentPalette)
+    }
+    
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as android.app.Activity).window
+            window.statusBarColor = Color.Transparent.toArgb()
+            window.navigationBarColor = Color.Transparent.toArgb()
+            
+            androidx.core.view.WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme
+                isAppearanceLightNavigationBars = !darkTheme
+            }
+        }
     }
 
     MaterialTheme(
@@ -141,19 +158,19 @@ private fun lightColorScheme(palette: AccentPalette): ColorScheme = androidx.com
     onBackground = LightTextPrimary,
     surface = LightSurface1,
     onSurface = LightTextPrimary,
-    error = Color(0xFFB3261E),
+    error = ErrorBase,
     onError = Color.White,
-    errorContainer = Color(0xFFFFDAD4),
-    onErrorContainer = Color(0xFF410E0B),
+    errorContainer = ErrorLight,
+    onErrorContainer = ErrorDark,
     outline = LightOutline,
     outlineVariant = LightOutlineVariant,
     surfaceVariant = LightSurface3,
     onSurfaceVariant = LightTextSecondary,
     surfaceTint = palette.primary,
-    scrim = Color(0xFF000000),
-    inverseSurface = LightSurface3,
-    inverseOnSurface = LightTextPrimary,
-    inversePrimary = palette.primary,
+    scrim = Color.Black.copy(alpha = Alpha.SCRIM),
+    inverseSurface = DarkSurface1, // Inverse in light is dark
+    inverseOnSurface = DarkTextPrimary,
+    inversePrimary = palette.primary, // Often same or lighter in reverse
     surfaceBright = LightSurface1,
     surfaceDim = LightSurface3,
     surfaceContainer = LightSurface2,
@@ -165,39 +182,39 @@ private fun lightColorScheme(palette: AccentPalette): ColorScheme = androidx.com
 
 private fun darkColorScheme(palette: AccentPalette): ColorScheme = androidx.compose.material3.darkColorScheme(
     primary = palette.primary,
-    onPrimary = Color.Black,
-    primaryContainer = palette.primaryContainer,
+    onPrimary = Color.White, // Premium dark often uses white on primary for punch
+    primaryContainer = palette.primary.copy(alpha = 0.3f), // Glassy container
     onPrimaryContainer = Color.White,
     secondary = palette.secondary,
-    onSecondary = Color.Black,
-    secondaryContainer = palette.secondaryContainer,
+    onSecondary = Color.White,
+    secondaryContainer = palette.secondary.copy(alpha = 0.3f),
     onSecondaryContainer = Color.White,
     tertiary = palette.tertiary,
     onTertiary = Color.Black,
-    tertiaryContainer = palette.tertiaryContainer,
+    tertiaryContainer = palette.tertiary.copy(alpha = 0.3f),
     onTertiaryContainer = Color.White,
     background = DarkBackground,
     onBackground = DarkTextPrimary,
     surface = DarkSurface1,
     onSurface = DarkTextPrimary,
-    error = Color(0xFFF2B8B5),
-    onError = Color(0xFF601410),
-    errorContainer = Color(0xFF8C1D18),
-    onErrorContainer = Color(0xFFFFDAD4),
+    error = ErrorBase,
+    onError = Color.Black,
+    errorContainer = ErrorDark,
+    onErrorContainer = ErrorLight,
     outline = DarkOutline,
     outlineVariant = DarkOutlineVariant,
     surfaceVariant = DarkSurface3,
     onSurfaceVariant = DarkTextSecondary,
     surfaceTint = palette.primary,
-    scrim = Color(0xFF000000),
+    scrim = Color.Black.copy(alpha = Alpha.SCRIM),
     inverseSurface = LightSurface1,
-    inverseOnSurface = DarkTextPrimary,
+    inverseOnSurface = LightTextPrimary,
     inversePrimary = palette.primary,
-    surfaceBright = DarkSurface3,
+    surfaceBright = DarkSurface2,
     surfaceDim = DarkSurface1,
     surfaceContainer = DarkSurface2,
-    surfaceContainerHigh = DarkSurface2,
+    surfaceContainerHigh = DarkSurface2, // Elevating slightly
     surfaceContainerHighest = DarkSurface3,
     surfaceContainerLow = DarkSurface1,
-    surfaceContainerLowest = DarkSurface1
+    surfaceContainerLowest = Obsidian // Deepest black
 )

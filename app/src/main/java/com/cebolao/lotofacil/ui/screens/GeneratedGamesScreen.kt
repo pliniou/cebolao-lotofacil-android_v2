@@ -50,7 +50,6 @@ import com.cebolao.lotofacil.ui.components.game.GameCardAction
 import com.cebolao.lotofacil.ui.components.game.GameList
 import com.cebolao.lotofacil.ui.components.game.GameSummaryCard
 import com.cebolao.lotofacil.ui.components.game.GameTabs
-import com.cebolao.lotofacil.ui.screens.AppScreen
 import com.cebolao.lotofacil.ui.model.UiLotofacilGame
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen

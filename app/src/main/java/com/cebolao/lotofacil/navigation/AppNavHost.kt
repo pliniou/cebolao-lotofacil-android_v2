@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.cebolao.lotofacil.presentation.viewmodel.MainUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.MainViewModel
 import com.cebolao.lotofacil.ui.screens.AboutScreen

@@ -6,15 +6,15 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.AppError
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.CheckReport
+import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.model.HomeScreenData
 import com.cebolao.lotofacil.domain.model.StatisticPattern
 import com.cebolao.lotofacil.domain.repository.SyncStatus
+import com.cebolao.lotofacil.domain.usecase.CalculateDrawNumericStatsUseCase
 import com.cebolao.lotofacil.domain.usecase.CheckLastGameUseCase
 import com.cebolao.lotofacil.domain.usecase.GetAnalyzedStatsUseCase
-import com.cebolao.lotofacil.domain.usecase.CalculateDrawNumericStatsUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawDetailsUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
-import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.usecase.ObserveDatabaseLoadingUseCase
 import com.cebolao.lotofacil.domain.usecase.ObserveSyncStatusUseCase
 import com.cebolao.lotofacil.domain.usecase.SyncHistoryUseCase
@@ -30,7 +30,6 @@ import com.cebolao.lotofacil.ui.model.toUiModel
 import com.cebolao.lotofacil.util.Formatters
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
 import com.cebolao.lotofacil.util.toUserMessageRes
-import com.cebolao.lotofacil.util.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

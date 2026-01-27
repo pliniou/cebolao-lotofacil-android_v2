@@ -1,8 +1,5 @@
 package com.cebolao.lotofacil.domain.model
 
-import androidx.annotation.StringRes
-import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.domain.model.FilterType
 
 /**
  * Representa uma estratégia pré-definida de filtros.
@@ -12,8 +9,6 @@ import com.cebolao.lotofacil.domain.model.FilterType
  */
 data class FilterPreset(
     val id: String,
-    @param:StringRes val labelRes: Int,
-    @param:StringRes val descriptionRes: Int,
     val rules: Map<FilterType, ClosedFloatingPointRange<Float>>
 )
 
@@ -22,8 +17,6 @@ object FilterPresets {
     val all: List<FilterPreset> = listOf(
         FilterPreset(
             id = "standard",
-            labelRes = R.string.preset_standard,
-            descriptionRes = R.string.preset_standard_desc,
             rules = mapOf(
                 FilterType.SOMA_DEZENAS to 166f..220f,
                 FilterType.PARES to 6f..9f,
@@ -34,8 +27,6 @@ object FilterPresets {
         ),
         FilterPreset(
             id = "balanced",
-            labelRes = R.string.preset_balanced,
-            descriptionRes = R.string.preset_balanced_desc,
             rules = mapOf(
                 FilterType.SOMA_DEZENAS to 170f..210f,
                 FilterType.PARES to 7f..8f,
@@ -44,8 +35,6 @@ object FilterPresets {
         ),
         FilterPreset(
             id = "math",
-            labelRes = R.string.preset_math,
-            descriptionRes = R.string.preset_math_desc,
             rules = mapOf(
                 FilterType.PRIMOS to 5f..6f,
                 FilterType.FIBONACCI to 4f..5f,
@@ -54,8 +43,6 @@ object FilterPresets {
         ),
         FilterPreset(
             id = "surprise",
-            labelRes = R.string.preset_surprise,
-            descriptionRes = R.string.preset_surprise_desc,
             rules = mapOf(
                 FilterType.REPETIDAS_CONCURSO_ANTERIOR to 9f..9f,
                 FilterType.PARES to 5f..7f
@@ -63,8 +50,6 @@ object FilterPresets {
         ),
         FilterPreset(
             id = "aggressive",
-            labelRes = R.string.preset_aggressive,
-            descriptionRes = R.string.preset_aggressive_desc,
             // Focused on highly specific patterns
             rules = mapOf(
                 FilterType.SOMA_DEZENAS to 190f..205f,
@@ -75,8 +60,6 @@ object FilterPresets {
         ),
         FilterPreset(
             id = "conservative",
-            labelRes = R.string.preset_conservative,
-            descriptionRes = R.string.preset_conservative_desc,
             rules = mapOf(
                 FilterType.SOMA_DEZENAS to 160f..230f,
                 FilterType.PARES to 5f..10f,
@@ -86,8 +69,6 @@ object FilterPresets {
         ),
         FilterPreset(
             id = "hot_numbers",
-            labelRes = R.string.preset_hot_numbers,
-            descriptionRes = R.string.preset_hot_numbers_desc,
             rules = mapOf(
                 FilterType.REPETIDAS_CONCURSO_ANTERIOR to 9f..11f,
                 FilterType.PARES to 6f..8f,

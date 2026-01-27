@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.defaultMinSize
-
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.ui.theme.Dimen
 import kotlinx.collections.immutable.ImmutableList
@@ -106,11 +105,9 @@ private fun NumberGridItem(
         if (clickable) boxBaseModifier.clickable { onNumberClick(number) } else boxBaseModifier
     }
 
-    // Debug hook: count recompositions for profiling tests. SideEffect runs after each successful
-    // composition/recomposition, so it provides a simple counter for how often an item is recomposed.
     val recomposeCount = remember { androidx.compose.runtime.mutableIntStateOf(0) }
     SideEffect {
-        recomposeCount.intValue = recomposeCount.intValue + 1
+        recomposeCount.intValue += 1
         onRecompose?.invoke(number, recomposeCount.intValue)
     }
 
@@ -129,4 +126,3 @@ private fun NumberGridItem(
         )
     }
 }
-

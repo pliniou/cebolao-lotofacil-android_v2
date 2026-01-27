@@ -26,24 +26,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.cebolao.lotofacil.domain.model.GameScore
 import com.cebolao.lotofacil.domain.model.MetricEvaluation
 import com.cebolao.lotofacil.domain.model.ScoreStatus
-import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.theme.GlassCard
 import com.cebolao.lotofacil.ui.theme.Dimen
-import com.cebolao.lotofacil.ui.theme.ErrorColor
 import com.cebolao.lotofacil.ui.theme.SuccessColor
-import com.cebolao.lotofacil.ui.theme.WarningBase
 import com.cebolao.lotofacil.ui.theme.SuccessBase
+import com.cebolao.lotofacil.ui.theme.WarningBase
+import com.cebolao.lotofacil.ui.theme.ErrorColor
 
 @Composable
 fun GameQualityCard(
     score: GameScore,
     modifier: Modifier = Modifier
 ) {
-    AppCard(
-        modifier = modifier.fillMaxWidth(),
-        outlined = true, // Force outlined for consistency
-        contentPadding = Dimen.Spacing16 // Standardizing padding
+    GlassCard(
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
+            modifier = Modifier.padding(Dimen.Spacing16),
             verticalArrangement = Arrangement.spacedBy(Dimen.Spacing12)
         ) {
             // Header: Total Score

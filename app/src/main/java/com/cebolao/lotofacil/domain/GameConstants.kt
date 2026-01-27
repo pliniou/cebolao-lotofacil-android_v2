@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.cebolao.lotofacil.domain
 
 import java.math.BigDecimal
@@ -58,9 +60,9 @@ object GameConstants {
 
     // Game Generation Options
     const val MAX_GENERATION_QUANTITY = 50
-    const val DEFAULT_GENERATION_QUANTITY = 5
+
     // Statistics Time Windows (number of contests to analyze)
-    val TIME_WINDOWS = listOf(10, 20, 50, 100, 200, 500)
+    val TIME_WINDOWS = listOf(9, 13, 20, 25, 50, 100, 200, 500, 1000, 2000, 0)
 
     // Sum Distribution for Charts
     const val SUM_STEP = 10

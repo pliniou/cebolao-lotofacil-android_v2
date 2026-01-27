@@ -1,3 +1,5 @@
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+
 package com.cebolao.lotofacil.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.cebolao.lotofacil.R
-import com.cebolao.lotofacil.domain.model.FilterPreset
 import com.cebolao.lotofacil.domain.model.FilterPresets
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
@@ -44,6 +45,9 @@ import com.cebolao.lotofacil.presentation.viewmodel.FiltersUiEvent
 import com.cebolao.lotofacil.presentation.viewmodel.FiltersViewModel
 import com.cebolao.lotofacil.presentation.viewmodel.GenerationUiState
 import com.cebolao.lotofacil.presentation.viewmodel.NavigationEvent
+import com.cebolao.lotofacil.presentation.viewmodel.SnackbarArg
+import com.cebolao.lotofacil.presentation.model.descriptionRes
+import com.cebolao.lotofacil.presentation.model.titleRes
 import com.cebolao.lotofacil.ui.components.common.AppConfirmationDialog
 import com.cebolao.lotofacil.ui.components.common.InfoDialog
 import com.cebolao.lotofacil.ui.components.filter.FilterGroupColumn
@@ -64,7 +68,7 @@ data class FilterCategory(
 
 private data class PendingSnackbar(
     val messageRes: Int,
-    val formatArgs: List<Any> = emptyList()
+    val formatArgs: List<SnackbarArg> = emptyList()
 )
 
 @Composable
@@ -76,7 +80,13 @@ fun FiltersScreen(navCtrl: NavController, viewModel: FiltersViewModel = hiltView
 
     val snackbarMessage = pendingSnackbar?.let { pending ->
         if (pending.formatArgs.isNotEmpty()) {
-            stringResource(pending.messageRes, *pending.formatArgs.toTypedArray())
+            val resolvedArgs = pending.formatArgs.map { arg ->
+                when (arg) {
+                    is SnackbarArg.Text -> arg.value
+                    is SnackbarArg.ResId -> stringResource(arg.resId)
+                }
+            }
+            stringResource(pending.messageRes, *resolvedArgs.toTypedArray())
         } else {
             stringResource(pending.messageRes)
         }
@@ -127,7 +137,8 @@ fun FiltersScreenContent(
 
     // Local state for quantity and preset selection
     var quantity by rememberSaveable { mutableIntStateOf(10) }
-    var selectedPreset by rememberSaveable { mutableStateOf<FilterPreset?>(null) }
+    var selectedPresetId by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedPreset = selectedPresetId?.let(FilterPresets::find)
 
     if (uiState.showResetDialog) {
         AppConfirmationDialog(
@@ -135,7 +146,7 @@ fun FiltersScreenContent(
             message = R.string.filters_reset_dialog_message,
             confirmText = R.string.filters_reset_confirm,
             onConfirm = {
-                selectedPreset = null
+                selectedPresetId = null
                 onEvent(FiltersUiEvent.ConfirmResetFilters)
                 haptics.performHapticFeedback(com.cebolao.lotofacil.ui.haptics.HapticFeedbackType.MEDIUM)
             },
@@ -270,7 +281,7 @@ fun FiltersScreenContent(
                     selectedPreset = selectedPreset,
                     presets = FilterPresets.all,
                     onPresetSelected = {
-                        selectedPreset = it
+                        selectedPresetId = it.id
                         onEvent(FiltersUiEvent.ApplyPreset(it))
                     },
                     modifier = Modifier
@@ -289,7 +300,7 @@ fun FiltersScreenContent(
                         Column(modifier = Modifier.weight(0.5f)) {
                             categories.take(2).forEachIndexed { index, category ->
                                 FilterGroupColumn(
-                                    categoryTitles[index], category.states, uiState.lastDraw,
+                                    categoryTitles[index], category.states,
                                     onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                                     onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                                     onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
@@ -302,7 +313,7 @@ fun FiltersScreenContent(
                             categories.drop(2).forEachIndexed { index, category ->
                                 val globalIndex = index + 2
                                 FilterGroupColumn(
-                                    categoryTitles[globalIndex], category.states, uiState.lastDraw,
+                                    categoryTitles[globalIndex], category.states,
                                     onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                                     onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                                     onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) },
@@ -315,7 +326,7 @@ fun FiltersScreenContent(
             } else {
                 categories.forEachIndexed { index, category ->
                     filterSection(
-                        categoryTitles[index], category.states, uiState.lastDraw,
+                        categoryTitles[index], category.states,
                         onToggle = { t, e -> onEvent(FiltersUiEvent.ToggleFilter(t, e)) },
                         onRangeAdjustment = { t, r -> onEvent(FiltersUiEvent.AdjustRange(t, r)) },
                         onInfoRequest = { onEvent(FiltersUiEvent.ShowFilterInfo(it)) }

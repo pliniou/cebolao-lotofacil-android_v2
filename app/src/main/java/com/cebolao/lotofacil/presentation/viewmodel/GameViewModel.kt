@@ -6,7 +6,6 @@ import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.GameComputedMetrics
-import com.cebolao.lotofacil.domain.model.LotofacilGame
 import com.cebolao.lotofacil.domain.repository.GameRepository
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.service.GameMetricsCalculator
@@ -26,12 +25,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.ensureActive
 import java.math.BigDecimal
 import javax.inject.Inject
 import com.cebolao.lotofacil.mapper.toUiModel as toUiAnalysisResult

@@ -1,12 +1,13 @@
 package com.cebolao.lotofacil.ui.screens
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -39,11 +40,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.lotofacil.R
@@ -60,7 +64,6 @@ import com.cebolao.lotofacil.ui.components.common.MessageState
 import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberGrid
-import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.components.stats.CheckResultCard
 import com.cebolao.lotofacil.ui.components.stats.FinancialPerformanceCard
@@ -68,6 +71,8 @@ import com.cebolao.lotofacil.ui.components.stats.GameQualityCard
 import com.cebolao.lotofacil.ui.components.stats.SimpleStatsCard
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.GlassCard
+import com.cebolao.lotofacil.ui.theme.GradientAzul
 import com.cebolao.lotofacil.ui.theme.Shapes
 import kotlinx.coroutines.flow.collectLatest
 
@@ -218,22 +223,25 @@ fun CheckerScreenContent(
                 ) {
                     val isComplete = uiState.selectedNumbers.size == GameConstants.GAME_SIZE
 
-                    Surface(
-                        color = if (isComplete) scheme.primaryContainer else scheme.surfaceVariant,
-                        contentColor = if (isComplete) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
-                        shape = CircleShape,
-                        tonalElevation = Dimen.Elevation.None,
-                        shadowElevation = Dimen.Elevation.None,
-                        border = BorderStroke(Dimen.Border.Thin, scheme.outlineVariant)
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp) // Slightly larger for impact
+                            .clip(CircleShape)
+                            .background(if (isComplete) GradientAzul else MaterialTheme.colorScheme.surfaceVariant.let {
+                                Brush.linearGradient(listOf(it, it)) // Fallback brush
+                            })
+                            .border(
+                                width = if (isComplete) 0.dp else Dimen.Border.Thin,
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "${uiState.selectedNumbers.size}/${GameConstants.GAME_SIZE}",
-                            modifier = Modifier.padding(
-                                horizontal = Dimen.Spacing16,
-                                vertical = Dimen.Spacing8
-                            ),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold
+                            style = MaterialTheme.typography.displaySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isComplete) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -286,19 +294,18 @@ fun CheckerScreenContent(
  */
 @Composable
 private fun InstructionsCard() {
-    AppCard(
+    GlassCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = Dimen.ItemSpacing),
-        outlined = false,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        contentPadding = Dimen.CardContentPadding
+            .padding(top = Dimen.ItemSpacing)
     ) {
-        MessageState(
-            icon = AppIcons.Success,
-            title = stringResource(R.string.checker_how_it_works_title),
-            message = stringResource(R.string.checker_how_it_works_desc)
-        )
+        Box(modifier = Modifier.padding(Dimen.CardContentPadding)) {
+            MessageState(
+                icon = AppIcons.Success,
+                title = stringResource(R.string.checker_how_it_works_title),
+                message = stringResource(R.string.checker_how_it_works_desc)
+            )
+        }
     }
 }
 

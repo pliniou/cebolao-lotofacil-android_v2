@@ -40,7 +40,8 @@ fun AppScreen(
                     subtitle = subtitle,
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = actions,
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f) // Glassy header
+                    // Deeper glass effect for the header
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)
                 )
             },
             bottomBar = bottomBar,

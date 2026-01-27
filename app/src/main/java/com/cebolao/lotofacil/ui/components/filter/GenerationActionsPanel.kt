@@ -2,7 +2,6 @@ package com.cebolao.lotofacil.ui.components.filter
 
 import com.cebolao.lotofacil.ui.haptics.rememberHapticFeedback
 import com.cebolao.lotofacil.ui.haptics.HapticFeedbackType
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut

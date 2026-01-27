@@ -1,3 +1,5 @@
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+
 package com.cebolao.lotofacil.ui.components.stats
 
 import androidx.compose.animation.AnimatedContent
@@ -41,10 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
-import com.cebolao.lotofacil.ui.model.UiStatisticsReport
 import com.cebolao.lotofacil.ui.components.common.AppDivider
 import com.cebolao.lotofacil.ui.components.common.CustomChip
 import com.cebolao.lotofacil.ui.components.game.NumberBall
@@ -52,6 +52,7 @@ import com.cebolao.lotofacil.ui.components.game.NumberBallSize
 import com.cebolao.lotofacil.ui.components.game.NumberBallVariant
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.CardVariant
+import com.cebolao.lotofacil.ui.model.UiStatisticsReport
 import com.cebolao.lotofacil.ui.theme.Dimen
 import com.cebolao.lotofacil.ui.theme.Motion
 import kotlinx.collections.immutable.ImmutableList

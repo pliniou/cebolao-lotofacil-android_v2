@@ -49,7 +49,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.max
-import kotlin.math.round
 import kotlin.math.sqrt
 
 private const val GRID_LINES = 5
@@ -202,9 +201,6 @@ private class ChartMetrics(size: Size, val dataCount: Int, density: Density) {
     val totalWidth = size.width - yAxisWidth - with(density) { 16.dp.toPx() } // Right padding
 
     val pointSpacing = if (dataCount > 1) totalWidth / (dataCount - 1) else totalWidth
-    
-    // Minimum touch target size (48dp) logic could be applied here if needed
-    val touchTargetWidth = pointSpacing.coerceAtMost(with(density) { 60.dp.toPx() })
 
     fun getX(index: Int): Float = yAxisWidth + (index * pointSpacing)
 
@@ -220,7 +216,7 @@ private class ChartMetrics(size: Size, val dataCount: Int, density: Density) {
         return if (index in 0 until dataCount) index else null
     }
 
-    private fun Float.roundToInt(): Int = Math.round(this)
+    private fun Float.roundToInt(): Int = this.roundToInt()
 }
 
 @Stable
@@ -466,7 +462,7 @@ private fun DrawScope.drawNormalLine(
     
     if (numericData.isEmpty()) return
     
-    val dataRange = numericData.maxOrNull() ?: 0f - (numericData.minOrNull() ?: 0f)
+    val dataRange = numericData.maxOrNull() ?: (0f - (numericData.minOrNull() ?: 0f))
     val bucketWidth = if (dataRange > 0) dataRange / (numericData.size - 1).coerceAtLeast(1) else 1f
 
     val path = Path()

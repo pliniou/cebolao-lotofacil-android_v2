@@ -32,9 +32,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterType
+import com.cebolao.lotofacil.presentation.model.descriptionRes
+import com.cebolao.lotofacil.presentation.model.titleRes
 import com.cebolao.lotofacil.ui.components.common.AppDivider
 import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Dimen

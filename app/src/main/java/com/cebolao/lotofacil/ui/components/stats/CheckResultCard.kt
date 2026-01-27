@@ -18,8 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,12 +31,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.GameConstants
 import com.cebolao.lotofacil.domain.model.CheckResult
-import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.Alpha
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.GlassCard
 import com.cebolao.lotofacil.ui.theme.StackSans
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 
@@ -45,9 +44,8 @@ fun CheckResultCard(
     result: CheckResult,
     modifier: Modifier = Modifier
 ) {
-    AppCard(
-        modifier = modifier.fillMaxWidth(),
-        outlined = true
+    GlassCard(
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(Dimen.Spacing16),

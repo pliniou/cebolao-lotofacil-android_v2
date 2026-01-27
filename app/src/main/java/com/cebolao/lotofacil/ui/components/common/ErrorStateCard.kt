@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.ui.components.common
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -30,7 +31,7 @@ import com.cebolao.lotofacil.ui.theme.Dimen
 fun ErrorStateCard(
     error: AppError,
     onRetry: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
     

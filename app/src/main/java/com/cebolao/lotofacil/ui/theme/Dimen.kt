@@ -10,7 +10,6 @@ object Dimen {
     val Spacing8 = 8.dp
     val Spacing12 = 12.dp
     val Spacing16 = 16.dp
-    val Spacing20 = 20.dp
     val Spacing24 = 24.dp
     val Spacing32 = 32.dp
 
@@ -23,7 +22,6 @@ object Dimen {
 
     // --- Semantic Spacing (Scaled) ---
     val TrackingWidest = 2.sp
-    val ElevationMedium = 0.dp 
 
     // --- Layout ---
     val CardContentPadding = Spacing16
@@ -43,9 +41,6 @@ object Dimen {
     val LoadingCardHeight = 120.dp
     val GameCardMinHeight = 250.dp
     val ChartHeightSmall = 140.dp
-    val ChartHeightMini = 100.dp
-    val MiniBarWidth = 40.dp
-    val MiniBarHeight = 6.dp
 
     // --- Indicators ---
     val IndicatorHeightSmall = 8.dp
@@ -74,14 +69,11 @@ object Dimen {
     val ChartPreviewHeight = 200.dp
     val ChartAxisLabelPadding = 40.dp
     val ChartLineStroke = 3.dp
-    val ChartDotRadiusSmall = 3.dp
-    val ChartDotRadiusLarge = 5.dp
 
     // --- Shapes ---
     val CardCornerRadius = 28.dp
     val CornerRadiusSmall = 16.dp
     val CornerRadiusMedium = 20.dp
-    val CornerRadiusTiny = 4.dp
 
     object Border {
         val Hairline = 0.5.dp
@@ -92,22 +84,5 @@ object Dimen {
     
     object Elevation {
         val None = 0.dp
-        val Level1 = 0.dp
-        val Level2 = 0.dp
-        val Level3 = 0.dp
-        val Level4 = 0.dp
-        val Level5 = 0.dp
-    }
-    
-    object TouchTarget {
-        val Minimum = 48.dp
-        val Comfortable = 56.dp
-        val Action = 64.dp
-    }
-    
-    object Ripple {
-        val Small = 20.dp
-        val Medium = 28.dp
-        val Large = 36.dp
     }
 }

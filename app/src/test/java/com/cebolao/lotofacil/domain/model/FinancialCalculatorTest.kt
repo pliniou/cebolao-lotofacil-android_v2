@@ -4,7 +4,6 @@ import com.cebolao.lotofacil.domain.GameConstants
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
 

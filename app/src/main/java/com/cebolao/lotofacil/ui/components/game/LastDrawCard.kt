@@ -35,7 +35,7 @@ import com.cebolao.lotofacil.ui.components.common.AppTable
 import com.cebolao.lotofacil.ui.components.common.AppTableData
 import com.cebolao.lotofacil.ui.components.common.AppTableStyle
 import com.cebolao.lotofacil.ui.components.common.ExpandableTable
-import com.cebolao.lotofacil.ui.components.layout.AppCard
+import com.cebolao.lotofacil.ui.theme.GlassCard
 import com.cebolao.lotofacil.ui.model.UiDraw
 import com.cebolao.lotofacil.ui.model.UiDrawDetails
 import com.cebolao.lotofacil.ui.theme.AppIcons
@@ -52,13 +52,13 @@ fun LastDrawCard(
 ) {
     val scheme = MaterialTheme.colorScheme
 
-    AppCard(
-        modifier = modifier.fillMaxWidth(),
-        outlined = true,
-        contentPadding = Dimen.Spacing16
+    GlassCard(
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Dimen.Spacing16),
             verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -168,8 +168,7 @@ fun LastDrawCard(
                     )
                     LocationInfoSection(details)
                     WinnersByStateSection(
-                        winners = details.winnersByState,
-                        onRefresh = onRefresh
+                        winners = details.winnersByState
                     )
                 }
             } else {
@@ -375,7 +374,7 @@ private fun LocationInfoSection(details: UiDrawDetails) {
 }
 
 @Composable
-private fun WinnersByStateSection(winners: List<WinnerLocation>, onRefresh: () -> Unit) {
+private fun WinnersByStateSection(winners: List<WinnerLocation>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.winners_by_state),

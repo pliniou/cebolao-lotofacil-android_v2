@@ -25,7 +25,7 @@ class NumberGridRecomposeTest {
         composeTestRule.setContent {
             NumberGrid(
                 selectedNumbers = selectedState.value,
-                onNumberClick = { selectedState.value = selectedState.value + it },
+                onNumberClick = { selectedState.value += it },
                 onItemRecompose = { number, count -> recomposeCounts[number] = count }
             )
         }

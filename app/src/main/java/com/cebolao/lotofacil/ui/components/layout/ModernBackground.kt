@@ -16,16 +16,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.cebolao.lotofacil.ui.theme.DarkBackground
-import com.cebolao.lotofacil.ui.theme.LightBackground
-import androidx.compose.material3.surfaceColorAtElevation
+import com.cebolao.lotofacil.ui.theme.GradientPremiumDark
+import com.cebolao.lotofacil.ui.theme.GradientPremiumLight
 
 @Composable
 fun ModernBackground(
@@ -33,14 +30,7 @@ fun ModernBackground(
     darkTheme: Boolean = isSystemInDarkTheme()
 ) {
     val scheme = MaterialTheme.colorScheme
-    val baseColor = if (darkTheme) DarkBackground else LightBackground
-    val baseBrush = Brush.verticalGradient(
-        colors = listOf(
-            baseColor,
-            scheme.surfaceColorAtElevation(4.dp),
-            baseColor
-        )
-    )
+    val baseBrush = if (darkTheme) GradientPremiumDark else GradientPremiumLight
 
     val animatedPrimary by animateColorAsState(
         targetValue = scheme.primary.copy(alpha = if (darkTheme) 0.22f else 0.14f),
@@ -53,8 +43,8 @@ fun ModernBackground(
 
     val infiniteTransition = rememberInfiniteTransition(label = "background_wave")
     val drift by infiniteTransition.animateFloat(
-        initialValue = -60f,
-        targetValue = 60f,
+        initialValue = -10f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 14000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -62,8 +52,8 @@ fun ModernBackground(
         label = "drift"
     )
     val driftSecondary by infiniteTransition.animateFloat(
-        initialValue = 40f,
-        targetValue = -40f,
+        initialValue = 80f,
+        targetValue = -80f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 18000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse

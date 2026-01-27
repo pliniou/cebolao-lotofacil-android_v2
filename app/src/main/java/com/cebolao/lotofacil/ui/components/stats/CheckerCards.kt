@@ -11,14 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.domain.model.CheckReport
 import com.cebolao.lotofacil.domain.model.FinancialProjection
 import com.cebolao.lotofacil.domain.model.GameComputedMetrics
 import com.cebolao.lotofacil.ui.components.common.StandardInfoRow
-import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.GlassCard
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -31,12 +30,20 @@ fun FinancialPerformanceCard(
     report: CheckReport,
     modifier: Modifier = Modifier
 ) {
-    AppCard(
-        modifier = modifier,
-        title = "Desempenho Financeiro",
-        outlined = true
+    GlassCard(
+        modifier = modifier.fillMaxWidth()
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)) {
+        Column(
+            modifier = Modifier.padding(Dimen.Spacing16),
+            verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
+        ) {
+            Text(
+                text = "Desempenho Financeiro",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
             StandardInfoRow(
                 icon = AppIcons.Wallet,
                 title = "Investimento",
@@ -61,15 +68,20 @@ fun SimpleStatsCard(
     gameMetrics: GameComputedMetrics,
     modifier: Modifier = Modifier
 ) {
-    AppCard(
-        modifier = modifier,
-        title = "Estatísticas do Jogo",
-        outlined = true
+    GlassCard(
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(Dimen.CardContentPadding),
             verticalArrangement = Arrangement.spacedBy(Dimen.SpacingShort)
         ) {
+            Text(
+                text = "Estatísticas do Jogo",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             // Primeira linha: Soma, Pares, Ímpares
             StatsRow(
                 items = listOf(

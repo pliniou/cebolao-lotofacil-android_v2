@@ -18,7 +18,6 @@ import com.cebolao.lotofacil.ui.theme.Dimen
 fun FilterGroupColumn(
     title: String,
     filters: List<FilterState>,
-    lastDraw: Set<Int>?,
     onToggle: (FilterType, Boolean) -> Unit,
     onRangeAdjustment: (FilterType, ClosedFloatingPointRange<Float>) -> Unit,
     onInfoRequest: (FilterType) -> Unit,
@@ -35,8 +34,7 @@ fun FilterGroupColumn(
                 state = filter,
                 onToggle = { onToggle(filter.type, it) },
                 onRange = { onRangeAdjustment(filter.type, it) },
-                onInfo = { onInfoRequest(filter.type) },
-                lastDraw = lastDraw
+                onInfo = { onInfoRequest(filter.type) }
             )
         }
     }
@@ -45,7 +43,6 @@ fun FilterGroupColumn(
 fun LazyListScope.filterSection(
     title: String,
     filters: List<FilterState>,
-    lastDraw: Set<Int>?,
     onToggle: (FilterType, Boolean) -> Unit,
     onRangeAdjustment: (FilterType, ClosedFloatingPointRange<Float>) -> Unit,
     onInfoRequest: (FilterType) -> Unit
@@ -63,7 +60,6 @@ fun LazyListScope.filterSection(
             onToggle = { onToggle(filter.type, it) },
             onRange = { onRangeAdjustment(filter.type, it) },
             onInfo = { onInfoRequest(filter.type) },
-            lastDraw = lastDraw,
             modifier = Modifier.padding(vertical = Dimen.Spacing4)
         )
     }
@@ -88,7 +84,6 @@ internal fun FilterGroupColumnPreview() {
                         selectedRange = 4f..6f
                     )
                 ),
-                lastDraw = null,
                 onToggle = { _, _ -> },
                 onRangeAdjustment = { _, _ -> },
                 onInfoRequest = {}

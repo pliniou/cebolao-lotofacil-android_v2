@@ -32,10 +32,10 @@ import com.cebolao.lotofacil.ui.components.common.LoadingCard
 import com.cebolao.lotofacil.ui.components.common.StandardAttentionCard
 import com.cebolao.lotofacil.ui.components.game.NumberBall
 import com.cebolao.lotofacil.ui.components.game.NumberBallSize
-import com.cebolao.lotofacil.ui.components.layout.AppCard
 import com.cebolao.lotofacil.ui.components.layout.StandardPageLayout
 import com.cebolao.lotofacil.ui.theme.AppIcons
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.GlassCard
 import com.cebolao.lotofacil.util.Formatters
 import java.time.format.FormatStyle
 
@@ -105,12 +105,13 @@ fun DrawListItem(draw: Draw) {
     val dateText = rememberDrawDate(draw.date)
     val numbers = remember(draw.numbers) { draw.numbers.sorted() }
 
-    AppCard(
-        modifier = Modifier.fillMaxWidth(),
-        outlined = true,
-        contentPadding = Dimen.SpacingMedium
+    GlassCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)) {
+        Column(
+            modifier = Modifier.padding(Dimen.SpacingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimen.ItemSpacing)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(Dimen.BallSpacing),

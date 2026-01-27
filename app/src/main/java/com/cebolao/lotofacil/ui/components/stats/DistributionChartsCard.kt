@@ -1,5 +1,6 @@
 package com.cebolao.lotofacil.ui.components.stats
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,7 +42,7 @@ fun DistributionChartsCard(
     selectedPattern: StatisticPattern,
     onPatternSelected: (StatisticPattern) -> Unit,
     lastDraw: UiDraw? = null,
-    modifier: Modifier = Modifier
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
 

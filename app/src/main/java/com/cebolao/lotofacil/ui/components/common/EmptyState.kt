@@ -1,6 +1,6 @@
 package com.cebolao.lotofacil.ui.components.common
 
-import androidx.annotation.StringRes
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.theme.Dimen
 
 /**
@@ -37,7 +35,7 @@ import com.cebolao.lotofacil.ui.theme.Dimen
 fun EmptyState(
     title: String,
     description: String? = null,
-    modifier: Modifier = Modifier,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     icon: ImageVector = Icons.Outlined.Info,
     action: (@Composable () -> Unit)? = null
 ) {
@@ -79,26 +77,6 @@ fun EmptyState(
             action()
         }
     }
-}
-
-/**
- * Empty state overload using String resources.
- */
-@Composable
-fun EmptyState(
-    @StringRes titleRes: Int,
-    @StringRes descriptionRes: Int? = null,
-    modifier: Modifier = Modifier,
-    icon: ImageVector = Icons.Outlined.Info,
-    action: (@Composable () -> Unit)? = null
-) {
-    EmptyState(
-        title = stringResource(titleRes),
-        description = descriptionRes?.let { stringResource(it) },
-        modifier = modifier,
-        icon = icon,
-        action = action
-    )
 }
 
 @Preview(showBackground = true)

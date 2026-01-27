@@ -13,6 +13,7 @@ import com.cebolao.lotofacil.domain.service.GenerationStep
 import com.cebolao.lotofacil.domain.usecase.GenerateGamesUseCase
 import com.cebolao.lotofacil.domain.usecase.GetLastDrawUseCase
 import com.cebolao.lotofacil.domain.usecase.SaveGeneratedGamesUseCase
+import com.cebolao.lotofacil.presentation.model.labelRes
 import com.cebolao.lotofacil.presentation.util.UiEvent
 import com.cebolao.lotofacil.presentation.util.UiState
 import com.cebolao.lotofacil.util.STATE_IN_TIMEOUT_MS
@@ -40,13 +41,18 @@ sealed interface NavigationEvent {
      */
     data class ShowSnackbar(
         @param:StringRes val messageRes: Int,
-        val formatArgs: List<Any> = emptyList()
+        val formatArgs: List<SnackbarArg> = emptyList()
     ) : NavigationEvent
 
     /**
      * Event to navigate to the generated games screen.
      */
     data object NavigateToGeneratedGames : NavigationEvent
+}
+
+sealed interface SnackbarArg {
+    data class Text(val value: String) : SnackbarArg
+    data class ResId(@param:StringRes val resId: Int) : SnackbarArg
 }
 
 /**
@@ -212,7 +218,12 @@ class FiltersViewModel @Inject constructor(
                 }
             }
         }
-        _events.trySend(NavigationEvent.ShowSnackbar(R.string.filter_preset_applied, formatArgs = listOf(preset.labelRes)))
+        _events.trySend(
+            NavigationEvent.ShowSnackbar(
+                R.string.filter_preset_applied,
+                formatArgs = listOf(SnackbarArg.ResId(preset.labelRes))
+            )
+        )
     }
 
     private var pendingQuantity: Int = 10

@@ -35,7 +35,7 @@ fun retryAfterHeaderToDelayMs(header: String?, nowMs: Long = System.currentTimeM
     } catch (_: DateTimeParseException) {
         // Expected if header is not a valid date
     } catch (e: Exception) {
-         safeLog("RetryAfter", "Failed to parse Retry-After header: ${e.message}")
+        safeLog("RetryAfter", "Failed to parse Retry-After header: ${e.message}")
     }
 
     return 0L
@@ -61,25 +61,17 @@ suspend fun <T> retryOnHttp429(
                 }
 
                 val retryAfter = e.response()?.headers()?.get("Retry-After")
-                val delayMs = retryAfterHeaderToDelayMs(retryAfter)
-                
-                // Use the larger of the calculated delay or the exponential backoff (if we were doing exponential, but here we seem to just rely on 429 header or backoff?)
-                // The test passed explicit backoff params. Usually, if Retry-After is present, we honor it.
-                // If not, we might use exponential backoff.
-                // Let's implement a simple logic: if Retry-After is > 0, use it. Else use currentBackoff.
-                
-                val finalDelay = if (delayMs > 0) delayMs else currentBackoff
-                
-                safeLog(tag, "HTTP 429 Too Many Requests. Retrying in ${finalDelay}ms (attempt $attempts/$maxRetries)")
-                delay(finalDelay)
+                val retryAfterMs = retryAfterHeaderToDelayMs(retryAfter)
+                val delayMs = if (retryAfterMs > 0) retryAfterMs else currentBackoff
 
-                // Exponential backoff for next time if we fallback to it? 
-                // The prompt didn't specify exact logic but let's assume standard behavior.
-                if (delayMs <= 0) {
-                     currentBackoff = (currentBackoff * 2).coerceAtMost(maxBackoffMs)
+                safeLog(tag, "HTTP 429 Too Many Requests. Retrying in ${delayMs}ms (attempt $attempts/$maxRetries)")
+                delay(delayMs)
+
+                if (retryAfterMs <= 0) {
+                    currentBackoff = (currentBackoff * 2).coerceAtMost(maxBackoffMs)
                 }
             } else {
-                 return Result.failure(e)
+                return Result.failure(e)
             }
         } catch (e: CancellationException) {
             throw e

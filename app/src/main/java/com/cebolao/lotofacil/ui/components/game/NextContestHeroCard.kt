@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.ui.components.game
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +13,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.ui.model.UiNextDrawInfo
-import com.cebolao.lotofacil.ui.components.layout.AppCard
-import com.cebolao.lotofacil.ui.components.layout.CardVariant
 import com.cebolao.lotofacil.ui.theme.Dimen
+import com.cebolao.lotofacil.ui.theme.GradientAzul
 
 @Composable
 fun NextContestHeroCard(
@@ -28,20 +32,29 @@ fun NextContestHeroCard(
 ) {
     if (info == null) return
 
-    val scheme = MaterialTheme.colorScheme
-    // Use a semi-transparent primary color for the glass effect
-    val containerColor = scheme.primary.copy(alpha = 0.85f)
-    val userContentColor = scheme.onPrimary
-
-    AppCard(
-        modifier = modifier,
-        variant = CardVariant.Glass,
-        color = containerColor,
-        contentPadding = Dimen.Spacing16
+    val userContentColor = Color.White
+    
+    // Premium Hero Card with Gradient
+    Box(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(brush = GradientAzul)
+            .border(
+                width = Dimen.Border.Thin,
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color.White.copy(alpha = 0.4f),
+                        Color.White.copy(alpha = 0.1f)
+                    )
+                ),
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(Dimen.Spacing16)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8)
+            verticalArrangement = Arrangement.spacedBy(Dimen.Spacing8),
+            modifier = Modifier.align(Alignment.Center)
         ) {
             // Header: NEXT CONTEST 1234
             Text(
@@ -52,7 +65,7 @@ fun NextContestHeroCard(
                 ).uppercase(),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
-                color = userContentColor.copy(alpha = 0.8f),
+                color = userContentColor.copy(alpha = 0.9f),
                 letterSpacing = Dimen.TrackingWidest
             )
 
@@ -74,13 +87,19 @@ fun NextContestHeroCard(
             // Footer: Date | Final 5
             Row(
                 modifier = Modifier
+                    .padding(top = Dimen.Spacing8)
                     .background(
-                        color = userContentColor.copy(alpha = 0.1f),
+                        color = Color.Black.copy(alpha = 0.15f),
                         shape = MaterialTheme.shapes.medium
                     )
-                    .padding(Dimen.Spacing8),
+                    .border(
+                        width = Dimen.Border.Hairline,
+                        color = Color.White.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(horizontal = Dimen.Spacing12, vertical = Dimen.Spacing8),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing16)
             ) {
                 // Date
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -100,8 +119,8 @@ fun NextContestHeroCard(
                 // Vertical Divider
                 Box(
                     modifier = Modifier
-                        .size(Dimen.Border.Thin, Dimen.IconMedium)
-                        .background(userContentColor.copy(alpha = 0.2f))
+                        .size(1.dp, Dimen.IconMedium)
+                        .background(userContentColor.copy(alpha = 0.3f))
                 )
 
                 // Final 5

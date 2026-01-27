@@ -87,6 +87,10 @@ class DatabaseLoader @Inject constructor(
         )
 
         val totalLines = countAssetLines()
+        if (totalLines <= 1) {
+            throw IOException("Asset file is empty or unreadable")
+        }
+        val totalDataLines = totalLines - 1
         Log.d(TAG, "Total lines to process: $totalLines")
 
         var inserted = 0
@@ -103,7 +107,7 @@ class DatabaseLoader @Inject constructor(
                         phase = LoadingPhase.READING_ASSETS,
                         progress = 0.05f,
                         loadedCount = 0,
-                        totalCount = totalLines - 1
+                        totalCount = totalDataLines
                     )
                 }
 
@@ -116,9 +120,9 @@ class DatabaseLoader @Inject constructor(
 
                     _loadingState.value = DatabaseLoadingState.Loading(
                         phase = LoadingPhase.PARSING_DATA,
-                        progress = 0.1f + (parsed.toFloat() / totalLines) * 0.3f,
+                        progress = 0.1f + (parsed.toFloat() / totalDataLines) * 0.3f,
                         loadedCount = inserted,
-                        totalCount = totalLines - 1
+                        totalCount = totalDataLines
                     )
 
                     val draw = HistoryParser.parseLine(line)
@@ -128,9 +132,9 @@ class DatabaseLoader @Inject constructor(
                         if (buffer.size >= BATCH_SIZE) {
                             _loadingState.value = DatabaseLoadingState.Loading(
                                 phase = LoadingPhase.SAVING_TO_DATABASE,
-                                progress = 0.4f + (parsed.toFloat() / totalLines) * 0.5f,
+                                progress = 0.4f + (parsed.toFloat() / totalDataLines) * 0.5f,
                                 loadedCount = inserted,
-                                totalCount = totalLines - 1
+                                totalCount = totalDataLines
                             )
 
                             drawDao.insertAll(buffer)

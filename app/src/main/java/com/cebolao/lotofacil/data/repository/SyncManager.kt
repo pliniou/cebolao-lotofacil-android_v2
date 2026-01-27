@@ -1,6 +1,7 @@
 package com.cebolao.lotofacil.data.repository
 
 import android.util.Log
+import com.cebolao.lotofacil.data.datasource.retryOnHttp429
 import com.cebolao.lotofacil.data.local.db.DrawDao
 import com.cebolao.lotofacil.data.mapper.toValidatedDrawOrNull
 import com.cebolao.lotofacil.data.network.ApiService
@@ -35,22 +36,14 @@ class SyncManager @Inject constructor(
         const val MAX_CONCURRENT_REQUESTS = 8
     }
 
-    /**
-     * Performs incremental sync from remote to local database.
-     * Only fetches new contests that aren't in local storage.
-     * 
-     * @return Latest API result or null if sync failed
-     * @throws AppError if sync encounters unrecoverable error
-     */
-    suspend fun performIncrementalSync(): LotofacilApiResult? {
+    suspend fun performIncrementalSync(): LotofacilApiResult {
         return withContext(ioDispatcher) {
             try {
                 // Get current max contest number from local database
                 val currentMax = drawDao.getLastDrawSnapshot()?.contestNumber ?: 0
 
                 // Fetch latest draw from remote
-                val remoteResult = apiService.getLatestResult()
-                    ?: throw SyncException("Unable to fetch latest draw from API")
+                val remoteResult = fetchWithRetry { apiService.getLatestResult() }
                 val latestDraw = remoteResult.toValidatedDrawOrNull()
                     ?: throw SyncException("Latest draw payload missing or invalid numbers")
 
@@ -91,6 +84,9 @@ class SyncManager @Inject constructor(
             } catch (e: IOException) {
                 Log.e(TAG, "Network error during sync", e)
                 throw SyncException("Network sync failed", e)
+            } catch (e: SyncException) {
+                Log.e(TAG, "Sync error during sync", e)
+                throw e
             } catch (e: SerializationException) {
                 Log.e(TAG, "Invalid response format during sync", e)
                 throw SyncException("Invalid response format", e)
@@ -107,8 +103,7 @@ class SyncManager @Inject constructor(
         return withContext(ioDispatcher) {
             try {
                 val currentMax = drawDao.getLastDrawSnapshot()?.contestNumber ?: 0
-                val remoteResult = apiService.getLatestResult()
-                    ?: throw SyncException("Unable to fetch latest draw from API")
+                val remoteResult = fetchWithRetry { apiService.getLatestResult() }
                 val latestDraw = remoteResult.toValidatedDrawOrNull()
                     ?: throw SyncException("Latest draw payload missing or invalid numbers")
 
@@ -117,6 +112,9 @@ class SyncManager @Inject constructor(
             } catch (e: IOException) {
                 Log.w(TAG, "Network error checking sync status", e)
                 throw SyncException("Network check failed", e)
+            } catch (e: SyncException) {
+                Log.w(TAG, "Sync error checking sync status", e)
+                throw e
             } catch (e: SerializationException) {
                 Log.w(TAG, "Invalid response format checking sync status", e)
                 throw SyncException("Invalid response format", e)
@@ -161,13 +159,23 @@ class SyncManager @Inject constructor(
     private suspend fun fetchSingleDraw(contestNumber: Int): com.cebolao.lotofacil.domain.model.Draw? {
         return withContext(ioDispatcher) {
             runCatching {
-                val apiResult = apiService.getResultByContest(contestNumber)
-                val validated = apiResult?.toValidatedDrawOrNull()
+                val apiResult = fetchWithRetry { apiService.getResultByContest(contestNumber) }
+                val validated = apiResult.toValidatedDrawOrNull()
                 if (validated == null) {
                     Log.w(TAG, "Invalid draw payload for contest $contestNumber")
                 }
                 validated
             }.getOrNull()
         }
+    }
+
+    private suspend fun <T> fetchWithRetry(block: suspend () -> T): T {
+        return retryOnHttp429(TAG) { block() }
+            .getOrElse { throwable ->
+                if (throwable is SerializationException) {
+                    throw throwable
+                }
+                throw SyncException("Network request failed", throwable)
+            }
     }
 }

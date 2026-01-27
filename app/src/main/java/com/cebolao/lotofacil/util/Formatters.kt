@@ -1,7 +1,5 @@
 package com.cebolao.lotofacil.util
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -24,7 +22,7 @@ object Formatters {
         return String.format(appLocale, "%.1f%%", value)
     }
 
-    fun formatDate(date: java.time.LocalDate): String {
+    fun formatDate(date: LocalDate): String {
         return localizedDateFormatter.format(date)
     }
 
@@ -44,12 +42,4 @@ object Formatters {
         return runCatching { LocalDate.parse(dateText, apiDateFormatter) }.getOrNull()
     }
 
-    fun getLocale(): Locale = appLocale
-}
-
-@Composable
-fun rememberCurrencyFormatter(): NumberFormat {
-    return remember {
-        NumberFormat.getCurrencyInstance(Formatters.getLocale())
-    }
 }

@@ -1,4 +1,5 @@
 package com.cebolao.lotofacil.data.datasource
+
 import okhttp3.Headers
 import okhttp3.Protocol
 import okhttp3.Request
@@ -12,6 +13,7 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.ZoneOffset
 
+@Suppress("SameParameterValue")
 class RetryOnHttp429Test {
 
     @Test

@@ -1,6 +1,5 @@
 package com.cebolao.lotofacil.ui.components.filter
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,12 +29,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.cebolao.lotofacil.R
 import com.cebolao.lotofacil.domain.model.FilterState
 import com.cebolao.lotofacil.domain.model.FilterType
+import com.cebolao.lotofacil.presentation.model.titleRes
 import com.cebolao.lotofacil.ui.theme.Dimen
-import com.cebolao.lotofacil.ui.theme.FontFamilyDisplay
 import com.cebolao.lotofacil.ui.theme.filterIcon
 import com.cebolao.lotofacil.util.Formatters
 
@@ -47,8 +43,7 @@ fun FilterCard(
     onToggle: (Boolean) -> Unit,
     onRange: (ClosedFloatingPointRange<Float>) -> Unit,
     onInfo: () -> Unit,
-    modifier: Modifier = Modifier,
-    lastDraw: Set<Int>? = null
+    modifier: Modifier = Modifier
 ) {
     val steps = (state.type.fullRange.endInclusive - state.type.fullRange.start).toInt() - 1
     val scheme = MaterialTheme.colorScheme
@@ -261,8 +256,7 @@ internal fun FilterCardPreview() {
                 ),
                 onToggle = {},
                 onRange = {},
-                onInfo = {},
-                lastDraw = null
+                onInfo = {}
             )
         }
     }

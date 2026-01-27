@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.cebolao.lotofacil.widget
 
 import android.app.PendingIntent
@@ -79,7 +81,7 @@ object WidgetUtils {
         }
     }
 
-    @androidx.annotation.RequiresApi(android.os.Build.VERSION_CODES.S)
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
     fun buildResponsiveRemoteViews(
         small: RemoteViews,
         medium: RemoteViews,

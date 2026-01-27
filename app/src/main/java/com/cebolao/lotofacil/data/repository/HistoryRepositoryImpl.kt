@@ -1,21 +1,15 @@
 package com.cebolao.lotofacil.data.repository
 
-import android.content.Context
 import android.util.Log
-import androidx.room.withTransaction
 import com.cebolao.lotofacil.data.cache.DrawLruCache
-import com.cebolao.lotofacil.data.local.db.AppDatabase
 import com.cebolao.lotofacil.data.local.db.DrawDao
 import com.cebolao.lotofacil.data.local.db.DrawDetailsDao
 import com.cebolao.lotofacil.data.mapper.toDraw
 import com.cebolao.lotofacil.data.mapper.toDrawDetails
 import com.cebolao.lotofacil.data.mapper.toDrawDetailsEntity
-import com.cebolao.lotofacil.data.mapper.toEntity
-import com.cebolao.lotofacil.data.network.ApiService
 import com.cebolao.lotofacil.data.network.LotofacilApiResult
 import com.cebolao.lotofacil.di.ApplicationScope
 import com.cebolao.lotofacil.di.IoDispatcher
-import com.cebolao.lotofacil.domain.exception.SyncException
 import com.cebolao.lotofacil.domain.model.AppResult
 import com.cebolao.lotofacil.domain.model.DatabaseLoadingState
 import com.cebolao.lotofacil.domain.model.Draw
@@ -23,7 +17,6 @@ import com.cebolao.lotofacil.domain.model.DrawDetails
 import com.cebolao.lotofacil.domain.repository.HistoryRepository
 import com.cebolao.lotofacil.domain.repository.SyncStatus
 import com.cebolao.lotofacil.util.toAppError
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -41,7 +34,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,11 +51,8 @@ private data class LatestApiResult(
 
 @Singleton
 class HistoryRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
-    appDatabase: AppDatabase,
     private val drawDao: DrawDao,
     private val drawDetailsDao: DrawDetailsDao,
-    apiService: ApiService,
     private val syncManager: SyncManager,
     private val databaseLoader: DatabaseLoader,
     @param:ApplicationScope private val scope: CoroutineScope,
@@ -199,25 +188,13 @@ class HistoryRepositoryImpl @Inject constructor(
     }
 
     private suspend fun runSyncIfNeeded(): AppResult<Unit> {
-        val shouldSync = try {
-            syncManager.shouldSync()
-        } catch (e: IOException) {
-            Log.e(TAG, "Network error checking sync status", e)
-            _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            return AppResult.Failure(e.toAppError())
-        } catch (e: SyncException) {
-            Log.e(TAG, "Sync service error checking sync status", e)
-            _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            return AppResult.Failure(e.toAppError())
-        }
-
-        if (!shouldSync) {
-            Log.i(TAG, "Sync not needed, skipping")
-            _syncStatus.value = SyncStatus.Success
-            return AppResult.Success(Unit)
-        }
-
         return try {
+            if (!syncManager.shouldSync()) {
+                Log.i(TAG, "Sync not needed, skipping")
+                _syncStatus.value = SyncStatus.Success
+                return AppResult.Success(Unit)
+            }
+
             _syncStatus.value = SyncStatus.Syncing
             Log.i(TAG, "Starting history sync")
 
@@ -231,18 +208,14 @@ class HistoryRepositoryImpl @Inject constructor(
             _syncStatus.value = SyncStatus.Success
             Log.i(TAG, "Sync completed successfully")
             AppResult.Success(Unit)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            
+            Log.e(TAG, "Sync failed", e)
             cacheLatestApiResult(null)
-            Log.e(TAG, "Network sync failed", e)
-            _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            AppResult.Failure(e.toAppError())
-        } catch (e: SyncException) {
-            cacheLatestApiResult(null)
-            Log.e(TAG, "Sync service error", e)
-            _syncStatus.value = SyncStatus.Failed(e.toAppError())
-            AppResult.Failure(e.toAppError())
-        } catch (e: CancellationException) {
-            throw e
+            val error = e.toAppError()
+            _syncStatus.value = SyncStatus.Failed(error)
+            AppResult.Failure(error)
         }
     }
 
