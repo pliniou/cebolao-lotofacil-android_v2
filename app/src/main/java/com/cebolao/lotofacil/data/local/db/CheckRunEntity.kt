@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Entidade Room para persistir conferências de jogos
+ * Room entity for persisting game check runs
  */
 @Entity(
     tableName = "check_runs",

@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.detekt)
 }
 
 android {
@@ -18,12 +17,15 @@ android {
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 2
-        versionName = "2.0.0"
+        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Only keep resources for Brazilian Portuguese
+        resConfigs("pt-rBR")
     }
 
     compileOptions {
@@ -39,12 +41,13 @@ android {
 
     packaging {
         resources {
-            excludes += setOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md",
-                "META-INF/AL2.0",
-                "META-INF/LGPL2.1"
-            )
+            excludes +=
+                setOf(
+                    "META-INF/LICENSE.md",
+                    "META-INF/LICENSE-notice.md",
+                    "META-INF/AL2.0",
+                    "META-INF/LGPL2.1",
+                )
         }
     }
 
@@ -54,20 +57,11 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
         debug {
             isMinifyEnabled = false
-        }
-    }
-
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-            isUniversalApk = true
         }
     }
 
@@ -146,34 +140,17 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.androidx.work.testing)
+
+    // Performance
+    implementation(libs.androidx.profileinstaller)
 }
 
 ktlint {
     android.set(true)
     outputToConsole.set(true)
-    ignoreFailures.set(true)
+    ignoreFailures.set(false)
     filter {
         exclude("**/src/test/**")
         exclude("**/src/androidTest/**")
-    }
-}
-
-detekt {
-    buildUponDefaultConfig = true
-    allRules = false
-    basePath = projectDir.absolutePath
-    ignoreFailures = true
-    reportsDir = layout.buildDirectory.dir("reports/detekt").get().asFile
-}
-
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-    reports {
-        xml.required.set(true)
-        xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
-        html.required.set(true)
-        html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
-        txt.required.set(false)
-        sarif.required.set(false)
-        md.required.set(false)
     }
 }

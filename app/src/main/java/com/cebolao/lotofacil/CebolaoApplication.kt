@@ -14,8 +14,8 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 /**
- * Application principal do app CebolaoLotofacil.
- * Configurado com Hilt para injecao de dependencias e WorkManager.
+ * Main application class for CebolaoLotofacil.
+ * Configured with Hilt for dependency injection and WorkManager.
  */
 @HiltAndroidApp
 class CebolaoApplication : Application(), Configuration.Provider {
@@ -30,7 +30,7 @@ class CebolaoApplication : Application(), Configuration.Provider {
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
-            // Logs mais verbosos em debug para diagnosticar workers; INFO em release
+            // More verbose logs in debug for diagnosing workers; INFO in release
             .setMinimumLoggingLevel(
                 if (BuildConfig.DEBUG) android.util.Log.VERBOSE else android.util.Log.INFO
             )

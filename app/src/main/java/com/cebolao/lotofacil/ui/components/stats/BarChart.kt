@@ -56,10 +56,10 @@ private const val GRID_LINES = 5
 enum class ChartType { BAR, LINE }
 
 /**
- * Componente de gráfico customizado (Barra ou Linha) usando Canvas.
+ * Custom chart component (Bar or Line) using Canvas.
  *
- * Suporta animação de entrada, seleção por toque, destaque de valores e linha de distribuição normal.
- * Agora com dimensões escaláveis baseadas na densidade da tela.
+ * Supports entry animation, touch selection, value highlighting, and normal distribution line.
+ * Now with scalable dimensions based on screen density.
  */
 @Composable
 fun BarChart(
@@ -502,7 +502,7 @@ private fun DrawScope.drawNormalLine(
     )
 
     drawContext.canvas.nativeCanvas.drawText(
-        "Distribuição Normal",
+        "Normal Distribution",
         size.width - 200f,
         m.topPadding + 20f,
         p.label.apply {

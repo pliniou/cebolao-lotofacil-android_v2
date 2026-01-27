@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import java.util.UUID
 
 /**
- * Entidade Room para persistir jogos do usuário
+ * Room entity for persisting user games
  */
 @Entity(
     tableName = "user_games",

@@ -273,6 +273,7 @@ fun GeneratedGamesScreenContent(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
+                // Optimize filtering: derivedStateOf relies on the stable lists from uiState
                 val games by remember(uiState.unpinnedGames, uiState.pinnedGames, page) {
                     derivedStateOf {
                         if (page == 0) uiState.unpinnedGames else uiState.pinnedGames

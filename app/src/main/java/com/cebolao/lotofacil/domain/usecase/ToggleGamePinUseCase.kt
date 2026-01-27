@@ -17,7 +17,7 @@ class ToggleGamePinUseCase @Inject constructor(
                 val updatedGame = if (existingGame != null) {
                     existingGame.copy(isPinned = !existingGame.isPinned)
                 } else {
-                    // Se o jogo nao existe, cria um novo com o estado invertido do atual.
+                    // If game doesn't exist, create a new one with inverted state from current.
                     game.copy(isPinned = !game.isPinned)
                 }
                 gameRepository.saveGame(updatedGame)

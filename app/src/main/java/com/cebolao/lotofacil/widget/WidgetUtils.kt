@@ -33,9 +33,9 @@ object WidgetUtils {
     internal const val UNIQUE_WIDGET_UPDATE_PERIODIC = "WidgetUpdatePeriodic"
 
     /**
-     * Breakpoints em dp: universais e estáveis entre densidades/launchers.
-     * Observação: o Android 12+ vai usar o mapa SizeF->RemoteViews (responsivo nativo).
-     * Este fallback é para < 12 (API < 31).
+     * Breakpoints in dp: universal and stable across densities/launchers.
+     * Note: Android 12+ will use SizeF->RemoteViews map (native responsive).
+     * This fallback is for < 12 (API < 31).
      */
     fun getSizeVariant(context: Context, appWidgetId: Int): WidgetSizeVariant {
         val opts = AppWidgetManager.getInstance(context).getAppWidgetOptions(appWidgetId)
@@ -87,7 +87,7 @@ object WidgetUtils {
         medium: RemoteViews,
         large: RemoteViews
     ): RemoteViews {
-        // Chaves em dp (SizeF widthDp, heightDp). Não precisam ser “pixel-perfect”.
+        // Keys in dp (SizeF widthDp, heightDp). Don't need to be "pixel-perfect".
         val sizeMap = mapOf(
             SizeF(180f, 110f) to small,
             SizeF(240f, 140f) to medium,
@@ -178,19 +178,28 @@ object WidgetUtils {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val small = RemoteViews(context.packageName, getLayoutIdFor(providerClass, WidgetSizeVariant.SMALL)).apply {
-                setOnClickPendingIntent(R.id.widget_refresh_button, getRefreshPendingIntent(context, providerClass, appWidgetId))
+                setOnClickPendingIntent(
+                    R.id.widget_refresh_button,
+                    getRefreshPendingIntent(context, providerClass, appWidgetId)
+                )
                 setOnClickPendingIntent(R.id.widget_root, getOpenAppPendingIntent(context))
                 applyLoadingState(this, contentId, loading)
             }
 
             val medium = RemoteViews(context.packageName, getLayoutIdFor(providerClass, WidgetSizeVariant.MEDIUM)).apply {
-                setOnClickPendingIntent(R.id.widget_refresh_button, getRefreshPendingIntent(context, providerClass, appWidgetId))
+                setOnClickPendingIntent(
+                    R.id.widget_refresh_button,
+                    getRefreshPendingIntent(context, providerClass, appWidgetId)
+                )
                 setOnClickPendingIntent(R.id.widget_root, getOpenAppPendingIntent(context))
                 applyLoadingState(this, contentId, loading)
             }
 
             val large = RemoteViews(context.packageName, getLayoutIdFor(providerClass, WidgetSizeVariant.LARGE)).apply {
-                setOnClickPendingIntent(R.id.widget_refresh_button, getRefreshPendingIntent(context, providerClass, appWidgetId))
+                setOnClickPendingIntent(
+                    R.id.widget_refresh_button,
+                    getRefreshPendingIntent(context, providerClass, appWidgetId)
+                )
                 setOnClickPendingIntent(R.id.widget_root, getOpenAppPendingIntent(context))
                 applyLoadingState(this, contentId, loading)
             }
@@ -204,7 +213,10 @@ object WidgetUtils {
         val variant = getSizeVariant(context, appWidgetId)
         val layoutId = getLayoutIdFor(providerClass, variant)
         val views = RemoteViews(context.packageName, layoutId).apply {
-            setOnClickPendingIntent(R.id.widget_refresh_button, getRefreshPendingIntent(context, providerClass, appWidgetId))
+            setOnClickPendingIntent(
+                R.id.widget_refresh_button,
+                getRefreshPendingIntent(context, providerClass, appWidgetId)
+            )
             setOnClickPendingIntent(R.id.widget_root, getOpenAppPendingIntent(context))
             applyLoadingState(this, contentId, loading)
         }

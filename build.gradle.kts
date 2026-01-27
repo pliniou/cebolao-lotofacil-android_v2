@@ -6,16 +6,4 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ktlint) apply false
-    alias(libs.plugins.detekt) apply false
-}
-
-// Optional: enable ksp incremental processing globally
-subprojects {
-    plugins.withId("com.google.devtools.ksp") {
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            compilerOptions {
-                freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
-            }
-        }
-    }
 }

@@ -10,28 +10,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 
 /**
- * Tipos de feedback háptico disponíveis
+ * Available haptic feedback types
  */
 enum class HapticFeedbackType {
-    /** Feedback leve para interações simples (cliques, toggles) */
+    /** Light feedback for simple interactions (clicks, toggles) */
     LIGHT,
 
-    /** Feedback médio para ações importantes (seleção, confirmação) */
+    /** Medium feedback for confirmations */
     MEDIUM,
 
-    /** Feedback forte para ações críticas (sucesso, erro) */
-    HEAVY,
+    /** Strong feedback for important actions */
+    STRONG,
 
-    /** Feedback para sucesso */
+    /** Success feedback pattern */
     SUCCESS,
 
-    /** Feedback para erro */
+    /** Error feedback pattern */
     ERROR
 }
 
 /**
- * Gerenciador de feedback háptico
- * Fornece feedback tátil para melhorar a experiência do usuário
+ * Haptic feedback manager
+ * Provides tactile feedback to improve user experience
  */
 class HapticFeedbackManager(context: Context) {
 
@@ -40,29 +40,41 @@ class HapticFeedbackManager(context: Context) {
             context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
         vibratorManager?.defaultVibrator
     } else {
-        // Android \u003c 12 (API \u003c 31) uses deprecated VIBRATOR_SERVICE
         @Suppress("DEPRECATION")
         context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }
 
     /**
-     * Executa feedback háptico
+     * Performs haptic feedback
      */
     fun performHapticFeedback(type: HapticFeedbackType) {
         if (vibrator?.hasVibrator() != true) return
 
-        val effect = when (type) {
-            HapticFeedbackType.LIGHT -> VibrationEffect.createOneShot(10, 50)
-            HapticFeedbackType.MEDIUM -> VibrationEffect.createOneShot(20, 100)
-            HapticFeedbackType.HEAVY -> VibrationEffect.createOneShot(30, 150)
-            HapticFeedbackType.SUCCESS -> createSuccessPattern()
-            HapticFeedbackType.ERROR -> createErrorPattern()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Android 10+ (API 29+) - Use Predefined Effects
+            val effect = when (type) {
+                HapticFeedbackType.LIGHT -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                HapticFeedbackType.MEDIUM -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+                HapticFeedbackType.STRONG -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
+                HapticFeedbackType.SUCCESS -> createSuccessPattern()
+                HapticFeedbackType.ERROR -> createErrorPattern()
+            }
+            vibrator.vibrate(effect)
+        } else {
+            // Android 8.0 - 9.0 (API 26-28) - Fallback to OneShot/Waveform
+            val effect = when (type) {
+                HapticFeedbackType.LIGHT -> VibrationEffect.createOneShot(10, 50) 
+                HapticFeedbackType.MEDIUM -> VibrationEffect.createOneShot(20, 100)
+                HapticFeedbackType.STRONG -> VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE)
+                HapticFeedbackType.SUCCESS -> createSuccessPattern()
+                HapticFeedbackType.ERROR -> createErrorPattern()
+            }
+            vibrator.vibrate(effect)
         }
-        vibrator.vibrate(effect)
     }
 
     private fun createSuccessPattern(): VibrationEffect {
-        // Padrão: curto - pausa - curto (sucesso duplo-tap)
+        // Pattern: short - pause - short (double-tap success)
         return VibrationEffect.createWaveform(
             longArrayOf(0, 20, 50, 20),
             intArrayOf(0, 100, 0, 100),
@@ -71,7 +83,7 @@ class HapticFeedbackManager(context: Context) {
     }
 
     private fun createErrorPattern(): VibrationEffect {
-        // Padrão: curto - curto - curto (erro triplo-tap)
+        // Pattern: short - short - short (triple-tap error)
         return VibrationEffect.createWaveform(
             longArrayOf(0, 30, 100, 30, 100, 30),
             intArrayOf(0, 150, 0, 150, 0, 150),
@@ -81,7 +93,7 @@ class HapticFeedbackManager(context: Context) {
 }
 
 /**
- * Composable para lembrar uma instância de HapticFeedbackManager
+ * Composable to remember a HapticFeedbackManager instance
  */
 @Composable
 fun rememberHapticFeedback(): HapticFeedbackManager {

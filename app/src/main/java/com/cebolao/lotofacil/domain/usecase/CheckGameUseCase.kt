@@ -53,7 +53,7 @@ class CheckGameUseCase @Inject constructor(
             }
 
             if (history.isEmpty()) {
-                emit(AppResult.Failure(AppError.Validation("Historico vazio")))
+                emit(AppResult.Failure(AppError.Validation("Empty history")))
                 return@flow
             }
 

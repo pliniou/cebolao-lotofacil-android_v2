@@ -19,7 +19,7 @@ class AnalyzeGameUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(game: LotofacilGame): AppResult<GameAnalysisResult> = withContext(dispatcher) {
         try {
-            // Flow de 1 emissão agora retorna AppResult<CheckReport>
+            // Flow with 1 emission now returns AppResult<CheckReport>
             when (val checkResult = checkGameUseCase(game.numbers).first()) {
                 is AppResult.Failure -> AppResult.Failure(checkResult.error)
                 is AppResult.Success -> {

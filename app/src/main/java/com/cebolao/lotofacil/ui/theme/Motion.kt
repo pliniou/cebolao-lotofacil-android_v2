@@ -6,25 +6,25 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.unit.dp
 
 /**
- * Sistema de Motion Design seguindo Material Design 3.
- * Fornece specs de animação consistentes e performáticas para toda a aplicação.
+ * Motion Design system following Material Design 3.
+ * Provides consistent and performant animation specs throughout the application.
  */
 object Motion {
     // --- DURATIONS (ms) ---
     /**
-     * Durações padrão para animações.
-     * Baseadas nas guidelines do Material Design 3.
+     * Standard animation durations.
+     * Based on Material Design 3 guidelines.
      */
     object Duration {
-        /** Animações rápidas - feedback imediato (150ms) */
+        /** Fast animations - immediate feedback (150ms) */
         const val FAST = 150
-        /** Animações padrão - transições de estado (300ms) */
+        /** Standard animations - state transitions (300ms) */
         const val MEDIUM = 300
-        /** Animações de entrada de elementos (350ms) */
+        /** Element entry animations (350ms) */
         const val ENTER = 350
-        /** Animações de saída de elementos (250ms) */
+        /** Element exit animations (250ms) */
         const val EXIT = 250
-        /** STAGGER delay para listas (50ms) */
+        /** STAGGER delay for lists (50ms) */
         const val STAGGER = 50
         /** Splash exit duration (500ms) */
         const val SPLASH = 500
@@ -32,33 +32,33 @@ object Motion {
     
     // --- EASING CURVES ---
     /**
-     * Curvas de easing seguindo M3 motion system.
-     * - Standard: Para maioria das animações
-     * - Emphasized: Para animações que precisam de mais atenção
-     * - Linear: Para rotações contínuas e progress indicators
+     * Easing curves following M3 motion system.
+     * - Standard: For most animations
+     * - Emphasized: For animations needing more attention
+     * - Linear: For continuous rotations and progress indicators
      */
     object Easing {
-        /** Curva padrão M3 - entrada e saída suaves */
+        /** Standard M3 curve - smooth entry and exit */
         val Standard = CubicBezierEasing(0.2f, 0f, 0f, 1f)
-        /** Desaceleração enfatizada - para elementos entrando */
+        /** Emphasized deceleration - for entering elements */
         val EmphasizedDecelerate = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
-        /** Aceleração enfatizada - para elementos saindo */
+        /** Emphasized acceleration - for exiting elements */
         val EmphasizedAccelerate = CubicBezierEasing(0.3f, 0f, 0.8f, 0.15f)
     }
     
     // --- SPRING SPECS ---
     /**
-     * Especificações de spring pré-configuradas.
-     * Springs são preferidos para animações naturais e responsivas.
+     * Pre-configured spring specifications.
+     * Springs are preferred for natural and responsive animations.
      */
     object Spring {
-        /** Spring suave - para animações gentis e naturais */
+        /** Gentle spring - for smooth and natural animations */
         fun <T> gentle() = spring<T>(
             dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
             stiffness = androidx.compose.animation.core.Spring.StiffnessLow
         )
         
-        /** Spring rápido - para feedback de interação */
+        /** Snappy spring - for interaction feedback */
         fun <T> snappy() = spring<T>(
             dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
             stiffness = androidx.compose.animation.core.Spring.StiffnessMedium
@@ -67,49 +67,49 @@ object Motion {
     
     // --- TWEEN SPECS ---
     /**
-     * Especificações de tween pré-configuradas.
-     * Tweens são usados quando precisamos de durações previsíveis.
+     * Pre-configured tween specifications.
+     * Tweens are used when predictable durations are needed.
      */
     object Tween {
-        /** Tween rápido para micro-interações */
+        /** Fast tween for micro-interactions */
         fun <T> fast(reduceMotion: Boolean = false) =
             tween<T>(if (reduceMotion) 0 else Duration.FAST, easing = Easing.Standard)
-        /** Tween médio para transições padrão */
+        /** Medium tween for standard transitions */
         fun <T> medium(reduceMotion: Boolean = false) =
             tween<T>(if (reduceMotion) 0 else Duration.MEDIUM, easing = Easing.Standard)
-        /** Tween de entrada com desaceleração */
+        /** Entry tween with deceleration */
         fun <T> enter(reduceMotion: Boolean = false) =
             tween<T>(if (reduceMotion) 0 else Duration.ENTER, easing = Easing.EmphasizedDecelerate)
-        /** Tween de saída com aceleração */
+        /** Exit tween with acceleration */
         fun <T> exit(reduceMotion: Boolean = false) =
             tween<T>(if (reduceMotion) 0 else Duration.EXIT, easing = Easing.EmphasizedAccelerate)
     }
     
     // --- OFFSET SPECS ---
     /**
-     * Offsets pré-definidos para animações de slide e fade.
+     * Pre-defined offsets for slide and fade animations.
      */
     object Offset {
-        /** Offset para slide de baixo para cima */
+        /** Offset for slide from bottom to top */
         val SlideUp = 24.dp
-        /** Offset para slide de cima para baixo */
+        /** Offset for slide from top to bottom */
         val SlideDown = 24.dp
-        /** Escala inicial para animações de zoom */
+        /** Initial scale for zoom animations */
         const val SCALE = 0.92f
-        /** Escala de pressão (press feedback) */
+        /** Press scale (press feedback) */
         const val PRESSSCALE = 0.96f
-        /** Escala de seleção (selected feedback) */
+        /** Selection scale (selected feedback) */
         const val SELECTSCALE = 1.05f
     }
 }
 
 // --- ANIMATION UTILITIES ---
 /**
- * Calcula o delay de stagger para animações em lista.
- * @param index Índice do item na lista
- * @param baseDelay Delay base em ms
- * @param maxDelay Delay máximo total em ms
- * @return Delay calculado em ms
+ * Calculates stagger delay for list animations.
+ * @param index Item index in the list
+ * @param baseDelay Base delay in ms
+ * @param maxDelay Maximum total delay in ms
+ * @return Calculated delay in ms
  */
 fun staggerDelay(
     index: Int,

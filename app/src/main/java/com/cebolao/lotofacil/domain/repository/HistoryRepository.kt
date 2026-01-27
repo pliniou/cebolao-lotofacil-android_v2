@@ -18,47 +18,47 @@ sealed interface SyncStatus {
 
 interface HistoryRepository {
     /**
-     * Estado atual do processo de sincronização do histórico.
+     * Current status of history synchronization process.
      */
     val syncStatus: StateFlow<SyncStatus>
 
     /**
-     * Estado atual do processo de carregamento do banco de dados.
+     * Current status of database loading process.
      */
     val loadingState: StateFlow<DatabaseLoadingState>
 
     /**
-     * Inicia sincronização do histórico (implementação deve ser idempotente quando possível).
+     * Initiates history synchronization (implementation should be idempotent when possible).
      */
     fun syncHistory(): Job
 
     /**
-     * Executa sincronização do histórico caso necessário e retorna o resultado.
+     * Executes history synchronization if needed and returns the result.
      */
     suspend fun syncHistoryIfNeeded(): AppResult<Unit>
 
     /**
-     * Observa toda a lista de concursos.
+     * Observes the complete list of contests.
      */
     fun observeHistory(): Flow<List<Draw>>
 
     /**
-     * Observa apenas o último concurso. Otimizado para Home Screen.
+     * Observes only the last contest. Optimized for Home Screen.
      */
     fun observeLastDraw(): Flow<Draw?>
 
     /**
-     * Retorna a lista completa de concursos disponíveis localmente.
+     * Returns the complete list of contests available locally.
      */
     suspend fun getHistory(): AppResult<List<Draw>>
 
     /**
-     * Retorna o último concurso ou null.
+     * Returns the last contest or null.
      */
     suspend fun getLastDraw(): AppResult<Draw?>
 
     /**
-     * Retorna detalhes do último concurso, quando disponível.
+     * Returns details of the last contest, when available.
      */
     suspend fun getLastDrawDetails(): AppResult<DrawDetails?>
 }

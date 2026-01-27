@@ -2,29 +2,29 @@ package com.cebolao.lotofacil.domain.model
 
 
 /**
- * Estatísticas completas de análise por faixa de acertos.
- * Calculado usando todo o banco de dados disponível, não apenas últimos 20 concursos.
+ * Complete hit range analysis statistics.
+ * Calculated using the entire available database, not just the last 20 draws.
  */
 data class RangeStatistics(
     val totalDraws: Int,
-    val range0to5: Int,      // 0-5 acertos
-    val range6to10: Int,     // 6-10 acertos  
-    val range11to15: Int,    // 11-15 acertos
-    val range16to20: Int,    // 16-20 acertos
-    val averageHits: Float,   // Média de acertos por jogo
-    val standardDeviation: Float, // Desvio padrão dos acertos
-    val mostFrequentRange: String, // Faixa mais frequente
-    val leastFrequentRange: String // Faixa menos frequente
+    val range0to5: Int,      // 0-5 hits
+    val range6to10: Int,     // 6-10 hits
+    val range11to15: Int,    // 11-15 hits
+    val range16to20: Int,    // 16-20 hits
+    val averageHits: Float,   // Average hits per game
+    val standardDeviation: Float, // Standard deviation of hits
+    val mostFrequentRange: String, // Most frequent range
+    val leastFrequentRange: String // Least frequent range
 ) {
     /**
-     * Calcula a porcentagem de jogos em uma determinada faixa
+     * Calculates the percentage of games in a specific range
      */
     fun getRangePercentage(rangeCount: Int): Float {
         return if (totalDraws > 0) (rangeCount.toFloat() / totalDraws * 100) else 0f
     }
-    
+
     /**
-     * Retorna a faixa com maior ocorrência
+     * Returns the range with highest occurrence
      */
     fun getDominantRange(): String {
         val ranges = mapOf(
@@ -35,16 +35,16 @@ data class RangeStatistics(
         )
         return ranges.maxByOrNull { it.value }?.key ?: "N/A"
     }
-    
+
     /**
-     * Verifica se um número de acertos está acima da média
+     * Checks if a hit count is above average
      */
     fun isAboveAverage(hits: Int): Boolean {
         return hits > averageHits
     }
-    
+
     /**
-     * Classifica o desempenho baseado na faixa de acertos
+     * Classifies performance based on hit range
      */
     fun classifyPerformance(hits: Int): PerformanceLevel {
         return when {
@@ -58,7 +58,7 @@ data class RangeStatistics(
 }
 
 /**
- * Níveis de desempenho baseados na faixa de acertos
+ * Performance levels based on hit range
  */
 enum class PerformanceLevel {
     POOR,
@@ -69,32 +69,32 @@ enum class PerformanceLevel {
 }
 
 /**
- * Utilitário para calcular estatísticas de faixa a partir de dados históricos
+ * Utility for calculating range statistics from historical data
  */
 object RangeStatisticsCalculator {
-    
+
     /**
-     * Calcula estatísticas completas de faixa a partir de uma lista de jogos
+     * Calculates complete range statistics from a list of games
      */
     fun calculateFromGames(games: List<LotofacilGame>): RangeStatistics {
         if (games.isEmpty()) {
             return RangeStatistics(0, 0, 0, 0, 0, 0f, 0f, "N/A", "N/A")
         }
-        
+
         val totalDraws = games.size
-        
-        // Contar acertos por faixa
+
+        // Count hits by range
         var range0to5 = 0
         var range6to10 = 0
         var range11to15 = 0
         var range16to20 = 0
-        
+
         val hitsList = mutableListOf<Int>()
-        
+
         games.forEach { game ->
             val hits = game.numbers.size
             hitsList.add(hits)
-            
+
             when {
                 hits <= 5 -> range0to5++
                 hits <= 10 -> range6to10++
@@ -102,22 +102,22 @@ object RangeStatisticsCalculator {
                 else -> range16to20++
             }
         }
-        
-        // Calcular estatísticas
+
+        // Calculate statistics
         val averageHits = hitsList.average().toFloat()
         val variance = hitsList.map { (it - averageHits).let { diff -> diff * diff } }.average()
         val standardDeviation = kotlin.math.sqrt(variance).toFloat()
-        
+
         val ranges = mapOf(
             "0-5" to range0to5,
             "6-10" to range6to10,
             "11-15" to range11to15,
             "16-20" to range16to20
         )
-        
+
         val mostFrequentRange = ranges.maxByOrNull { it.value }?.key ?: "N/A"
         val leastFrequentRange = ranges.minByOrNull { it.value }?.key ?: "N/A"
-        
+
         return RangeStatistics(
             totalDraws = totalDraws,
             range0to5 = range0to5,
@@ -130,9 +130,9 @@ object RangeStatisticsCalculator {
             leastFrequentRange = leastFrequentRange
         )
     }
-    
+
     /**
-     * Calcula estatísticas a partir de dados de check report
+     * Calculates statistics from check report data
      */
     fun calculateFromCheckReports(reports: List<CheckReport>): RangeStatistics {
         val games = reports.map { it.ticket }

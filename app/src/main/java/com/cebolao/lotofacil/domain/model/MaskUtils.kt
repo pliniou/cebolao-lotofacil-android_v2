@@ -12,7 +12,7 @@ object MaskUtils {
     }
 
     fun toSet(mask: Long): Set<Int> {
-        val result = HashSet<Int>()
+        val result = LinkedHashSet<Int>()
         var m = mask
         var idx = 1
         while (m != 0L && idx <= 64) {

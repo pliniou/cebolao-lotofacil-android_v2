@@ -5,32 +5,32 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserPreferencesRepository {
     /**
-     * Tema atual (string conforme o padrão do app).
+     * Current theme (string according to app standard).
      */
     val themeMode: Flow<ThemeMode>
 
     /**
-     * Indica se o onboarding já foi concluído.
+     * Indicates if onboarding has been completed.
      */
     val hasCompletedOnboarding: Flow<Boolean>
 
     /**
-     * Paleta/accent selecionado (por nome).
+     * Selected accent palette (by name).
      */
     val accentPalette: Flow<String>
 
     /**
-     * Define o modo de tema.
+     * Sets the theme mode.
      */
     suspend fun setThemeMode(mode: ThemeMode)
 
     /**
-     * Define conclusão do onboarding.
+     * Sets onboarding completion.
      */
     suspend fun setHasCompletedOnboarding(completed: Boolean)
 
     /**
-     * Define a paleta/accent.
+     * Sets the accent palette.
      */
     suspend fun setAccentPalette(paletteName: String)
 }

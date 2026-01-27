@@ -7,43 +7,43 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface GameRepository {
     /**
-     * Jogos gerados ainda não fixados.
+     * Generated games not yet pinned.
      */
     val unpinnedGames: StateFlow<ImmutableList<LotofacilGame>>
 
     /**
-     * Jogos fixados (pinned).
+     * Pinned games.
      */
     val pinnedGames: StateFlow<ImmutableList<LotofacilGame>>
 
     /**
-     * Retorna um jogo pelo seu mask, ou null se não existir.
+     * Returns a game by its mask, or null if it doesn't exist.
      */
     suspend fun getGame(mask: Long): AppResult<LotofacilGame?>
 
     /**
-     * Salva ou atualiza um jogo.
-     * Implementação deve tratar merge de campos não presentes no domínio (id, source, seed).
+     * Saves or updates a game.
+     * Implementation should handle merging of fields not present in domain (id, source, seed).
      */
     suspend fun saveGame(game: LotofacilGame): AppResult<Unit>
 
     /**
-     * Adiciona jogos recém-gerados à lista de "unpinned".
+     * Adds newly generated games to the "unpinned" list.
      */
     suspend fun addGeneratedGames(newGames: List<LotofacilGame>): AppResult<Unit>
 
     /**
-     * Limpa jogos não fixados.
+     * Clears unpinned games.
      */
     suspend fun clearUnpinnedGames(): AppResult<Unit>
 
     /**
-     * Remove um jogo.
+     * Removes a game.
      */
     suspend fun deleteGame(gameToDelete: LotofacilGame): AppResult<Unit>
 
     /**
-     * Exporta os jogos para uma representação textual.
+     * Exports games to a text representation.
      */
     suspend fun exportGames(): AppResult<String>
 }

@@ -97,7 +97,6 @@
     <string name="table_header_value">Valor</string>
     <string name="next_contest_final_five_label">Acumulado final 0/5</string>
     <string name="distribution_last_label">Último: %1$s</string>
-    <string name="enhanced_stats_title">Análise Estatística</string>
     <string name="state_expanded">Expandido</string>
     <string name="state_collapsed">Recolhido</string>
 
@@ -381,16 +380,6 @@
     <string name="filters_save_error">Erro ao salvar jogos gerados.</string>
 
     <!-- Checker Details -->
-    <string name="checker_range_analysis_title">Análise por Faixa de Acertos</string>
-    <string name="checker_total_analyzed" tools:ignore="PluralsCandidate">Total analisado: %1$d jogos</string>
-    <string name="checker_avg_hits">Média de acertos: %.1f</string>
-    <string name="checker_distribution_by_range">Distribuição por Faixa</string>
-    <string name="checker_range_0_5">0–5 acertos</string>
-    <string name="checker_range_6_10">6–10 acertos</string>
-    <string name="checker_range_11_15">11–15 acertos</string>
-    <string name="checker_range_16_20">16–20 acertos</string>
-    <string name="checker_most_common_range">Faixa mais comum: %1$s</string>
-    <string name="checker_least_common_range">Faixa menos comum: %1$s</string>
     <string name="checker_info_title" tools:keep="@string/checker_info_title">Informações da Conferência</string>
     <string name="checker_info_window_label" tools:keep="@string/checker_info_window_label">Janela de Concursos:</string>
     <string name="checker_info_date_label" tools:keep="@string/checker_info_date_label">Data/Hora:</string>
@@ -549,17 +538,5 @@
     <string name="error_unknown_title">Unexpected Error</string>
     <string name="error_unknown_message">An unexpected error occurred. Please try again.</string>
 
-    <!-- Accessibility - Content Descriptions (Enhanced) -->
-    <string name="cd_settings">Settings</string>
-    <string name="cd_back">Go back</string>
-    <string name="cd_pin_game">Pin this game</string>
-    <string name="cd_unpin_game">Unpin this game</string>
-    <string name="cd_delete_game">Delete this game</string>
-    <string name="cd_filter">Filter options</string>
-    <string name="cd_theme">Change theme</string>
-    <string name="cd_accent_color">Change accent color</string>
-    <string name="cd_number">Number %1$d</string>
-    <string name="cd_selected_number">Number %1$d selected</string>
-    <string name="cd_select_number">Select number %1$d</string>
-    <string name="cd_deselect_number">Deselect number %1$d</string>
+
 </resources>
