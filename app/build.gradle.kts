@@ -1,156 +1,74 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ktlint)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
-    namespace = "com.cebolao.lotofacil"
-    compileSdk = 35
+    namespace = "br.com.loterias.cebolaolotofacil"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.cebolao.lotofacil"
-        minSdk = 26
-        //noinspection OldTargetApi
-        targetSdk = 35
-        versionCode = 2
-        versionName = "1.0"
+        applicationId = "br.com.loterias.cebolaolotofacil"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 3
+        versionName = "1.2.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
-        // Only keep resources for Brazilian Portuguese
-        resConfigs("pt-rBR")
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
-    }
-
-    buildFeatures {
-        buildConfig = true
-        compose = true
-    }
-
-    packaging {
-        resources {
-            excludes +=
-                setOf(
-                    "META-INF/LICENSE.md",
-                    "META-INF/LICENSE-notice.md",
-                    "META-INF/AL2.0",
-                    "META-INF/LGPL2.1",
-                )
-        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
-        debug {
             isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
-    lint {
-        baseline = file("lint-baseline.xml")
-        abortOnError = false
-        checkDependencies = true
+    buildFeatures {
+        compose = true
     }
-}
 
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-    arg("room.generateKotlin", "true")
-    arg("room.incremental", "true")
-}
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.5"
+    }
 
-kotlin {
-    jvmToolchain(17)
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    packaging {
+        resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
+    // Compose BOM for version alignment
+    implementation(platform("androidx.compose:compose-bom:2024.01.00"))
+
+    // Core Android
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Compose UI
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
 
-    implementation(libs.bundles.compose)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // Dependency Injection
+    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
-    // Data
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-
-    // Network
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
-
-    // Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.work)
-    ksp(libs.androidx.hilt.compiler)
-
-    // Coroutines and kotlinx
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.collections.immutable)
-
-    // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
-
-    // Core library desugaring
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
+    // Coroutine support
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Testing
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation(libs.mockk.android)
-    androidTestImplementation(libs.androidx.work.testing)
-
-    // Performance
-    implementation(libs.androidx.profileinstaller)
-}
-
-ktlint {
-    android.set(true)
-    outputToConsole.set(true)
-    ignoreFailures.set(false)
-    filter {
-        exclude("**/src/test/**")
-        exclude("**/src/androidTest/**")
-    }
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.01.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
