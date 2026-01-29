@@ -64,7 +64,8 @@ android {
         resources {
             excludes += listOf(
                 "/META-INF/{AL2.0,LGPL2.1}",
-                "/META-INF/proguard/androidx-*.pro"
+                "/META-INF/proguard/androidx-*.pro",
+                "/META-INF/LICENSE.md"
             )
         }
     }
