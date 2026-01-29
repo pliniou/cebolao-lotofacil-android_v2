@@ -2,13 +2,18 @@ package br.com.loterias.cebolaolotofacil.presentation.viewmodel
 
 import br.com.loterias.cebolaolotofacil.domain.model.LotofacilResult
 import br.com.loterias.cebolaolotofacil.domain.usecase.GetRecentLotofacilResultsUseCase
+import br.com.loterias.cebolaolotofacil.testutil.MainDispatcherRule
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class HomeViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: HomeViewModel
     private lateinit var mockUseCase: GetRecentLotofacilResultsUseCase

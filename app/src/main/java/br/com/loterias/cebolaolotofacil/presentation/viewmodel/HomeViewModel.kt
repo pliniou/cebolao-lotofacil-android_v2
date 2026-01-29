@@ -44,49 +44,37 @@ class HomeViewModel(
     val isRefreshing: StateFlow<Boolean> = _refreshing.asStateFlow()
 
     init {
-        fetchResults()
+        viewModelScope.launch { fetchResults() }
     }
 
     /**
      * Fetch recent lottery results with proper error handling
      */
-    private fun fetchResults() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                getRecentResults()
-                    .catch { e ->
-                        Timber.e(e, "Error fetching results")
-                        _uiState.update { 
-                            it.copy(
-                                error = e.message ?: "Unknown error occurred",
-                                isLoading = false,
-                                isEmpty = true
-                            ) 
-                        }
-                    }
-                    .collect { data ->
-                        _uiState.update { state ->
-                            state.copy(
-                                results = data,
-                                isLoading = false,
-                                isEmpty = data.isEmpty(),
-                                resultsCount = data.size,
-                                error = null
-                            )
-                        }
-                    }
-            } catch (e: Exception) {
-                Timber.e(e, "Unexpected error in fetchResults")
-                _uiState.update { 
+    private suspend fun fetchResults() {
+        _uiState.update { it.copy(isLoading = true, error = null) }
+
+        getRecentResults()
+            .catch { e ->
+                Timber.e(e, "Error fetching results")
+                _uiState.update {
                     it.copy(
-                        error = "Erro ao carregar resultados",
+                        error = e.message ?: "Erro ao carregar resultados",
                         isLoading = false,
                         isEmpty = true
-                    ) 
+                    )
                 }
             }
-        }
+            .collect { data ->
+                _uiState.update { state ->
+                    state.copy(
+                        results = data,
+                        isLoading = false,
+                        isEmpty = data.isEmpty(),
+                        resultsCount = data.size,
+                        error = null
+                    )
+                }
+            }
     }
 
     /**
@@ -108,7 +96,7 @@ class HomeViewModel(
      */
     fun retryLoading() {
         Timber.d("Retrying to load results")
-        fetchResults()
+        viewModelScope.launch { fetchResults() }
     }
 
     /**
@@ -140,28 +128,30 @@ class HomeViewModel(
             _uiState.update { it.copy(isLoadingMore = true) }
             try {
                 val nextPage = currentState.currentPage + 1
-                
-                getRecentResults()
+
+                // Consome apenas um "snapshot" para evitar coleções infinitas/duplicações.
+                val newData = getRecentResults()
                     .catch { e ->
                         Timber.e(e, "Error loading more results")
-                        _uiState.update { 
+                        _uiState.update {
                             it.copy(
                                 isLoadingMore = false,
                                 error = "Erro ao carregar mais resultados"
-                            ) 
-                        }
-                    }
-                    .collect { newData ->
-                        _uiState.update { state ->
-                            state.copy(
-                                results = state.results + newData,
-                                isLoadingMore = false,
-                                currentPage = nextPage,
-                                canLoadMore = newData.size == ITEMS_PER_PAGE,
-                                error = null
                             )
                         }
                     }
+                    .firstOrNull()
+                    .orEmpty()
+
+                _uiState.update { state ->
+                    state.copy(
+                        results = state.results + newData,
+                        isLoadingMore = false,
+                        currentPage = nextPage,
+                        canLoadMore = newData.size == ITEMS_PER_PAGE,
+                        error = null
+                    )
+                }
             } catch (e: Exception) {
                 Timber.e(e, "Unexpected error in loadMore")
                 _uiState.update { 

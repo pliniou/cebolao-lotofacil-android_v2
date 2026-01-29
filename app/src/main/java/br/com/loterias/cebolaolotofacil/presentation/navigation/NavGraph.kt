@@ -13,14 +13,3 @@ sealed class Screen(val route: String) {
         fun createRoute(concurso: Int) = "result_details/$concurso"
     }
 }
-
-/**
- * Bottom navigation items
- */
-enum class BottomNavItem(val route: String, val label: String, val icon: String) {
-    HOME("home", "Home", "home"),
-    GENERATOR("generator", "Gerador", "tune"),
-    GAMES("games", "Jogos", "sports_casino"),
-    CHECKER("checker", "Conferência", "done_all"),
-    ABOUT("about", "Sobre", "info")
-}

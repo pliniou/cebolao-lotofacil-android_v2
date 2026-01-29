@@ -1,6 +1,5 @@
 package br.com.loterias.cebolaolotofacil.di
 
-import android.content.Context
 import androidx.room.Room
 import br.com.loterias.cebolaolotofacil.BuildConfig
 import br.com.loterias.cebolaolotofacil.data.LotofacilRepositoryImpl
@@ -29,13 +28,6 @@ import java.util.concurrent.TimeUnit
  * Configures all dependencies including network, database, and ViewModels
  */
 val appModule = module {
-
-    // Timber logging
-    single {
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-    }
 
     // Moshi for JSON serialization
     single {

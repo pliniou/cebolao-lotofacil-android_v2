@@ -50,6 +50,22 @@
 
     <!-- Home Screen -->
     <string name="home_subtitle">Sua sorte, suas estatísticas</string>
+    <string name="home_results_title">Resultados Lotofácil</string>
+    <string name="home_refresh_results_description">Atualizar resultados</string>
+    <string name="home_loading_results">Carregando resultados…</string>
+    <string name="home_error_title">Erro ao carregar</string>
+    <string name="home_retry">Tentar novamente</string>
+    <string name="home_empty_title">Nenhum resultado disponível</string>
+    <string name="home_empty_message">Verifique sua conexão ou tente novamente mais tarde</string>
+    <string name="home_results_end">Fim dos resultados</string>
+    <string name="home_draw_label">Concurso</string>
+    <string name="home_drawn_numbers_label">Números sorteados</string>
+    <string name="home_winners_label">Ganhadores</string>
+    <string name="home_rollover_label">Acumulado</string>
+
+    <string name="generator_title">Gerador de Combinações</string>
+    <string name="generator_subtitle">Crie combinações otimizadas de números</string>
+    <string name="generator_start">Começar</string>
     <string name="results_title">Todos os Resultados</string>
     <string name="results_error_message">Não foi possível carregar os resultados.</string>
     <string name="results_contest_number_format">Concurso %1$d</string>
@@ -277,17 +293,6 @@
     <string name="games_clear_confirm">Limpar</string>
     <string name="games_delete_dialog_title">Excluir Jogo?</string>
 
-    <!-- Widget Resources -->
-    <string name="widget_last_draw_title">Último concurso</string>
-    <string name="widget_next_contest_title_generic">Próximo</string>
-    <string name="widget_pinned_game_title">Fixado</string>
-    <string name="content_desc_refresh">Atualizar</string>
-    <string name="widget_next_contest_title">Próximo Concurso</string>
-    <string name="widget_no_pinned_games">Nenhum jogo fixado</string>
-    <string name="widget_last_draw_description" tools:keep="@string/widget_last_draw_description">Mostra o resultado do último sorteio da Lotofácil</string>
-    <string name="widget_next_contest_description" tools:keep="@string/widget_next_contest_description">Mostra informações sobre o próximo concurso</string>
-    <string name="widget_pinned_game_description" tools:keep="@string/widget_pinned_game_description">Exibe seus jogos fixados para acompanhamento rápido</string>
-
     <!-- Presets -->
     <string name="preset_standard">Padrão</string>
     <string name="preset_standard_desc">Estratégia mais comum, seguindo a média histórica da maioria dos sorteios.</string>
@@ -507,6 +512,18 @@
     <string name="about_privacy_title">Privacidade</string>
     <string name="about_privacy_desc">Nenhum dado pessoal é coletado. Jogos ficam salvos apenas localmente no seu dispositivo.</string>
     <string name="about_version_title">Versão</string>
+    <string name="about_app_name">Cebolão Lotofácil</string>
+    <string name="about_app_description">O Cebolão Lotofácil ajuda você a analisar e otimizar jogos da Lotofácil. Inclui ferramentas para ver resultados, gerar combinações e gerenciar seus jogos.</string>
+    <string name="about_features_title">Recursos</string>
+    <string name="about_feature_results_title">Resultados atualizados</string>
+    <string name="about_feature_results_desc">Acompanhe os últimos sorteios</string>
+    <string name="about_feature_generator_title">Gerador de combinações</string>
+    <string name="about_feature_generator_desc">Crie combinações otimizadas</string>
+    <string name="about_feature_games_title">Gerenciador de jogos</string>
+    <string name="about_feature_games_desc">Salve e organize seus jogos</string>
+    <string name="about_feature_checker_title">Conferidor</string>
+    <string name="about_feature_checker_desc">Confira se você ganhou</string>
+    <string name="about_built_with">Desenvolvido com Jetpack Compose</string>
 
     <!-- Confirmations (New) -->
 

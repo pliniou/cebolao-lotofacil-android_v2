@@ -65,15 +65,16 @@ android {
             excludes += listOf(
                 "/META-INF/{AL2.0,LGPL2.1}",
                 "/META-INF/proguard/androidx-*.pro",
-                "/META-INF/LICENSE.md"
+                "/META-INF/LICENSE.md",
+                "/META-INF/LICENSE-notice.md"
             )
         }
     }
 }
 
 dependencies {
-    // Compose BOM for version alignment (latest stable)
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    // Compose BOM for version alignment (includes Material3 1.3.0)
+    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
 
     // Core Android & Lifecycle
     implementation("androidx.core:core-ktx:1.13.1")
@@ -93,9 +94,6 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.animation:animation")
-
-    // Accompanist (SwipeRefresh for pull-to-refresh)
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
 
     // Splash Screen API
     implementation("androidx.core:core-splashscreen:1.0.1")

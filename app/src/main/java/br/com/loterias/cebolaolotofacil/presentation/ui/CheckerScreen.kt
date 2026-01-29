@@ -5,9 +5,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import br.com.loterias.cebolaolotofacil.R
 
 /**
  * Checker screen for verifying games against lottery results
@@ -22,7 +24,7 @@ fun CheckerScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Conferência de Jogos",
+            stringResource(R.string.checker_title),
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center
         )
@@ -30,7 +32,7 @@ fun CheckerScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            "Verifique se seus números foram sorteados",
+            stringResource(R.string.checker_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground
@@ -44,7 +46,7 @@ fun CheckerScreen(modifier: Modifier = Modifier) {
                 .fillMaxWidth(0.8f)
                 .height(48.dp)
         ) {
-            Text("Verificar")
+            Text(stringResource(R.string.checker_check_button))
         }
     }
 }

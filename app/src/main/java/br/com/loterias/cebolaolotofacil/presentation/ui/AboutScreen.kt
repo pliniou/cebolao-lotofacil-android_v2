@@ -7,9 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import br.com.loterias.cebolaolotofacil.BuildConfig
+import br.com.loterias.cebolaolotofacil.R
 
 /**
  * About screen with application information
@@ -27,7 +30,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            "Cebolão Lotofácil",
+            stringResource(R.string.about_app_name),
             style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center
         )
@@ -35,7 +38,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            "v1.2.0",
+            "v${BuildConfig.VERSION_NAME}",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -54,15 +57,14 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    "Sobre o Aplicativo",
+                    stringResource(R.string.about_title),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    "Cebolão Lotofácil é um aplicativo para análise e otimização de jogos na Lotofácil brasileira. " +
-                    "Oferece ferramentas modernas para gerar combinações, verificar resultados e gerenciar seus jogos.",
+                    stringResource(R.string.about_app_description),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Justify
                 )
@@ -84,22 +86,33 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "Recursos",
+                    stringResource(R.string.about_features_title),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
 
-                FeatureItem("🎯 Resultados Atualizados", "Acompanhe os últimos sorteios")
-                FeatureItem("🔮 Gerador de Combinações", "Crie combinações otimizadas")
-                FeatureItem("💾 Gerenciador de Jogos", "Salve e organize seus jogos")
-                FeatureItem("✅ Verificador", "Confira se você ganhou")
-                FeatureItem("🌙 Modo Noturno", "Interface adaptável")
+                FeatureItem(
+                    title = "🎯 ${stringResource(R.string.about_feature_results_title)}",
+                    description = stringResource(R.string.about_feature_results_desc)
+                )
+                FeatureItem(
+                    title = "🔮 ${stringResource(R.string.about_feature_generator_title)}",
+                    description = stringResource(R.string.about_feature_generator_desc)
+                )
+                FeatureItem(
+                    title = "💾 ${stringResource(R.string.about_feature_games_title)}",
+                    description = stringResource(R.string.about_feature_games_desc)
+                )
+                FeatureItem(
+                    title = "✅ ${stringResource(R.string.about_feature_checker_title)}",
+                    description = stringResource(R.string.about_feature_checker_desc)
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "Desenvolvido com ❤️ usando Jetpack Compose e clean architecture",
+            stringResource(R.string.about_built_with),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground

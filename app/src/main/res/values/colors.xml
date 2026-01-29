@@ -19,11 +19,6 @@
 
     <!-- MAPPINGS -->
     <color name="app_background">@color/surface_light</color>
-    <color name="widget_background">@color/surface_container_light</color>
-    <color name="widget_text_primary">@color/on_surface_light</color>
-    <color name="widget_text_secondary">@color/on_surface_variant_light</color>
-    <color name="widget_divider">@color/outline_light</color>
-    <color name="widget_icon_tint">@color/brand_primary</color>
     
     <!-- Number Ball Colors -->
     <color name="ball_text_selected">@color/brand_on_primary</color>

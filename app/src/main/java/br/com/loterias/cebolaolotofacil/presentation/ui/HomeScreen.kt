@@ -17,14 +17,15 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.com.loterias.cebolaolotofacil.R
 import br.com.loterias.cebolaolotofacil.domain.model.LotofacilResult
 import br.com.loterias.cebolaolotofacil.presentation.viewmodel.HomeViewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -38,21 +39,24 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Lotofácil Resultados") },
+                title = { Text(stringResource(R.string.home_results_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
                     IconButton(onClick = { viewModel.refreshResults() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh results")
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.home_refresh_results_description)
+                        )
                     }
                 }
             )
         }
     ) { padding ->
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing),
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
             onRefresh = { viewModel.refreshResults() },
             modifier = Modifier
                 .fillMaxSize()
@@ -74,8 +78,11 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                 else -> {
                     ResultsList(
                         results = state.results,
+                        isLoadingMore = state.isLoadingMore,
+                        canLoadMore = state.canLoadMore,
                         modifier = Modifier.fillMaxSize(),
-                        onResultClick = { viewModel.selectResult(it) }
+                        onResultClick = { viewModel.selectResult(it) },
+                        onLoadMore = { viewModel.loadMore() }
                     )
                 }
             }
@@ -102,7 +109,7 @@ fun LoadingIndicator(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Carregando resultados...",
+                stringResource(R.string.home_loading_results),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -137,7 +144,7 @@ fun ErrorScreen(
                 tint = MaterialTheme.colorScheme.error
             )
             Text(
-                "Erro ao carregar",
+                stringResource(R.string.home_error_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -155,7 +162,7 @@ fun ErrorScreen(
                     .clip(RoundedCornerShape(8.dp))
                     .height(48.dp)
             ) {
-                Text("Tentar Novamente")
+                Text(stringResource(R.string.home_retry))
             }
         }
     }
@@ -176,13 +183,13 @@ fun EmptyStateScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                "Nenhum resultado disponível",
+                stringResource(R.string.home_empty_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Verifique sua conexão ou tente novamente mais tarde",
+                stringResource(R.string.home_empty_message),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground
@@ -197,20 +204,21 @@ fun EmptyStateScreen(modifier: Modifier = Modifier) {
 @Composable
 fun ResultsList(
     results: List<LotofacilResult>,
+    isLoadingMore: Boolean,
+    canLoadMore: Boolean,
     modifier: Modifier = Modifier,
     onResultClick: (LotofacilResult) -> Unit = {},
-    viewModel: HomeViewModel = koinViewModel()
+    onLoadMore: () -> Unit = {}
 ) {
-    val state = viewModel.uiState.collectAsState().value
     val listState = rememberLazyListState()
 
     // Load more when user scrolls near the end
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, results.size, isLoadingMore, canLoadMore) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collect { lastVisibleIndex ->
                 if (lastVisibleIndex != null && lastVisibleIndex >= results.size - 3) {
-                    if (!state.isLoadingMore && state.canLoadMore) {
-                        viewModel.loadMore()
+                    if (!isLoadingMore && canLoadMore) {
+                        onLoadMore()
                     }
                 }
             }
@@ -236,7 +244,7 @@ fun ResultsList(
         }
 
         // Loading indicator at the bottom
-        if (state.isLoadingMore) {
+        if (isLoadingMore) {
             item {
                 Box(
                     modifier = Modifier
@@ -253,7 +261,7 @@ fun ResultsList(
         }
 
         // No more items indicator
-        if (!state.canLoadMore && results.isNotEmpty()) {
+        if (!canLoadMore && results.isNotEmpty()) {
             item {
                 Box(
                     modifier = Modifier
@@ -262,7 +270,7 @@ fun ResultsList(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Fim dos resultados",
+                        stringResource(R.string.home_results_end),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -302,7 +310,7 @@ fun ResultCard(
             ) {
                 Column {
                     Text(
-                        "Concurso",
+                        stringResource(R.string.home_draw_label),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -323,14 +331,14 @@ fun ResultCard(
                 )
             }
 
-            Divider(
+            HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant,
                 thickness = 0.5.dp
             )
 
             // Numbers grid
             Text(
-                "Números sorteados",
+                stringResource(R.string.home_drawn_numbers_label),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -352,10 +360,13 @@ fun ResultCard(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     result.ganhadores?.let {
-                        InfoItem(label = "Ganhadores", value = it.toString())
+                        InfoItem(label = stringResource(R.string.home_winners_label), value = it.toString())
                     }
                     result.valorAcumulado?.let {
-                        InfoItem(label = "Acumulado", value = "R$ %.2f".format(it))
+                        InfoItem(
+                            label = stringResource(R.string.home_rollover_label),
+                            value = "R$ %.2f".format(it)
+                        )
                     }
                 }
             }
@@ -380,7 +391,7 @@ fun NumbersGrid(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                row.forEachIndexed { index, number ->
+                row.forEachIndexed { _, number ->
                     NumberBall(
                         number = number,
                         modifier = Modifier

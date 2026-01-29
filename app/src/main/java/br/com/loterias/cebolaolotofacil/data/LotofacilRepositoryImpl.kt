@@ -6,6 +6,7 @@ import br.com.loterias.cebolaolotofacil.domain.model.LotofacilResult
 import br.com.loterias.cebolaolotofacil.domain.repository.LotofacilRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
@@ -23,32 +24,23 @@ class LotofacilRepositoryImpl(
      * Tries local cache first, then falls back to API with retry logic
      */
     override fun getRecentResults(): Flow<List<LotofacilResult>> = flow {
-        var hasCachedData = false
-        
         try {
-            // Try to fetch fresh data from API first
+            // Busca dados frescos e atualiza o cache local.
             val freshResults = apiService.getRecentResults(limit = 10)
             val entity = freshResults.toEntity()
             localDao.insertResult(entity)
             emit(listOf(entity.toDomain()))
-            hasCachedData = true
         } catch (apiException: Exception) {
             Timber.w(apiException, "Failed to fetch from API, attempting to use cached data")
-        }
 
-        // Emit cached data if API failed
-        if (!hasCachedData) {
-            try {
-                localDao.getRecentResults(limit = 10).collect { cachedResults ->
-                    if (cachedResults.isNotEmpty()) {
-                        emit(cachedResults.map { it.toDomain() })
-                    } else {
-                        throw Exception("No cached data and API fetch failed")
-                    }
-                }
-            } catch (exception: Exception) {
-                Timber.e(exception, "Error fetching recent results")
-                throw exception
+            // Emite apenas um snapshot do cache para evitar "collect" infinito.
+            val cachedResults = localDao.getRecentResults(limit = 10).first()
+            if (cachedResults.isNotEmpty()) {
+                emit(cachedResults.map { it.toDomain() })
+            } else {
+                val error = IllegalStateException("No cached data and API fetch failed")
+                Timber.e(error, "Error fetching recent results")
+                throw error
             }
         }
     }

@@ -49,6 +49,22 @@
 
     <!-- Home Screen -->
     <string name="home_subtitle">Your luck, your statistics</string>
+    <string name="home_results_title">Lotofácil Results</string>
+    <string name="home_refresh_results_description">Refresh results</string>
+    <string name="home_loading_results">Loading results…</string>
+    <string name="home_error_title">Failed to load</string>
+    <string name="home_retry">Try again</string>
+    <string name="home_empty_title">No results available</string>
+    <string name="home_empty_message">Check your connection or try again later</string>
+    <string name="home_results_end">End of results</string>
+    <string name="home_draw_label">Draw</string>
+    <string name="home_drawn_numbers_label">Drawn numbers</string>
+    <string name="home_winners_label">Winners</string>
+    <string name="home_rollover_label">Rollover</string>
+
+    <string name="generator_title">Combination Generator</string>
+    <string name="generator_subtitle">Create optimized number combinations</string>
+    <string name="generator_start">Start</string>
     <string name="results_title">All Results</string>
     <string name="results_error_message">Could not load results.</string>
     <string name="results_contest_number_format">Draw %1$d</string>
@@ -274,20 +290,6 @@
     <string name="games_clear_confirm">Clear</string>
     <string name="games_delete_dialog_title">Delete Game?</string>
 
-    <!-- Widget Resources -->
-    <string name="widget_last_draw_title">Last Draw</string>
-    <string name="widget_next_contest_title_generic">Next</string>
-    <string name="widget_pinned_game_title">Pinned</string>
-    <string name="content_desc_refresh">Refresh</string>
-    <string name="widget_next_contest_title">Next Draw</string>
-    <string name="widget_no_pinned_games">No pinned games</string>
-    <string name="widget_last_draw_description" tools:keep="@string/widget_last_draw_description">Shows the latest Lotofácil result</string>
-    <string name="widget_next_contest_description" tools:keep="@string/widget_next_contest_description">Shows info about the next draw</string>
-    <string name="widget_pinned_game_description" tools:keep="@string/widget_pinned_game_description">Shows your pinned games</string>
-    <string name="widget_placeholder_dash" translatable="false">--</string>
-    <string name="widget_placeholder_date" translatable="false">--/--</string>
-    <string name="widget_placeholder_number" translatable="false">00</string>
-
     <!-- Presets -->
     <string name="preset_standard">Standard</string>
     <string name="preset_standard_desc">Most common strategy, following historical average.</string>
@@ -504,6 +506,18 @@
     <string name="about_privacy_title">Privacy</string>
     <string name="about_privacy_desc">No personal data collected. Games are saved locally.</string>
     <string name="about_version_title">Version</string>
+    <string name="about_app_name">Cebolão Lotofácil</string>
+    <string name="about_app_description">Cebolão Lotofácil helps you analyze and optimize Lotofácil games. It includes tools to check results, generate combinations, and manage your games.</string>
+    <string name="about_features_title">Features</string>
+    <string name="about_feature_results_title">Updated results</string>
+    <string name="about_feature_results_desc">Follow the latest draws</string>
+    <string name="about_feature_generator_title">Combination generator</string>
+    <string name="about_feature_generator_desc">Create optimized combinations</string>
+    <string name="about_feature_games_title">Game manager</string>
+    <string name="about_feature_games_desc">Save and organize your games</string>
+    <string name="about_feature_checker_title">Checker</string>
+    <string name="about_feature_checker_desc">Check if you won</string>
+    <string name="about_built_with">Built with Jetpack Compose</string>
 
     <!-- Confirmations (New) -->
 
