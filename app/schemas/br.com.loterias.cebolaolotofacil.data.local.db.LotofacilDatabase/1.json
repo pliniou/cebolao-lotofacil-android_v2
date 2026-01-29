@@ -1,0 +1,82 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "d1fbc553faa10dee81b7a95a7808db1e",
+    "entities": [
+      {
+        "tableName": "lotofacil_results",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`concurso` INTEGER NOT NULL, `dezenas` TEXT NOT NULL, `data` TEXT NOT NULL, `valor_acumulado` REAL, `valor_premio_principal` REAL, `ganhadores` INTEGER, `data_proximo_sorteio` TEXT, `sync_timestamp` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, PRIMARY KEY(`concurso`))",
+        "fields": [
+          {
+            "fieldPath": "concurso",
+            "columnName": "concurso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dezenas",
+            "columnName": "dezenas",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "data",
+            "columnName": "data",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valorAcumulado",
+            "columnName": "valor_acumulado",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "valorPremioPrincipal",
+            "columnName": "valor_premio_principal",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ganhadores",
+            "columnName": "ganhadores",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataProximoSorteio",
+            "columnName": "data_proximo_sorteio",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "syncTimestamp",
+            "columnName": "sync_timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "is_favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "concurso"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd1fbc553faa10dee81b7a95a7808db1e')"
+    ]
+  }
+}
