@@ -22,7 +22,7 @@ class WidgetManifestTest {
 
         for (cls in classes) {
             try {
-                val cn = ComponentName(context, cls)
+                val cn = ComponentName(context, cls.name)
                 val info = pm.getReceiverInfo(cn, 0)
                 assertNotNull(info)
             } catch (e: Exception) {
